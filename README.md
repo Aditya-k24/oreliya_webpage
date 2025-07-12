@@ -26,6 +26,91 @@ This project uses a **pnpm monorepo** structure with the following workspaces:
 - **TypeScript** - Type safety
 - **PostgreSQL 16** - Database
 - **Prisma** - Database ORM
+- **Winston** - Logging
+- **Helmet, Morgan, CORS** - Security & logging middleware
+
+#### API Structure & Best Practices
+
+The API follows a modular, scalable structure:
+
+```
+apps/api/src/
+├── config/         # Configuration (logger, database, etc.)
+├── controllers/    # Route controllers (business logic)
+├── middlewares/    # Express middlewares (error, async, etc.)
+├── repositories/   # Data access layer
+├── routes/         # Route definitions
+├── services/       # Service layer (domain logic)
+├── utils/          # Utility functions (error classes, helpers)
+├── types/          # TypeScript types/interfaces
+├── server.ts       # Main Express app entry point
+```
+
+- **Winston logger** for structured logging
+- **Global error handler** and custom error classes
+- **Async wrapper** for safe async route handling
+- **Health check endpoint** at `/api/health`
+- **TypeScript** throughout for safety and maintainability
+
+#### Example: Health Check Endpoint
+
+- **Route:** `GET /api/health`
+- **Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "healthy",
+    "timestamp": "2025-07-12T21:38:07.819Z",
+    "uptime": 2.13,
+    "services": {
+      "database": { "status": "connected", "responseTime": 75 },
+      "memory": { "used": 13, "total": 31, "percentage": 43.81 }
+    }
+  }
+}
+```
+
+#### Extending the API
+
+- Add new business logic in `controllers/`, `services/`, and `repositories/`
+- Register new routes in `routes/`
+- Use the async wrapper and error handler for robust error management
+- All new code should use TypeScript types from `types/`
+
+#### Error Handling, Async Wrapper, and Logger
+
+- **Global error handler**: All errors are caught and formatted as JSON responses. Custom errors extend `CustomError` in `utils/errors.ts`.
+- **Async wrapper**: Use `asyncWrapper` from `middlewares/asyncWrapper.ts` to wrap all async route handlers for automatic error forwarding.
+- **Winston logger**: Use `logger` from `config/logger.ts` for structured logging (info, warn, error, debug).
+
+**Example error response:**
+
+```json
+{
+  "success": false,
+  "message": "Route /api/unknown not found",
+  "code": "NOT_FOUND"
+}
+```
+
+**Adding new middleware or error types:**
+
+- Place new middleware in `middlewares/` and use in `server.ts` or specific routes.
+- Add new error classes in `utils/errors.ts` as needed, extending `CustomError`.
+
+#### Troubleshooting: Port Conflicts
+
+- If you see errors like `EADDRINUSE`, another process is using the port. Stop the process or let the server auto-select a new port.
+- You can kill all Node/Vite dev servers with:
+  ```bash
+  pkill -f tsx
+  pkill -f vite
+  ```
+- Then restart with `pnpm --filter api dev` and `pnpm --filter web dev`.
+
+---
 
 ### Development Tools
 
@@ -179,7 +264,15 @@ oreliya_webpage/
 ├── apps/
 │   ├── api/                         # Node.js backend
 │   │   ├── src/
-│   │   │   ├── index.ts            # Express server entry point
+│   │   │   ├── config/             # Configuration (logger, database, etc.)
+│   │   │   ├── controllers/        # Route controllers (business logic)
+│   │   │   ├── middlewares/        # Express middlewares (error, async, etc.)
+│   │   │   ├── repositories/       # Data access layer
+│   │   │   ├── routes/             # Route definitions
+│   │   │   ├── services/           # Service layer (domain logic)
+│   │   │   ├── utils/              # Utility functions (error classes, helpers)
+│   │   │   ├── types/              # TypeScript types/interfaces
+│   │   │   ├── server.ts           # Main Express app entry point
 │   │   │   └── lib/
 │   │   │       └── prisma.ts       # Prisma client instance
 │   │   ├── prisma/

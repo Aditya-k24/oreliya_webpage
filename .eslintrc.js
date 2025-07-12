@@ -46,6 +46,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     'no-console': 'warn',
     'no-debugger': 'error',
+    'max-classes-per-file': 'off',
   },
   ignorePatterns: [
     'dist',
