@@ -472,3 +472,83 @@ The seed script creates comprehensive demo data including:
 ## 📄 License
 
 This project is licensed under the MIT License.
+
+## 🔐 Authentication System
+
+The backend API implements a robust authentication and authorization system with the following features:
+
+- **User Signup** (`POST /api/auth/signup`): Register a new user, validate input, hash password, assign default role, return JWT tokens.
+- **User Login** (`POST /api/auth/login`): Authenticate user, check password, return JWT tokens.
+- **User Logout** (`POST /api/auth/logout`): Invalidate refresh token.
+- **Token Refresh** (`POST /api/auth/refresh`): Exchange a valid refresh token for new access/refresh tokens.
+- **Get Current User** (`GET /api/auth/me`): Return authenticated user's profile (requires access token).
+- **Role-Based Access Control (RBAC)**: Middleware to restrict routes to users with specific roles (e.g., `requireUser`, `requireAdmin`).
+- **Password Hashing**: All passwords are securely hashed with bcrypt.
+- **JWT Authentication**: Access and refresh tokens are signed and verified using environment secrets.
+- **Prisma Repository Pattern**: All DB access is abstracted in repositories for testability and maintainability.
+- **Comprehensive Error Handling**: Custom error classes and global error handler for consistent API responses.
+
+### Example Auth Endpoints
+
+#### Signup
+
+```http
+POST /api/auth/signup
+Content-Type: application/json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "1234567890"
+}
+```
+
+#### Login
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+#### Logout
+
+```http
+POST /api/auth/logout
+Content-Type: application/json
+{
+  "refreshToken": "<refresh_token>"
+}
+```
+
+#### Refresh Token
+
+```http
+POST /api/auth/refresh
+Content-Type: application/json
+{
+  "refreshToken": "<refresh_token>"
+}
+```
+
+#### Get Current User
+
+```http
+GET /api/auth/me
+Authorization: Bearer <access_token>
+```
+
+### Testing
+
+- All authentication endpoints and logic are covered by Jest and Supertest tests.
+- Run all tests with:
+  ```bash
+  pnpm --filter api test
+  ```
+- All tests must pass before commit (see CI pipeline).
+
+---

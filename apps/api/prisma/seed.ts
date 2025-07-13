@@ -10,6 +10,15 @@ async function main() {
   // Create roles
   // eslint-disable-next-line no-console
   console.log('Creating roles...');
+  await prisma.role.upsert({
+    where: { name: 'user' },
+    update: {},
+    create: {
+      name: 'user',
+      description: 'Regular user with basic permissions',
+    },
+  });
+
   const customerRole = await prisma.role.upsert({
     where: { name: 'customer' },
     update: {},
@@ -19,7 +28,7 @@ async function main() {
     },
   });
 
-  await prisma.role.upsert({
+  const adminRole = await prisma.role.upsert({
     where: { name: 'admin' },
     update: {},
     create: {
@@ -42,7 +51,7 @@ async function main() {
       firstName: 'Admin',
       lastName: 'User',
       phone: '+1234567890',
-      roleId: customerRole.id, // Use customerRole for demo, or fetch adminRole if needed
+      roleId: adminRole.id,
       isActive: true,
       emailVerified: true,
     },
