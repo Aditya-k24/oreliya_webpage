@@ -7,6 +7,7 @@ import wishlistRoutes from './wishlistRoutes';
 import orderRoutes from './orderRoutes';
 import webhookRoutes from './webhookRoutes';
 import addressRoutes from './addressRoutes';
+import adminRoutes from './adminRoutes';
 
 const router: ExpressRouter = Router();
 
@@ -33,6 +34,9 @@ router.use('/addresses', addressRoutes);
 
 // Webhook routes
 router.use('/webhooks', webhookRoutes);
+
+// Admin routes
+router.use('/admin', adminRoutes);
 
 // API routes
 router.get('/hello', (req, res) => {

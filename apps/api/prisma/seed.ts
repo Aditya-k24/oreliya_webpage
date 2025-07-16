@@ -22,7 +22,7 @@ async function main() {
     update: {},
     create: {
       email: 'admin@oreliya.com',
-      password: '$2a$10$rQZ8NwYz8NwYz8NwYz8NwO', // hashed 'password123'
+      password: '$2a$10$41L7Iar.xk8c4n0zzVBrPOcn5y6dncxVbF/l0/2WBrePeos3ofHs6', // bcrypt hash for 'password123'
       firstName: 'Admin',
       lastName: 'User',
       roleId: (await prisma.role.findUnique({ where: { name: 'admin' } }))!.id,

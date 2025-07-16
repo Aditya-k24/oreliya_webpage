@@ -1,6 +1,77 @@
-# Oreliya - Full Stack Monorepo
+# Oreliya - Full Stack E-commerce Monorepo
 
-A modern, scalable full-stack application built with TypeScript, React, Node.js, and PostgreSQL.
+A modern, scalable full-stack e-commerce application built with TypeScript, React, Node.js, and PostgreSQL.
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Node.js 20+**
+- **pnpm** (recommended) or npm
+- **PostgreSQL 16+**
+- **Git**
+
+### Installation & Setup
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd oreliya_webpage
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   pnpm install
+   ```
+
+3. **Set up environment variables**
+
+   ```bash
+   cd apps/api
+   cp env.example .env
+   ```
+
+   Update `.env` with your database and Stripe credentials:
+
+   ```env
+   DATABASE_URL="postgresql://username:password@localhost:5432/oreliya"
+   JWT_SECRET="your-jwt-secret"
+   STRIPE_SECRET_KEY="sk_test_..."
+   STRIPE_WEBHOOK_SECRET="whsec_..."
+   ```
+
+4. **Set up the database**
+
+   ```bash
+   cd apps/api
+   pnpm db:generate
+   pnpm db:push
+   pnpm db:seed
+   ```
+
+5. **Start the development servers**
+
+   ```bash
+   # Start API server (from apps/api directory)
+   pnpm dev
+
+   # Start web app (from apps/web directory, in new terminal)
+   cd apps/web
+   pnpm dev
+   ```
+
+6. **Run tests**
+
+   ```bash
+   # Test all API endpoints
+   cd apps/api
+   ./test-api.sh
+
+   # Test admin functionality
+   pnpm tsx src/scripts/test-admin-api.ts
+   ```
 
 ## 🏗️ Architecture
 
@@ -28,6 +99,162 @@ This project uses a **pnpm monorepo** structure with the following workspaces:
 - **Prisma** - Database ORM
 - **Winston** - Logging
 - **Helmet, Morgan, CORS** - Security & logging middleware
+- **Stripe** - Payment processing
+- **JWT** - Authentication
+
+## 🛍️ E-commerce Features
+
+### Core Features
+
+- **Product Management** - Full CRUD with variants and customizations
+- **Shopping Cart** - Add, update, remove items
+- **Wishlist** - Save favorite products
+- **Order Management** - Create and track orders
+- **Address Management** - Multiple shipping/billing addresses
+- **User Authentication** - JWT-based auth with refresh tokens
+- **Stripe Integration** - Secure payment processing
+- **Admin Dashboard** - Complete admin panel
+
+### Admin Dashboard
+
+The application includes a comprehensive **Admin Dashboard** with full management capabilities.
+
+#### Admin Features
+
+- **📊 Analytics Dashboard**
+  - Daily sales statistics (last 7 days)
+  - Top products by quantity sold
+  - Low inventory alerts (stock < 5)
+  - Real-time data aggregation
+
+- **🎯 Deals Management**
+  - Create percentage/fixed discounts
+  - Set usage limits and date ranges
+  - Track deal usage and performance
+  - Full CRUD operations
+
+- **⚙️ Customization Management**
+  - Product customization presets
+  - Engraving, color, and option configurations
+  - Price adjustment controls
+  - Template management
+
+- **👥 Role Management**
+  - Create and manage user roles
+  - Role-based access control
+  - Permission management
+  - User role assignments
+
+#### Admin API Endpoints
+
+```http
+# Analytics & Stats
+GET    /api/admin/stats                    # Dashboard statistics
+
+# Deals Management
+GET    /api/admin/deals                    # List all deals
+POST   /api/admin/deals                    # Create new deal
+PUT    /api/admin/deals/:id                # Update deal
+DELETE /api/admin/deals/:id                # Delete deal
+
+# Customization Management
+GET    /api/admin/customizations           # List customizations
+POST   /api/admin/customizations           # Create customization
+PUT    /api/admin/customizations/:id       # Update customization
+DELETE /api/admin/customizations/:id       # Delete customization
+
+# Role Management
+GET    /api/admin/roles                    # List all roles
+POST   /api/admin/roles                    # Create new role
+PUT    /api/admin/roles/:id                # Update role
+DELETE /api/admin/roles/:id                # Delete role
+```
+
+#### Admin Authentication
+
+- **Default Admin Credentials:**
+  - Email: `admin@oreliya.com`
+  - Password: `password123`
+
+- **Admin Access:**
+  - All admin endpoints require authentication
+  - JWT token with admin role required
+  - Role-based middleware protection
+
+#### Example Admin Usage
+
+```bash
+# Login as admin
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@oreliya.com", "password": "password123"}'
+
+# Get admin stats
+curl -X GET http://localhost:3001/api/admin/stats \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+
+# Create a deal
+curl -X POST http://localhost:3001/api/admin/deals \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Summer Sale",
+    "description": "20% off all jewelry",
+    "type": "percentage",
+    "value": 20,
+    "minAmount": 100,
+    "maxDiscount": 500,
+    "startDate": "2024-06-01T00:00:00Z",
+    "endDate": "2024-08-31T23:59:59Z",
+    "isActive": true,
+    "usageLimit": 1000
+  }'
+```
+
+## 🧪 Testing
+
+### Automated Testing
+
+The project includes comprehensive automated testing:
+
+```bash
+# Test all API endpoints
+cd apps/api
+./test-api.sh
+
+# Test admin functionality
+pnpm tsx src/scripts/test-admin-api.ts
+
+# Run individual test suites
+pnpm test:api          # Main API tests
+pnpm test              # Jest unit tests
+pnpm test:coverage     # Test coverage
+```
+
+### Test Coverage
+
+- **✅ Health Check** - API status verification
+- **✅ Authentication** - User signup, login, token refresh
+- **✅ Product Management** - CRUD operations, filtering, search
+- **✅ Cart Management** - Add, update, remove items
+- **✅ Wishlist Management** - Add, remove, check items
+- **✅ Address Management** - Full CRUD operations
+- **✅ Order Management** - Order creation and tracking
+- **✅ Webhook Integration** - Stripe webhook handling
+- **✅ Admin Dashboard** - All admin endpoints and features
+
+### Test Results
+
+```
+📊 Test Results Summary:
+========================
+Total Tests: 17
+Passed: 17
+Failed: 0
+Success Rate: 100.0%
+
+🎉 All tests passed! API is working correctly.
+```
 
 ## 🛍️ Product API
 
@@ -455,328 +682,6 @@ apps/api/src/
 
 - **Docker** - Containerization
 - **Docker Compose** - Multi-container orchestration
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+
-- pnpm 8+
-- Docker & Docker Compose (for full stack)
-
-### Installation
-
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd oreliya
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   pnpm install
-   ```
-
-3. **Set up environment variables**
-
-   ```bash
-   cp apps/api/env.example apps/api/.env
-   # Edit the .env file with your configuration
-   ```
-
-4. **Set up the database**
-
-   ```bash
-   # Start PostgreSQL with Docker
-   pnpm docker:up
-
-   # Run database migrations
-   pnpm --filter api db:migrate
-
-   # Seed the database with demo data
-   pnpm --filter api db:seed
-   ```
-
-### Development
-
-#### Start all services
-
-```bash
-# Start frontend and backend in parallel
-pnpm dev
-
-# Frontend will be available at http://localhost:5173
-# Backend will be available at http://localhost:3000
-# Database will be available at localhost:5432
-```
-
-#### Start individual services
-
-```bash
-# Frontend only
-pnpm --filter web dev
-
-# Backend only
-pnpm --filter api dev
-```
-
-#### Docker (Full Stack)
-
-```bash
-# Build and start all services
-pnpm docker:build
-pnpm docker:up
-
-# View logs
-pnpm docker:logs
-
-# Stop services
-pnpm docker:down
-```
-
-## 📜 Available Scripts
-
-### Root Level
-
-```bash
-pnpm dev          # Start all services in development mode
-pnpm build        # Build all packages
-pnpm test         # Run tests across all packages
-pnpm lint         # Lint all packages
-pnpm lint:fix     # Fix linting issues
-pnpm type-check   # Run TypeScript type checking
-pnpm clean        # Clean all build artifacts
-```
-
-### Docker Commands
-
-```bash
-pnpm docker:build # Build Docker images
-pnpm docker:up    # Start Docker services
-pnpm docker:down  # Stop Docker services
-pnpm docker:logs  # View Docker logs
-```
-
-### Individual Workspace Commands
-
-```bash
-# Web app
-pnpm --filter web dev
-pnpm --filter web build
-pnpm --filter web preview
-
-# API
-pnpm --filter api dev
-pnpm --filter api build
-pnpm --filter api start
-
-# Database
-pnpm --filter api db:generate    # Generate Prisma client
-pnpm --filter api db:migrate     # Run migrations
-pnpm --filter api db:seed        # Seed database
-pnpm --filter api db:studio      # Open Prisma Studio
-pnpm --filter api db:reset       # Reset database
-```
-
-## 🏗️ Project Structure
-
-```
-oreliya_webpage/
-├── .husky/                          # Git hooks
-│   ├── pre-commit                   # Pre-commit linting
-│   └── commit-msg                   # Commit message validation
-├── apps/
-│   ├── api/                         # Node.js backend
-│   │   ├── src/
-│   │   │   ├── config/             # Configuration (logger, database, etc.)
-│   │   │   ├── controllers/        # Route controllers (business logic)
-│   │   │   ├── middlewares/        # Express middlewares (error, async, etc.)
-│   │   │   ├── repositories/       # Data access layer
-│   │   │   ├── routes/             # Route definitions
-│   │   │   ├── services/           # Service layer (domain logic)
-│   │   │   ├── utils/              # Utility functions (error classes, helpers)
-│   │   │   ├── types/              # TypeScript types/interfaces
-│   │   │   ├── server.ts           # Main Express app entry point
-│   │   │   └── lib/
-│   │   │       └── prisma.ts       # Prisma client instance
-│   │   ├── prisma/
-│   │   │   ├── schema.prisma       # Database schema
-│   │   │   └── seed.ts             # Database seed script
-│   │   ├── package.json            # API dependencies
-│   │   ├── tsconfig.json           # TypeScript config
-│   │   └── env.example             # Environment variables template
-│   └── web/                         # React frontend
-│       ├── src/
-│       │   ├── App.tsx             # Main React component
-│       │   ├── main.tsx            # React entry point
-│       │   └── index.css           # Global styles
-│       ├── public/
-│       ├── package.json            # Web dependencies
-│       ├── tsconfig.json           # TypeScript config
-│       ├── tsconfig.node.json      # Node tools config
-│       ├── vite.config.ts          # Vite configuration
-│       └── index.html              # HTML template
-├── packages/
-│   └── ui/                          # Shared UI components
-│       ├── src/
-│       │   ├── components/
-│       │   │   └── Button.tsx      # Button component
-│       │   ├── styles/
-│       │   │   └── button.css      # Button styles
-│       │   └── index.ts            # Package exports
-│       ├── package.json            # UI package config
-│       └── tsconfig.json           # TypeScript config
-├── .editorconfig                   # Editor configuration
-├── .eslintrc.js                    # ESLint (Airbnb + TypeScript)
-├── .gitignore                      # Git ignore rules
-├── .lintstagedrc.js                # Pre-commit linting config
-├── .prettierrc                     # Code formatting rules
-├── commitlint.config.js            # Commit message rules
-├── docker-compose.yml              # Docker services (PostgreSQL + API)
-├── Dockerfile                      # API Docker image (Node 20-slim)
-├── package.json                    # Root monorepo config
-├── pnpm-workspace.yaml             # pnpm workspace definition
-├── README.md                       # Comprehensive documentation
-└── tsconfig.json                   # Root TypeScript configuration
-```
-
-## 🔧 Configuration
-
-### Code Quality
-
-- **ESLint**: Airbnb + TypeScript rules
-- **Prettier**: Consistent code formatting
-- **Husky**: Pre-commit hooks for linting and formatting
-- **commitlint**: Conventional commit messages
-
-### Docker
-
-- **API**: Node.js 20-slim with pnpm
-- **Database**: PostgreSQL 16-alpine with health checks
-- **Networking**: Isolated Docker network
-
-### Database
-
-- **ORM**: Prisma with PostgreSQL
-- **Migrations**: Version-controlled schema changes
-- **Seeding**: Automated demo data population
-- **Studio**: Visual database management tool
-
-## 📝 Development Guidelines
-
-### Code Style
-
-- Use TypeScript for all new code
-- Follow Airbnb ESLint rules
-- Use Prettier for formatting
-- Write conventional commit messages
-
-### Git Workflow
-
-1. Create feature branch from `main`
-2. Make changes with proper commits
-3. Run `pnpm lint` and `pnpm type-check`
-4. Create pull request
-5. Ensure CI passes
-
-### Adding New Dependencies
-
-```bash
-# Add to specific workspace
-pnpm --filter <workspace-name> add <package-name>
-
-# Add dev dependency
-pnpm --filter <workspace-name> add -D <package-name>
-
-# Add to root (shared dev dependencies)
-pnpm add -D <package-name>
-```
-
-### Database Operations
-
-```bash
-# Generate Prisma client after schema changes
-pnpm --filter api db:generate
-
-# Create and apply new migration
-pnpm --filter api db:migrate
-
-# Reset database and re-seed
-pnpm --filter api db:reset
-
-# Open Prisma Studio for database management
-pnpm --filter api db:studio
-```
-
-## 🐳 Docker Services
-
-### API Service
-
-- **Port**: 3000
-- **Health Check**: `GET /health`
-- **Environment**: Production-ready with security headers
-
-### PostgreSQL Database
-
-- **Port**: 5432
-- **Database**: `oreliya_db`
-- **Health Check**: Automatic with `pg_isready`
-- **Persistence**: Docker volume
-- **Schema**: 16 models with relationships
-
-## 🔍 API Endpoints
-
-### Health & Status
-
-- `GET /health` - Health check with database connection status
-- `GET /api/db-test` - Database connection test with record counts
-
-### Sample Endpoints
-
-- `GET /api/hello` - Sample endpoint
-
-### Database Management
-
-- `POST /api/db/migrate` - Run database migrations (planned)
-- `POST /api/db/seed` - Seed database with demo data (planned)
-
-## 🗄️ Database Schema
-
-The application uses **Prisma ORM** with PostgreSQL and includes a comprehensive e-commerce schema:
-
-### Core Models (16 total)
-
-- **Users & Authentication**: `User`, `Role`, `RefreshToken`
-- **Addresses**: `Address` (billing/shipping)
-- **Products**: `Product`, `ProductImage`, `ProductVariant`, `Customization`
-- **Categories**: `Category` (hierarchical structure)
-- **E-commerce**: `Cart`, `CartItem`, `Order`, `OrderItem`
-- **User Features**: `Wishlist`, `Review`
-- **Promotions**: `Deal`
-
-### Key Features
-
-- **Relationships**: Proper foreign keys with cascade deletes
-- **Data Types**: Decimal for prices, JSON for complex data
-- **Constraints**: Unique constraints, required fields
-- **Audit Fields**: Created/updated timestamps
-- **Customizations**: Support for product personalization (engraving, etc.)
-
-### Demo Data
-
-The seed script creates comprehensive demo data including:
-
-- Admin and customer users
-- Sample products (jewelry, watches)
-- Complete e-commerce flow (cart, orders, reviews)
-- Product customizations and variants
-
-**Demo Credentials:**
-
-- **Admin**: `admin@oreliya.com` / `password123`
-- **Customer**: `customer@oreliya.com` / `password123`
 
 ## 📚 Next Steps
 

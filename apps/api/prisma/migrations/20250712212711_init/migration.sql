@@ -341,3 +341,9 @@ ALTER TABLE "reviews" ADD CONSTRAINT "reviews_productId_fkey" FOREIGN KEY ("prod
 
 -- AddForeignKey
 ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Sample indexes for admin analytics performance
+CREATE INDEX IF NOT EXISTS idx_order_createdAt ON "Order" ("createdAt");
+CREATE INDEX IF NOT EXISTS idx_orderItem_productId ON "OrderItem" ("productId");
+CREATE INDEX IF NOT EXISTS idx_productVariant_stockQuantity ON "ProductVariant" ("stockQuantity");
+CREATE INDEX IF NOT EXISTS idx_deal_createdAt ON "Deal" ("createdAt");
