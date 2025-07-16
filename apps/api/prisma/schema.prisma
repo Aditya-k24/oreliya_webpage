@@ -94,37 +94,32 @@ model Category {
   parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   children Category[] @relation("CategoryHierarchy")
 
-  // Relations
-  products Product[]
-
   @@map("categories")
 }
 
 // Main products
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  slug        String   @unique
-  sku         String   @unique
-  price       Decimal  @db.Decimal(10, 2)
-  comparePrice Decimal? @db.Decimal(10, 2)
-  costPrice   Decimal? @db.Decimal(10, 2)
-  weight      Decimal? @db.Decimal(8, 2)
-  dimensions  Json?    // {length, width, height}
-  isActive    Boolean  @default(true)
-  isFeatured  Boolean  @default(false)
-  stockQuantity Int    @default(0)
-  lowStockThreshold Int @default(5)
-  categoryId  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String   @id @default(cuid())
+  name              String
+  slug              String   @unique
+  description       String
+  shortDescription  String?
+  price             Decimal  @db.Decimal(10, 2)
+  compareAtPrice    Decimal? @db.Decimal(10, 2)
+  images            String[] // Array of image URLs
+  category          String   // Simple string category
+  tags              String[] // Array of tags
+  isActive          Boolean  @default(true)
+  isFeatured        Boolean  @default(false)
+  isOnSale          Boolean  @default(false)
+  salePercentage    Int?     // Percentage discount
+  metadata          Json?    // Additional metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   // Relations
-  category       Category          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  images         ProductImage[]
   variants       ProductVariant[]
-  customizations Customization[]
+  customizations ProductCustomization[]
   reviews        Review[]
   cartItems      CartItem[]
   orderItems     OrderItem[]
@@ -133,34 +128,20 @@ model Product {
   @@map("products")
 }
 
-// Product images
-model ProductImage {
-  id        String   @id @default(cuid())
-  productId String
-  url       String
-  alt       String?
-  isPrimary Boolean  @default(false)
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
 
-  // Relations
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@map("product_images")
-}
-
-// Product variants (size, color, etc.)
+// Product variants (size, material, etc.)
 model ProductVariant {
-  id        String   @id @default(cuid())
-  productId String
-  name      String   // e.g., "Size", "Color"
-  value     String   // e.g., "Large", "Red"
-  sku       String?  @unique
-  price     Decimal? @db.Decimal(10, 2)
-  stockQuantity Int  @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  productId     String
+  size          String?
+  material      String?
+  price         Decimal  @db.Decimal(10, 2)
+  stockQuantity Int      @default(0)
+  sku           String   @unique
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -169,23 +150,21 @@ model ProductVariant {
 }
 
 // Product customizations (engraving, etc.)
-model Customization {
-  id          String   @id @default(cuid())
-  productId   String
-  name        String   // e.g., "Engraving Text"
-  type        String   // e.g., "text", "image", "select"
-  description String?
-  isRequired  Boolean  @default(false)
-  price       Decimal? @db.Decimal(10, 2)
-  maxLength   Int?
-  options     Json?    // For select type: ["option1", "option2"]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model ProductCustomization {
+  id               String   @id @default(cuid())
+  productId        String
+  name             String   // e.g., "Engraving Text"
+  type             String   // e.g., "text", "image", "color", "select"
+  required         Boolean  @default(false)
+  options          String[] // For select type: ["option1", "option2"]
+  priceAdjustment  Decimal? @db.Decimal(10, 2)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relations
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@map("customizations")
+  @@map("product_customizations")
 }
 
 // Deals and promotions
@@ -259,6 +238,10 @@ model Order {
   deliveredAt   DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  // Stripe fields
+  stripeSessionId String? // Stripe Checkout session ID
+  paymentStatus   String? // e.g. 'pending', 'paid', 'failed'
 
   // Relations
   user            User      @relation(fields: [userId], references: [id], onDelete: Restrict)

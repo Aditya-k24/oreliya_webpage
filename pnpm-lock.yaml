@@ -55,6 +55,9 @@ importers:
       prettier:
         specifier: ^3.1.0
         version: 3.6.2
+      ts-jest:
+        specifier: ^29.4.0
+        version: 29.4.0(@babel/core@7.28.0)(jest@30.0.4)(typescript@5.8.3)
       typescript:
         specifier: ^5.3.3
         version: 5.8.3
@@ -64,6 +67,9 @@ importers:
       '@prisma/client':
         specifier: ^6.11.1
         version: 6.11.1(prisma@6.11.1)(typescript@5.8.3)
+      '@types/stripe':
+        specifier: ^8.0.417
+        version: 8.0.417(@types/node@24.0.13)
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -91,6 +97,9 @@ importers:
       prisma:
         specifier: ^6.11.1
         version: 6.11.1(typescript@5.8.3)
+      stripe:
+        specifier: ^18.3.0
+        version: 18.3.0(@types/node@24.0.13)
       winston:
         specifier: ^3.17.0
         version: 3.17.0
@@ -2606,7 +2615,6 @@ packages:
       }
     dependencies:
       undici-types: 7.8.0
-    dev: true
 
   /@types/normalize-package-data@2.4.4:
     resolution:
@@ -2702,6 +2710,18 @@ packages:
         integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==,
       }
     dev: true
+
+  /@types/stripe@8.0.417(@types/node@24.0.13):
+    resolution:
+      {
+        integrity: sha512-PTuqskh9YKNENnOHGVJBm4sM0zE8B1jZw1JIskuGAPkMB+OH236QeN8scclhYGPA4nG6zTtPXgwpXdp+HPDTVw==,
+      }
+    deprecated: This is a stub types definition. stripe provides its own type definitions, so you do not need this installed.
+    dependencies:
+      stripe: 18.3.0(@types/node@24.0.13)
+    transitivePeerDependencies:
+      - '@types/node'
+    dev: false
 
   /@types/superagent@8.1.9:
     resolution:
@@ -8491,6 +8511,16 @@ packages:
     engines: { node: '>=0.6' }
     dependencies:
       side-channel: 1.1.0
+    dev: false
+
+  /qs@6.14.0:
+    resolution:
+      {
+        integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==,
+      }
+    engines: { node: '>=0.6' }
+    dependencies:
+      side-channel: 1.1.0
 
   /queue-microtask@1.2.3:
     resolution:
@@ -9496,6 +9526,22 @@ packages:
     engines: { node: '>=8' }
     dev: true
 
+  /stripe@18.3.0(@types/node@24.0.13):
+    resolution:
+      {
+        integrity: sha512-FkxrTUUcWB4CVN2yzgsfF/YHD6WgYHduaa7VmokCy5TLCgl5UNJkwortxcedrxSavQ8Qfa4Ir4JxcbIYiBsyLg==,
+      }
+    engines: { node: '>=12.*' }
+    peerDependencies:
+      '@types/node': '>=12.x.x'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+    dependencies:
+      '@types/node': 24.0.13
+      qs: 6.14.0
+    dev: false
+
   /superagent@10.2.2:
     resolution:
       {
@@ -9511,7 +9557,7 @@ packages:
       formidable: 3.5.4
       methods: 1.1.2
       mime: 2.6.0
-      qs: 6.13.0
+      qs: 6.14.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9909,7 +9955,6 @@ packages:
       {
         integrity: sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw==,
       }
-    dev: true
 
   /unpipe@1.0.0:
     resolution:

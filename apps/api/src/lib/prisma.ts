@@ -1,15 +1,8 @@
-/* eslint-disable vars-on-top, no-var */
 import { PrismaClient } from '@prisma/client';
 
-declare global {
-  var prismaClient: PrismaClient | undefined;
-}
+export const prisma = new PrismaClient();
 
-export const prisma: PrismaClient =
-  globalThis.prismaClient || new PrismaClient();
-
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.prismaClient = prisma;
-}
-
-export default prisma;
+// Graceful shutdown
+process.on('beforeExit', async () => {
+  await prisma.$disconnect();
+});

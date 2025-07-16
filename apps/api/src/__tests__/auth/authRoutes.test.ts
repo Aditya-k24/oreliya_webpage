@@ -1,5 +1,5 @@
+import express, { RequestHandler } from 'express';
 import request from 'supertest';
-import express, { Response, NextFunction } from 'express';
 import { AuthController } from '../../controllers/authController';
 import { AuthService } from '../../services/authService';
 import { AuthenticatedRequest } from '../../types/auth';
@@ -20,7 +20,10 @@ describe('Auth Routes', () => {
     app.use(express.json());
 
     // Create a real AuthService instance with dummy repositories
-    mockAuthService = new AuthService({} as any, {} as any);
+    mockAuthService = new AuthService(
+      {} as unknown as any,
+      {} as unknown as any
+    );
     jest.spyOn(mockAuthService, 'signup').mockImplementation(jest.fn());
     jest.spyOn(mockAuthService, 'login').mockImplementation(jest.fn());
     jest.spyOn(mockAuthService, 'logout').mockImplementation(jest.fn());
@@ -271,12 +274,8 @@ describe('Auth Routes', () => {
       testApp.use(express.json());
 
       // Mock the authentication middleware
-      const mockAuthMiddleware = (
-        req: AuthenticatedRequest,
-        _res: Response,
-        next: NextFunction
-      ) => {
-        req.user = {
+      const mockAuthMiddleware: RequestHandler = (req, _res, next) => {
+        (req as unknown as AuthenticatedRequest).user = {
           id: 'user-1',
           email: 'test@example.com',
           role: 'user',

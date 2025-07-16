@@ -1,11 +1,11 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken, extractTokenFromHeader } from '../config/jwt';
 import { AuthenticatedRequest } from '../types/auth';
 import { UnauthorizedError, ForbiddenError } from '../utils/errors';
 import logger from '../config/logger';
 
 export const authenticateToken = (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): void => {
@@ -18,7 +18,7 @@ export const authenticateToken = (
     const payload = verifyAccessToken(token);
 
     // Add user info to request
-    req.user = {
+    (req as AuthenticatedRequest).user = {
       id: payload.userId,
       email: payload.email,
       role: payload.role,
@@ -33,24 +33,21 @@ export const authenticateToken = (
 };
 
 export const requireRole = (allowedRoles: string[]) => {
-  return (
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     try {
-      if (!req.user) {
+      const authReq = req as AuthenticatedRequest;
+      if (!authReq.user) {
         throw new UnauthorizedError('Authentication required');
       }
 
-      if (!allowedRoles.includes(req.user.role)) {
+      if (!allowedRoles.includes(authReq.user.role)) {
         throw new ForbiddenError(
           `Access denied. Required roles: ${allowedRoles.join(', ')}`
         );
       }
 
       logger.debug(
-        `Role check passed for user: ${req.user.email} (${req.user.role})`
+        `Role check passed for user: ${authReq.user.email} (${authReq.user.role})`
       );
       next();
     } catch (error) {
@@ -63,8 +60,11 @@ export const requireRole = (allowedRoles: string[]) => {
 export const requireUser = requireRole(['user', 'admin']);
 export const requireAdmin = requireRole(['admin']);
 
+// Export for backward compatibility
+export const authMiddleware = authenticateToken;
+
 export const optionalAuth = (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): void => {
@@ -72,7 +72,7 @@ export const optionalAuth = (
     const token = extractTokenFromHeader(req);
     if (token) {
       const payload = verifyAccessToken(token);
-      req.user = {
+      (req as AuthenticatedRequest).user = {
         id: payload.userId,
         email: payload.email,
         role: payload.role,

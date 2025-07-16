@@ -1,12 +1,13 @@
 import { Request } from 'express';
 
-// Request/Response types
+export interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role: string;
+}
+
 export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
+  user: AuthenticatedUser;
 }
 
 // Auth request types

@@ -29,6 +29,336 @@ This project uses a **pnpm monorepo** structure with the following workspaces:
 - **Winston** - Logging
 - **Helmet, Morgan, CORS** - Security & logging middleware
 
+## 🛍️ Product API
+
+The application includes a comprehensive **Product Management System** with advanced e-commerce features.
+
+### Product Features
+
+- **Product Variants**: Size, material, price, stock quantity, SKU
+- **Product Customizations**: Engraving, color options, price adjustments
+- **Sale Management**: Sale percentage, compare-at prices
+- **Featured Products**: Highlight special items
+- **Active/Inactive Status**: Product visibility control
+- **Advanced Search & Filtering**: Category, tags, price range, sale status
+- **Smart Pagination**: Configurable page size with metadata
+- **Data Aggregation**: Categories, tags, deals & featured products
+
+### API Endpoints
+
+#### Product Management
+
+```http
+GET    /api/products                    # List products with filters
+GET    /api/products/:slug              # Get product by slug
+GET    /api/products/id/:id             # Get product by ID
+POST   /api/products                    # Create product (admin)
+PUT    /api/products/:id                # Update product (admin)
+DELETE /api/products/:id                # Delete product (admin)
+```
+
+#### Product Data
+
+```http
+GET    /api/products/categories         # Get all categories
+GET    /api/products/tags               # Get all tags
+GET    /api/products/deals/featured     # Get deals & featured products
+```
+
+### Query Parameters
+
+#### Filtering Options
+
+```http
+GET /api/products?category=Jewelry&isOnSale=true&priceMin=100&priceMax=1000
+```
+
+| Parameter    | Type    | Description                       |
+| ------------ | ------- | --------------------------------- |
+| `category`   | string  | Filter by product category        |
+| `tags`       | string  | Filter by tags (comma-separated)  |
+| `priceMin`   | number  | Minimum price filter              |
+| `priceMax`   | number  | Maximum price filter              |
+| `isActive`   | boolean | Filter by active status           |
+| `isFeatured` | boolean | Filter by featured status         |
+| `isOnSale`   | boolean | Filter by sale status             |
+| `inStock`    | boolean | Filter by stock availability      |
+| `search`     | string  | Search in name, description, tags |
+
+#### Pagination & Sorting
+
+```http
+GET /api/products?page=1&limit=20&sortBy=price&sortOrder=asc
+```
+
+| Parameter   | Type   | Default   | Description                                    |
+| ----------- | ------ | --------- | ---------------------------------------------- |
+| `page`      | number | 1         | Page number (1-based)                          |
+| `limit`     | number | 20        | Items per page (1-100)                         |
+| `sortBy`    | string | createdAt | Sort field (name, price, createdAt, updatedAt) |
+| `sortOrder` | string | desc      | Sort order (asc, desc)                         |
+
+### Example Responses
+
+#### Product List Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "products": [
+      {
+        "id": "cmd1qfllk00084akvnq6s5urp",
+        "name": "Diamond Ring",
+        "slug": "diamond-ring",
+        "description": "A beautiful diamond ring perfect for special occasions",
+        "shortDescription": "Elegant diamond ring",
+        "price": "999.99",
+        "compareAtPrice": "1299.99",
+        "images": [
+          "https://example.com/ring1.jpg",
+          "https://example.com/ring2.jpg"
+        ],
+        "category": "Jewelry",
+        "tags": ["diamond", "ring", "jewelry", "premium"],
+        "isActive": true,
+        "isFeatured": true,
+        "isOnSale": true,
+        "salePercentage": 23,
+        "variants": [
+          {
+            "id": "cmd1qfllk00094akvisxjobk4",
+            "size": "6",
+            "material": "White Gold",
+            "price": "999.99",
+            "stockQuantity": 5,
+            "sku": "RING-001-6-WG",
+            "isActive": true
+          }
+        ],
+        "customizations": [
+          {
+            "id": "cmd1qfllk000b4akvj435b6gj",
+            "name": "Engraving",
+            "type": "text",
+            "required": false,
+            "options": [],
+            "priceAdjustment": "50"
+          }
+        ]
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 2,
+      "totalPages": 1,
+      "hasNext": false,
+      "hasPrev": false
+    },
+    "filters": {
+      "category": "Jewelry",
+      "isOnSale": true
+    },
+    "sort": {
+      "field": "createdAt",
+      "order": "desc"
+    }
+  }
+}
+```
+
+#### Categories Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "categories": ["Jewelry", "Watches"]
+  }
+}
+```
+
+#### Tags Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "tags": [
+      "diamond",
+      "ring",
+      "jewelry",
+      "premium",
+      "watch",
+      "luxury",
+      "professional"
+    ]
+  }
+}
+```
+
+#### Deals & Featured Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "deals": [
+      {
+        "id": "cmd1qfllk00084akvnq6s5urp",
+        "name": "Diamond Ring",
+        "isOnSale": true,
+        "salePercentage": 23
+      }
+    ],
+    "featured": [
+      {
+        "id": "cmd1qfllk00084akvnq6s5urp",
+        "name": "Diamond Ring",
+        "isFeatured": true
+      },
+      {
+        "id": "cmd1qflmo000c4akvf10huwjh",
+        "name": "Luxury Watch",
+        "isFeatured": true
+      }
+    ]
+  }
+}
+```
+
+### Database Schema
+
+#### Product Model
+
+```prisma
+model Product {
+  id                String   @id @default(cuid())
+  name              String
+  slug              String   @unique
+  description       String
+  shortDescription  String?
+  price             Decimal  @db.Decimal(10, 2)
+  compareAtPrice    Decimal? @db.Decimal(10, 2)
+  images            String[] // Array of image URLs
+  category          String   // Simple string category
+  tags              String[] // Array of tags
+  isActive          Boolean  @default(true)
+  isFeatured        Boolean  @default(false)
+  isOnSale          Boolean  @default(false)
+  salePercentage    Int?     // Percentage discount
+  metadata          Json?    // Additional metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  variants       ProductVariant[]
+  customizations ProductCustomization[]
+  reviews        Review[]
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  wishlists      Wishlist[]
+}
+```
+
+#### Product Variant Model
+
+```prisma
+model ProductVariant {
+  id            String   @id @default(cuid())
+  productId     String
+  size          String?
+  material      String?
+  price         Decimal  @db.Decimal(10, 2)
+  stockQuantity Int      @default(0)
+  sku           String   @unique
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+```
+
+#### Product Customization Model
+
+```prisma
+model ProductCustomization {
+  id               String   @id @default(cuid())
+  productId        String
+  name             String   // e.g., "Engraving Text"
+  type             String   // e.g., "text", "image", "color", "select"
+  required         Boolean  @default(false)
+  options          String[] // For select type: ["option1", "option2"]
+  priceAdjustment  Decimal? @db.Decimal(10, 2)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+```
+
+### Usage Examples
+
+#### Get Products with Filters
+
+```bash
+# Get all jewelry products on sale
+curl "http://localhost:3001/api/products?category=Jewelry&isOnSale=true"
+
+# Get products in price range
+curl "http://localhost:3001/api/products?priceMin=500&priceMax=1500"
+
+# Search for diamond products
+curl "http://localhost:3001/api/products?search=diamond"
+
+# Get featured products with pagination
+curl "http://localhost:3001/api/products?isFeatured=true&page=1&limit=10"
+```
+
+#### Get Product by Slug
+
+```bash
+curl "http://localhost:3001/api/products/diamond-ring"
+```
+
+#### Get Categories and Tags
+
+```bash
+# Get all categories
+curl "http://localhost:3001/api/products/categories"
+
+# Get all tags
+curl "http://localhost:3001/api/products/tags"
+```
+
+#### Get Deals and Featured Products
+
+```bash
+curl "http://localhost:3001/api/products/deals/featured"
+```
+
+### Validation & Error Handling
+
+The API includes comprehensive validation:
+
+- **Required fields**: name, description, price, category
+- **Price validation**: Must be greater than 0
+- **Stock validation**: Cannot be negative
+- **Pagination limits**: Page size 1-100
+- **Proper error responses** with HTTP status codes
+
+#### Example Error Response
+
+```json
+{
+  "success": false,
+  "message": "Price must be greater than 0",
+  "code": "VALIDATION_ERROR"
+}
+```
+
 #### API Structure & Best Practices
 
 The API follows a modular, scalable structure:
@@ -248,10 +578,6 @@ pnpm --filter api db:migrate     # Run migrations
 pnpm --filter api db:seed        # Seed database
 pnpm --filter api db:studio      # Open Prisma Studio
 pnpm --filter api db:reset       # Reset database
-
-# UI Package
-pnpm --filter ui build
-pnpm --filter ui dev
 ```
 
 ## 🏗️ Project Structure

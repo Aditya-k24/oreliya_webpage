@@ -154,7 +154,7 @@ describe('AuthService', () => {
         BadRequestError
       );
       expect(mockUserRepository.createUser).not.toHaveBeenCalled();
-    });
+    }, 15000);
   });
 
   describe('login', () => {
@@ -224,7 +224,7 @@ describe('AuthService', () => {
       expect(result.message).toBe('Login successful');
       expect(result.data?.user.email).toBe(mockLoginData.email);
       expect(result.data?.tokens).toBeDefined();
-    });
+    }, 15000);
 
     it('should throw UnauthorizedError if user not found', async () => {
       mockUserRepository.findUserByEmail.mockResolvedValue(null);

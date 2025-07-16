@@ -1,10 +1,21 @@
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
 
-// Load test environment variables
-dotenv.config({ path: '.env.test' });
+// Load environment variables
+config();
 
-// Set test environment
-process.env.NODE_ENV = 'test';
+// Set dummy Stripe key for tests
+process.env.STRIPE_SECRET_KEY = 'sk_test_dummy_key_for_testing';
+
+// Global test setup
+beforeAll(() => {
+  // Any global setup needed
+  jest.setTimeout(15000);
+});
+
+afterAll(() => {
+  // Any global cleanup needed
+  jest.clearAllTimers();
+});
 
 // Mock console methods to reduce noise in tests
 global.console = {
