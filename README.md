@@ -878,3 +878,48 @@ Authorization: Bearer <access_token>
 - All tests must pass before commit (see CI pipeline).
 
 ---
+
+## 🧪 Automated API Testing
+
+This project includes a comprehensive automated API test script that verifies all major API endpoints and flows, including both public and authenticated routes.
+
+### What is Tested?
+
+- Health check endpoint
+- User signup and login (authentication)
+- Product listing, deals, featured products, categories, and tags
+- Address management (create, get, update, delete)
+- Cart, wishlist, and order endpoints (basic checks)
+- Webhook endpoint (Stripe signature validation)
+
+### How to Run All API Tests
+
+1. **Ensure the API server is not already running on port 3001.**
+2. From the project root, run:
+
+   ```sh
+   ./apps/api/test-api.sh
+   ```
+
+   Or, from the `apps/api` directory:
+
+   ```sh
+   ./test-api.sh
+   ```
+
+   This script will:
+   - Start the API server if not already running
+   - Run all API endpoint tests in sequence
+   - Print a summary of passed/failed tests
+
+3. **To run the test script directly (API must already be running):**
+   ```sh
+   pnpm test:api
+   ```
+
+### Test Results
+
+- All endpoints must pass for a healthy, production-ready API.
+- If any test fails, the script will print the error and a summary at the end.
+
+---

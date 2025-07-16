@@ -17,8 +17,10 @@ async function main() {
 
   // Create admin user
   console.log('Creating admin user...');
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { email: 'admin@oreliya.com' },
+    update: {},
+    create: {
       email: 'admin@oreliya.com',
       password: '$2a$10$rQZ8NwYz8NwYz8NwYz8NwO', // hashed 'password123'
       firstName: 'Admin',
@@ -29,8 +31,10 @@ async function main() {
 
   // Create test user
   console.log('Creating test user...');
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { email: 'user@oreliya.com' },
+    update: {},
+    create: {
       email: 'user@oreliya.com',
       password: '$2a$10$rQZ8NwYz8NwYz8NwYz8NwO', // hashed 'password123'
       firstName: 'Test',
@@ -59,8 +63,10 @@ async function main() {
 
   // Create products
   console.log('Creating products...');
-  await prisma.product.create({
-    data: {
+  await prisma.product.upsert({
+    where: { slug: 'diamond-ring' },
+    update: {},
+    create: {
       name: 'Diamond Ring',
       slug: 'diamond-ring',
       description: 'Beautiful diamond ring',
@@ -108,8 +114,10 @@ async function main() {
     },
   });
 
-  await prisma.product.create({
-    data: {
+  await prisma.product.upsert({
+    where: { slug: 'luxury-watch' },
+    update: {},
+    create: {
       name: 'Luxury Watch',
       slug: 'luxury-watch',
       description: 'Premium luxury watch',

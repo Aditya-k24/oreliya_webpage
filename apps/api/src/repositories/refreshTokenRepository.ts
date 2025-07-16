@@ -13,16 +13,44 @@ export class RefreshTokenRepository {
     token: string;
     expiresAt: Date;
   }): Promise<RefreshToken> {
-    try {
-      const refreshToken = await this.prisma.refreshToken.create({
-        data: tokenData,
-      });
-      logger.info(`Refresh token created for user: ${tokenData.userId}`);
-      return refreshToken;
-    } catch (error) {
-      logger.error('Error creating refresh token:', error);
-      throw error;
+    let attempts = 0;
+    const maxAttempts = 3;
+    let lastError;
+    let currentTokenData = { ...tokenData };
+    let success = false;
+    let refreshToken: RefreshToken | null = null;
+    while (attempts < maxAttempts && !success) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        refreshToken = await this.prisma.refreshToken.create({
+          data: currentTokenData,
+        });
+        logger.info(
+          `Refresh token created for user: ${currentTokenData.userId}`
+        );
+        success = true;
+      } catch (error: any) {
+        // Prisma unique constraint error code
+        if (error.code === 'P2002' && error.meta?.target?.includes('token')) {
+          logger.warn('Duplicate refresh token generated, retrying...');
+          const newToken = `${currentTokenData.token}-${Math.random().toString(36).slice(2, 8)}`;
+          currentTokenData = { ...currentTokenData, token: newToken };
+          attempts += 1;
+          lastError = error;
+        } else {
+          logger.error('Error creating refresh token:', error);
+          throw error;
+        }
+      }
     }
+    if (success && refreshToken) {
+      return refreshToken;
+    }
+    logger.error(
+      'Failed to create unique refresh token after retries:',
+      lastError
+    );
+    throw lastError;
   }
 
   async findRefreshTokenByToken(token: string): Promise<RefreshToken | null> {

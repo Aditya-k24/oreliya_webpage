@@ -1,0 +1,783 @@
+openapi: 3.1.0
+info:
+  title: Oreliya Product Management API
+  description: |
+    Comprehensive API for managing products, variants, and customizations.
+    Supports pagination, search, filtering, and sorting for product listings.
+    Admin-only endpoints for product CRUD operations.
+  version: 1.0.0
+  contact:
+    name: Oreliya API Support
+    email: support@oreliya.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3001/api
+    description: Development server
+  - url: https://api.oreliya.com
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /products:
+    get:
+      summary: Get all products
+      description: |
+        Retrieve a paginated list of products with support for search, filtering, and sorting.
+        All query parameters are optional.
+      tags:
+        - Products
+      parameters:
+        - name: page
+          in: query
+          description: 'Page number (default: 1)'
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: 'Number of items per page (default: 20, max: 100)'
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: 'Search term for product name, description, or tags'
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: 'Filter by category'
+          schema:
+            type: string
+        - name: tags
+          in: query
+          description: 'Filter by tags (comma-separated)'
+          schema:
+            type: string
+        - name: priceMin
+          in: query
+          description: 'Minimum price filter'
+          schema:
+            type: number
+            minimum: 0
+        - name: priceMax
+          in: query
+          description: 'Maximum price filter'
+          schema:
+            type: number
+            minimum: 0
+        - name: isActive
+          in: query
+          description: 'Filter by active status'
+          schema:
+            type: boolean
+        - name: isFeatured
+          in: query
+          description: 'Filter by featured status'
+          schema:
+            type: boolean
+        - name: isOnSale
+          in: query
+          description: 'Filter by sale status'
+          schema:
+            type: boolean
+        - name: inStock
+          in: query
+          description: 'Filter by stock availability'
+          schema:
+            type: boolean
+        - name: sortBy
+          in: query
+          description: 'Sort field (name, price, createdAt, updatedAt)'
+          schema:
+            type: string
+            enum:
+              - name
+              - price
+              - createdAt
+              - updatedAt
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: 'Sort order'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create a new product
+      description: Create a new product (admin only)
+      tags:
+        - Products
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden (admin access required)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/deals/featured:
+    get:
+      summary: Get deals and featured products
+      description: Retrieve products that are on sale and featured products
+      tags:
+        - Products
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealsResponse'
+
+  /products/categories:
+    get:
+      summary: Get all categories
+      description: Retrieve a list of all product categories
+      tags:
+        - Products
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      categories:
+                        type: array
+                        items:
+                          type: string
+
+  /products/tags:
+    get:
+      summary: Get all tags
+      description: Retrieve a list of all product tags
+      tags:
+        - Products
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      tags:
+                        type: array
+                        items:
+                          type: string
+
+  /products/id/{id}:
+    get:
+      summary: Get product by ID
+      description: Retrieve a specific product by its ID
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{slug}:
+    get:
+      summary: Get product by slug
+      description: Retrieve a specific product by its slug
+      tags:
+        - Products
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: Product slug
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{id}:
+    put:
+      summary: Update product
+      description: Update an existing product (admin only)
+      tags:
+        - Products
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden (admin access required)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete product
+      description: Delete a product (admin only)
+      tags:
+        - Products
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden (admin access required)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ProductVariant:
+      type: object
+      properties:
+        id:
+          type: string
+        size:
+          type: string
+          nullable: true
+        material:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: decimal
+        stockQuantity:
+          type: integer
+        sku:
+          type: string
+        isActive:
+          type: boolean
+      required:
+        - id
+        - price
+        - stockQuantity
+        - sku
+        - isActive
+
+    ProductCustomization:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+            - text
+            - image
+            - color
+            - select
+        required:
+          type: boolean
+        options:
+          type: array
+          items:
+            type: string
+          nullable: true
+        priceAdjustment:
+          type: number
+          format: decimal
+          nullable: true
+      required:
+        - id
+        - name
+        - type
+        - required
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        shortDescription:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: decimal
+        compareAtPrice:
+          type: number
+          format: decimal
+          nullable: true
+        images:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        isFeatured:
+          type: boolean
+        isOnSale:
+          type: boolean
+        salePercentage:
+          type: integer
+          nullable: true
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductVariant'
+        customizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductCustomization'
+        metadata:
+          type: object
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - slug
+        - description
+        - price
+        - images
+        - category
+        - tags
+        - isActive
+        - isFeatured
+        - isOnSale
+        - variants
+        - customizations
+        - createdAt
+        - updatedAt
+
+    CreateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        shortDescription:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: decimal
+        compareAtPrice:
+          type: number
+          format: decimal
+          nullable: true
+        images:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        isFeatured:
+          type: boolean
+        isOnSale:
+          type: boolean
+        salePercentage:
+          type: integer
+          nullable: true
+        variants:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/ProductVariant'
+              - type: object
+                not:
+                  required:
+                    - id
+        customizations:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/ProductCustomization'
+              - type: object
+                not:
+                  required:
+                    - id
+        metadata:
+          type: object
+          nullable: true
+      required:
+        - name
+        - description
+        - price
+        - category
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        shortDescription:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: decimal
+        compareAtPrice:
+          type: number
+          format: decimal
+          nullable: true
+        images:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        isFeatured:
+          type: boolean
+        isOnSale:
+          type: boolean
+        salePercentage:
+          type: integer
+          nullable: true
+        variants:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/ProductVariant'
+              - type: object
+                not:
+                  required:
+                    - id
+        customizations:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/ProductCustomization'
+              - type: object
+                not:
+                  required:
+                    - id
+        metadata:
+          type: object
+          nullable: true
+      required:
+        - id
+
+    ProductResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            product:
+              $ref: '#/components/schemas/Product'
+      required:
+        - success
+        - data
+
+    ProductListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            products:
+              type: array
+              items:
+                $ref: '#/components/schemas/Product'
+            pagination:
+              type: object
+              properties:
+                page:
+                  type: integer
+                limit:
+                  type: integer
+                total:
+                  type: integer
+                totalPages:
+                  type: integer
+                hasNext:
+                  type: boolean
+                hasPrev:
+                  type: boolean
+              required:
+                - page
+                - limit
+                - total
+                - totalPages
+                - hasNext
+                - hasPrev
+            filters:
+              type: object
+              properties:
+                category:
+                  type: string
+                  nullable: true
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                priceMin:
+                  type: number
+                  nullable: true
+                priceMax:
+                  type: number
+                  nullable: true
+                isActive:
+                  type: boolean
+                  nullable: true
+                isFeatured:
+                  type: boolean
+                  nullable: true
+                isOnSale:
+                  type: boolean
+                  nullable: true
+                inStock:
+                  type: boolean
+                  nullable: true
+                search:
+                  type: string
+                  nullable: true
+            sort:
+              type: object
+              properties:
+                field:
+                  type: string
+                  enum:
+                    - name
+                    - price
+                    - createdAt
+                    - updatedAt
+                order:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+              required:
+                - field
+                - order
+      required:
+        - success
+        - data
+
+    DealsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            deals:
+              type: array
+              items:
+                $ref: '#/components/schemas/Product'
+            featured:
+              type: array
+              items:
+                $ref: '#/components/schemas/Product'
+      required:
+        - success
+        - data
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        stack:
+          type: string
+          nullable: true
+      required:
+        - success
+        - message
