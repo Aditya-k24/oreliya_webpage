@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "pnpm --parallel --recursive run dev",
     "build": "pnpm --recursive run build",
+    "vercel-build": "cd apps/web && pnpm install && pnpm run build",
     "test": "pnpm --recursive run test",
     "lint": "pnpm --recursive run lint",
     "lint:fix": "pnpm --recursive run lint:fix",
