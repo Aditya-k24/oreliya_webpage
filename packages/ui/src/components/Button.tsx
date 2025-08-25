@@ -1,7 +1,8 @@
-import React from 'react';
+import type { ReactNode } from 'react';
+import '../styles/button.css';
 
 export interface ButtonProps {
-  children: React.ReactNode;
+  children: ReactNode;
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'small' | 'medium' | 'large';
   onClick?: () => void;
@@ -22,12 +23,12 @@ function Button({
     primary: 'button--primary',
     secondary: 'button--secondary',
     outline: 'button--outline',
-  };
+  } as const;
   const sizeClasses = {
     small: 'button--small',
     medium: 'button--medium',
     large: 'button--large',
-  };
+  } as const;
 
   const classes = [
     baseClasses,
