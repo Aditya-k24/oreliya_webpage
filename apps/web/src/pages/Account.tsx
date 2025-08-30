@@ -13,7 +13,7 @@ export function Account() {
           </h2>
           <Link
             to='/login'
-            className='px-6 py-3 bg-[#BFA16A] text-white font-medium rounded-lg hover:bg-[#a88c4a] transition-colors'
+            className='px-6 py-3 bg-[#2D5A27] text-white font-medium rounded-lg hover:bg-[#1E3A1A] transition-colors'
           >
             Login
           </Link>

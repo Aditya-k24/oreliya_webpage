@@ -6,84 +6,73 @@ export function Header() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className='bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200/70 dark:border-gray-800/70 sticky top-0 z-50 shadow-sm'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='relative flex items-center justify-between h-16 lg:h-20'>
+    <header className='bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50'>
+      <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+        {/* Top bar with green accent */}
+        <div className='h-1 bg-[#1E240A]' />
+
+        <div className='flex items-center justify-between h-20'>
           {/* Left navigation */}
-          <nav className='hidden md:flex items-center gap-8 text-sm tracking-wide'>
+          <nav className='hidden lg:flex items-center gap-12 text-sm'>
             <Link
               to='/customization'
-              className={`uppercase font-medium transition-colors duration-200 ${
+              className={`uppercase tracking-widest transition-colors duration-300 ${
                 isActive('/customization')
-                  ? 'text-[#BFA16A]'
-                  : 'text-gray-700 dark:text-gray-300 hover:text-[#BFA16A]'
+                  ? 'text-[#1E240A] border-b-2 border-[#1E240A] pb-1'
+                  : 'text-[#1E240A] hover:text-[#2A3A1A]'
               }`}
             >
-              Customize
+              Custom Design
             </Link>
             <Link
               to='/about'
-              className={`uppercase font-medium transition-colors duration-200 ${
+              className={`uppercase tracking-widest transition-colors duration-300 ${
                 isActive('/about')
-                  ? 'text-[#BFA16A]'
-                  : 'text-gray-700 dark:text-gray-300 hover:text-[#BFA16A]'
+                  ? 'text-[#1E240A] border-b-2 border-[#1E240A] pb-1'
+                  : 'text-[#1E240A] hover:text-[#2A3A1A]'
               }`}
             >
-              About
+              Heritage
             </Link>
           </nav>
 
-          {/* Center Logo - Enhanced with hover effects */}
+          {/* Center Logo */}
           <Link
             to='/'
             className='absolute left-1/2 transform -translate-x-1/2 flex items-center group'
           >
-            <div className='flex items-center group-hover:scale-105 transition-all duration-300'>
+            <div className='flex items-center'>
               {/* Logo Mark */}
-              <div className='relative w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center group-hover:scale-110 transition-transform duration-300'>
+              <div className='w-12 h-12 flex items-center justify-center'>
                 <img
                   src='/logo-mark.svg'
                   alt='Oreliya logo mark'
-                  className='w-full h-full object-contain dark:hidden'
-                />
-                <img
-                  src='/logo-mark-white.svg'
-                  alt='Oreliya logo mark'
-                  className='w-full h-full object-contain hidden dark:block'
+                  className='w-full h-full object-contain'
                 />
               </div>
 
               {/* Logo Text */}
-              <div className='relative'>
+              <div className='h-8'>
                 <img
                   src='/logo.svg'
                   alt='Oreliya'
-                  className='h-8 lg:h-10 w-auto object-contain dark:hidden group-hover:opacity-80 transition-opacity duration-300'
-                />
-                <img
-                  src='/logo-white.svg'
-                  alt='Oreliya'
-                  className='h-8 lg:h-10 w-auto object-contain hidden dark:block group-hover:opacity-80 transition-opacity duration-300'
+                  className='h-full w-auto object-contain'
                 />
               </div>
             </div>
-
-            {/* Subtle glow effect on hover */}
-            <div className='absolute inset-0 bg-gradient-to-r from-[#BFA16A]/0 via-[#BFA16A]/5 to-[#BFA16A]/0 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10' />
           </Link>
 
           {/* Right side actions */}
-          <div className='flex items-center gap-3'>
-            {/* Reach Out Link */}
+          <div className='flex items-center gap-8'>
             <Link
               to='/contact'
-              className={`uppercase font-medium transition-colors duration-200 ${
+              className={`uppercase tracking-widest transition-colors duration-300 ${
                 isActive('/contact')
-                  ? 'text-[#BFA16A]'
-                  : 'text-gray-700 dark:text-gray-300 hover:text-[#BFA16A]'
+                  ? 'text-[#1E240A] border-b-2 border-[#1E240A] pb-1'
+                  : 'text-[#1E240A] hover:text-[#2A3A1A]'
               }`}
             >
-              Contact Us
+              Contact
             </Link>
           </div>
         </div>

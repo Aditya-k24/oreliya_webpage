@@ -45,7 +45,7 @@ export function CheckoutForm({ onSuccess }: { onSuccess: () => void }) {
       <button
         type='submit'
         disabled={loading || !stripe}
-        className='w-full bg-[#BFA16A] text-white py-2 rounded font-semibold hover:bg-[#a88c4a] transition'
+        className='w-full bg-[#1E240A] text-white py-2 rounded font-semibold hover:bg-[#2A3A1A] transition'
       >
         {loading ? 'Processing...' : 'Pay Now'}
       </button>

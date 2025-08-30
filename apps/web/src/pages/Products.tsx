@@ -129,7 +129,7 @@ export function ProductsPage() {
   if (loading) {
     return (
       <div className='min-h-screen flex items-center justify-center'>
-        <div className='animate-spin rounded-full h-32 w-32 border-b-2 border-[#BFA16A]' />
+        <div className='animate-spin rounded-full h-32 w-32 border-b-2 border-[#2D5A27]' />
       </div>
     );
   }

@@ -8,7 +8,7 @@ interface DefaultLayoutProps {
 
 export function DefaultLayout({ children }: DefaultLayoutProps) {
   return (
-    <div className='min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950'>
+    <div className='min-h-screen flex flex-col bg-[#1E240A]'>
       <Header />
       <main className='flex-1 py-8'>{children}</main>
       <Footer />

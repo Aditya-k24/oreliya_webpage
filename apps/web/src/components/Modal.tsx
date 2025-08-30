@@ -20,7 +20,7 @@ export function Modal({ open, onClose, children, title }: ModalProps) {
           &times;
         </button>
         {title && (
-          <h2 className='text-xl font-semibold mb-4 text-[#BFA16A]'>{title}</h2>
+          <h2 className='text-xl font-semibold mb-4 text-[#1E240A]'>{title}</h2>
         )}
         {children}
       </div>

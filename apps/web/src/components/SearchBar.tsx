@@ -49,7 +49,7 @@ export function SearchBar({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className='w-full px-4 py-3 pl-12 pr-20 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#BFA16A] focus:border-transparent dark:text-gray-100 transition-colors'
+          className='w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#1E240A] focus:border-transparent dark:text-gray-100 transition-colors'
         />
 
         {/* Search Icon */}
@@ -98,7 +98,7 @@ export function SearchBar({
           type='button'
           onClick={handleSearch}
           disabled={!query.trim()}
-          className='absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1.5 bg-[#BFA16A] text-white rounded-md hover:bg-[#a88c4a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium'
+          className='absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1.5 bg-[#1E240A] text-white rounded-md hover:bg-[#2A3A1A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium'
         >
           Search
         </button>

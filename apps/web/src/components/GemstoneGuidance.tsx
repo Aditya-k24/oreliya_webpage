@@ -3,7 +3,7 @@ export function GemstoneGuidance() {
     <section className='py-20 bg-[#213326] text-white'>
       <div className='max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
         <div>
-          <h3 className='text-sm tracking-widest text-[#BFA16A] mb-3'>
+          <h3 className='text-sm tracking-widest text-[#1E240A] mb-3'>
             Gemstone Guidance
           </h3>
           <h2 className='text-3xl md:text-4xl font-bold mb-6 leading-tight'>

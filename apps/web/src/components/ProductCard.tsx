@@ -89,7 +89,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Title */}
-        <h3 className='font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-[#BFA16A] transition-colors'>
+        <h3 className='font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-[#1E240A] transition-colors'>
           {product.name}
         </h3>
 

@@ -24,7 +24,7 @@ export function Toaster({
   return (
     <div className='fixed top-6 right-6 z-50 space-y-2'>
       {toasts.map(t => {
-        let bgClass = 'bg-[#BFA16A]';
+        let bgClass = 'bg-[#1E240A]';
         if (t.type === 'success') bgClass = 'bg-green-600';
         else if (t.type === 'error') bgClass = 'bg-red-600';
         return (

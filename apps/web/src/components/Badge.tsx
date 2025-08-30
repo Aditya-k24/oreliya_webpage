@@ -18,7 +18,7 @@ export function Badge({
   const baseClasses = 'inline-flex items-center font-medium rounded-full';
 
   const variantClasses = {
-    primary: 'bg-[#BFA16A] text-white',
+    primary: 'bg-[#1E240A] text-white',
     secondary: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
     success:
       'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',

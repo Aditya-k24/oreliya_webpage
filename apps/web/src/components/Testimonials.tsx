@@ -26,7 +26,7 @@ export function Testimonials() {
               key={t.name}
               className='rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/70 dark:border-gray-800 p-6 shadow-sm hover:shadow-lg transition-shadow'
             >
-              <div className='flex items-center gap-2 text-[#BFA16A] mb-3'>
+              <div className='flex items-center gap-2 text-[#1E240A] mb-3'>
                 ★★★★★
               </div>
               <p className='text-gray-700 dark:text-gray-300 mb-4'>{t.text}</p>

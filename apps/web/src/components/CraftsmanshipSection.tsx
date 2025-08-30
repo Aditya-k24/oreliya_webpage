@@ -2,9 +2,12 @@ export function CraftsmanshipSection() {
   return (
     <section className='relative overflow-hidden'>
       <div className='absolute inset-0'>
-        <img
-          src='https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1600&auto=format&fit=crop'
-          alt='Craftsmanship'
+        <video
+          src='/our-craft.mp4'
+          autoPlay
+          muted
+          loop
+          playsInline
           className='w-full h-full object-cover'
         />
         <div className='absolute inset-0 bg-black/40' />
@@ -20,15 +23,15 @@ export function CraftsmanshipSection() {
           <div className='flex gap-4'>
             <a
               href='/contact'
-              className='px-6 py-3 rounded-lg bg-white text-gray-900 font-semibold hover:bg-gray-100'
+              className='px-6 py-3 bg-[#1E240A] text-white font-medium hover:bg-[#2A3A1A] transition-colors uppercase tracking-wider text-sm'
             >
               Book a consultation
             </a>
             <a
-              href='/products'
-              className='px-6 py-3 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-gray-900'
+              href='/customization'
+              className='px-6 py-3 border-2 border-white text-white font-medium hover:bg-white hover:text-[#1E240A] transition-all uppercase tracking-wider text-sm'
             >
-              View collections
+              Start Custom Design
             </a>
           </div>
         </div>
