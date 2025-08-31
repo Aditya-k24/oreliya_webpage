@@ -19,7 +19,7 @@ export function Cart() {
     },
   ]);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
 
   const updateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity < 1) return;
