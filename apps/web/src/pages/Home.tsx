@@ -123,7 +123,10 @@ export function Home() {
 
         {/* Elegant CTA Button */}
         <a href='/customization'>
-                      <button type='button' className='bg-[#1E240A] text-white font-medium py-4 px-8 border border-[#1E240A] hover:bg-white hover:text-[#1E240A] transition-all duration-300 uppercase tracking-wider text-sm'>
+          <button
+            type='button'
+            className='bg-[#1E240A] text-white font-medium py-4 px-8 border border-[#1E240A] hover:bg-white hover:text-[#1E240A] transition-all duration-300 uppercase tracking-wider text-sm rounded'
+          >
             Start Custom Design
           </button>
         </a>

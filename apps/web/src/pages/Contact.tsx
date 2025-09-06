@@ -26,7 +26,9 @@ export function Contact() {
     setIsSubmitting(true);
 
     // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise<void>(resolve => {
+      setTimeout(() => resolve(), 2000);
+    });
 
     setIsSubmitting(false);
     // Handle form submission logic here
@@ -45,9 +47,9 @@ export function Contact() {
               Get in Touch
             </h1>
             <p className='text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed'>
-              We'd love to hear from you. Whether you have a question about our
-              collection or need assistance with a custom design, we're here to
-              help.
+              We&apos;d love to hear from you. Whether you have a question about
+              our collection or need assistance with a custom design, we&apos;re
+              here to help.
             </p>
           </div>
         </div>
@@ -59,7 +61,7 @@ export function Contact() {
           <div className='space-y-8'>
             <div>
               <h2 className='text-3xl font-light text-[#1E240A] mb-6'>
-                Let's Connect
+                Let&apos;s Connect
               </h2>
               <p className='text-lg text-gray-600 leading-relaxed'>
                 Our team is ready to assist you with any questions about our
@@ -196,6 +198,7 @@ export function Contact() {
               Send Us a Message
             </h3>
 
+            {/* eslint-disable jsx-a11y/label-has-associated-control */}
             <form onSubmit={handleSubmit} className='space-y-6'>
               <div>
                 <label
@@ -281,7 +284,7 @@ export function Contact() {
               <button
                 type='submit'
                 disabled={isSubmitting}
-                className={`w-full py-4 px-6 font-medium rounded-none border border-[#1E240A] transition-all duration-300 uppercase tracking-wider text-sm ${
+                className={`w-full py-4 px-6 font-medium rounded border border-[#1E240A] transition-all duration-300 uppercase tracking-wider text-sm ${
                   isSubmitting
                     ? 'bg-gray-400 cursor-not-allowed text-white'
                     : 'bg-[#1E240A] text-white hover:bg-white hover:text-[#1E240A]'
@@ -290,6 +293,7 @@ export function Contact() {
                 {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
             </form>
+            {/* eslint-enable jsx-a11y/label-has-associated-control */}
           </div>
         </div>
       </div>

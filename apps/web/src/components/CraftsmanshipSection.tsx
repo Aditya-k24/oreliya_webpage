@@ -17,21 +17,19 @@ export function CraftsmanshipSection() {
           <h3 className='text-3xl md:text-5xl font-bold text-white mb-4'>
             Your story, our craft.
           </h3>
-          <p className='text-white/90 text-lg mb-8'>
-            Explore custom designs made just for you by master artisans.
-          </p>
+
           <div className='flex gap-4'>
             <a
               href='/contact'
-              className='px-6 py-3 bg-[#1E240A] text-white font-medium hover:bg-[#2A3A1A] transition-colors uppercase tracking-wider text-sm'
+              className='px-6 py-3 bg-[#1E240A] text-white font-medium hover:bg-[#2A3A1A] transition-colors uppercase tracking-wider text-sm rounded'
             >
-              Book a consultation
+              Get in touch
             </a>
             <a
               href='/customization'
-              className='px-6 py-3 border-2 border-white text-white font-medium hover:bg-white hover:text-[#1E240A] transition-all uppercase tracking-wider text-sm'
+              className='px-6 py-3 border-2 border-white text-white font-medium hover:bg-white hover:text-[#1E240A] transition-all uppercase tracking-wider text-sm rounded'
             >
-              Start Custom Design
+              Create your jewellery
             </a>
           </div>
         </div>

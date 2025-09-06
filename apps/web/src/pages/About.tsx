@@ -26,15 +26,15 @@ export function About() {
             Start Custom Design
           </Link>
         </div>
-        </div>
+      </div>
 
       {/* Mission Section */}
       <div className='max-w-7xl mx-auto px-6 lg:px-8 py-20'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-16 items-center'>
-            <div>
+          <div>
             <h2 className='text-4xl font-light text-[#1E240A] mb-6 leading-tight'>
               Our Mission
-              </h2>
+            </h2>
             <p className='text-lg text-gray-600 mb-8 leading-relaxed'>
               To create exceptional jewelry that transcends time, combining
               traditional craftsmanship with contemporary design. Every piece is
@@ -45,29 +45,29 @@ export function About() {
               connecting generations through shared stories and timeless
               elegance.
             </p>
-            </div>
+          </div>
 
-            <div className='relative'>
+          <div className='relative'>
             <div className='aspect-square bg-gradient-to-br from-[#1E240A] to-[#2A3A1A] rounded-2xl p-12 flex items-center justify-center'>
-                <div className='text-white text-center'>
+              <div className='text-white text-center'>
                 <div className='w-16 h-16 mx-auto mb-6'>
                   <span className='text-4xl'>💎</span>
                 </div>
                 <h3 className='text-2xl font-medium mb-2'>Craftsmanship</h3>
                 <p className='text-[#F6EEDF]'>Excellence in every detail</p>
-                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Values Section */}
+      {/* Values Section */}
       <div className='bg-[#F6EEDF] py-20'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl font-light text-[#1E240A] mb-4'>
-            Our Values
-          </h2>
+              Our Values
+            </h2>
             <p className='text-lg text-gray-600 max-w-2xl mx-auto'>
               The principles that guide our work and define our legacy
             </p>
@@ -113,20 +113,20 @@ export function About() {
                 honesty, transparency, and genuine care.
               </p>
             </div>
-            </div>
           </div>
         </div>
+      </div>
 
       {/* Team Section */}
-        <div className='max-w-7xl mx-auto px-6 lg:px-8 py-20'>
-          <div className='text-center mb-16'>
+      <div className='max-w-7xl mx-auto px-6 lg:px-8 py-20'>
+        <div className='text-center mb-16'>
           <h2 className='text-4xl font-light text-[#1E240A] mb-4'>
             Meet Our Team
           </h2>
           <p className='text-lg text-gray-600 max-w-2xl mx-auto'>
             The passionate artisans and designers behind every creation
           </p>
-              </div>
+        </div>
 
         <div className='grid md:grid-cols-3 gap-12'>
           <div className='text-center group'>
@@ -142,20 +142,20 @@ export function About() {
             </p>
           </div>
 
-            <div className='text-center group'>
+          <div className='text-center group'>
             <div className='w-32 h-32 bg-[#1E240A] rounded-full mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-300'>
               <span className='text-white text-4xl'>👩‍🎨</span>
             </div>
             <h3 className='text-xl font-medium text-[#1E240A] mb-2'>
               Creative Director
-              </h3>
+            </h3>
             <p className='text-gray-600 leading-relaxed'>
               Our visionary designer who transforms inspiration into
               breathtaking jewelry that captures the essence of beauty.
-              </p>
-            </div>
+            </p>
+          </div>
 
-            <div className='text-center group'>
+          <div className='text-center group'>
             <div className='w-32 h-32 bg-[#1E240A] rounded-full mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-300'>
               <span className='text-white text-4xl'>👨‍💼</span>
             </div>
@@ -166,9 +166,9 @@ export function About() {
               Ensuring every piece meets our exacting standards before it
               reaches your hands.
             </p>
-            </div>
           </div>
         </div>
+      </div>
 
       {/* CTA Section */}
       <div className='bg-gradient-to-r from-[#1E240A] to-[#2A3A1A] py-20 text-center'>

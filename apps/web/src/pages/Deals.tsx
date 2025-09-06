@@ -92,8 +92,8 @@ export function CustomizationPage() {
 
     try {
       // Simulate API call - replace with actual API endpoint
-      await new Promise(resolve => {
-        setTimeout(resolve, 2000);
+      await new Promise<void>(resolve => {
+        setTimeout(() => resolve(), 2000);
       });
 
       setSubmitSuccess(true);
@@ -159,6 +159,7 @@ export function CustomizationPage() {
 
         {/* Form */}
         <div className='bg-white border border-gray-100 rounded-2xl shadow-lg p-6 lg:p-8'>
+          {/* eslint-disable jsx-a11y/label-has-associated-control */}
           <form onSubmit={handleSubmit} className='space-y-6'>
             {/* Personal Information */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -406,7 +407,7 @@ export function CustomizationPage() {
               <button
                 type='submit'
                 disabled={isSubmitting}
-                className='w-full bg-[#1E240A] hover:bg-[#2A3A1A] text-white font-medium py-3 px-4 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center uppercase tracking-wider text-sm'
+                className='w-full bg-[#1E240A] hover:bg-[#2A3A1A] text-white font-medium py-3 px-4 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center uppercase tracking-wider text-sm rounded'
               >
                 {isSubmitting ? (
                   <>
@@ -419,6 +420,7 @@ export function CustomizationPage() {
               </button>
             </div>
           </form>
+          {/* eslint-enable jsx-a11y/label-has-associated-control */}
         </div>
 
         {/* Information Section */}
