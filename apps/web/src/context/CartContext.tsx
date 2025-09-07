@@ -156,10 +156,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  // Update totals whenever items change
+  // Update totals whenever items change (with deep comparison)
+  const itemsString = useMemo(() => JSON.stringify(state.items), [state.items]);
+
   useEffect(() => {
     dispatch({ type: 'UPDATE_TOTALS' });
-  }, [state.items]);
+  }, [itemsString]);
 
   // Load cart from API when user is authenticated
   useEffect(() => {

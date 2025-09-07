@@ -6,6 +6,23 @@ import { Pagination } from '../components/Pagination';
 import { Badge } from '../components/Badge';
 import { apiClient } from '../api/client';
 
+// Custom hook for debouncing
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 interface ProductVariant {
   id: string;
   name: string;
@@ -50,12 +67,15 @@ export function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  // Debounce search query to avoid excessive API calls
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
       if (selectedCategory) params.append('category', selectedCategory);
-      if (searchQuery) params.append('search', searchQuery);
+      if (debouncedSearchQuery) params.append('search', debouncedSearchQuery);
       params.append('page', currentPage.toString());
       params.append('limit', '12');
 
@@ -69,7 +89,7 @@ export function ProductsPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, searchQuery, currentPage]);
+  }, [selectedCategory, debouncedSearchQuery, currentPage]);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -87,44 +107,53 @@ export function ProductsPage() {
     fetchCategories();
   }, [fetchProducts, fetchCategories]);
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category === selectedCategory ? '' : category);
-    setCurrentPage(1);
-    setSearchParams(prev => {
-      const newParams = new URLSearchParams(prev);
-      if (category === selectedCategory) {
-        newParams.delete('category');
-      } else {
-        newParams.set('category', category);
-      }
-      newParams.set('page', '1');
-      return newParams;
-    });
-  };
+  const handleCategoryChange = useCallback(
+    (category: string) => {
+      setSelectedCategory(category === selectedCategory ? '' : category);
+      setCurrentPage(1);
+      setSearchParams(prev => {
+        const newParams = new URLSearchParams(prev);
+        if (category === selectedCategory) {
+          newParams.delete('category');
+        } else {
+          newParams.set('category', category);
+        }
+        newParams.set('page', '1');
+        return newParams;
+      });
+    },
+    [selectedCategory, setSearchParams]
+  );
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-    setSearchParams(prev => {
-      const newParams = new URLSearchParams(prev);
-      if (query) {
-        newParams.set('search', query);
-      } else {
-        newParams.delete('search');
-      }
-      newParams.set('page', '1');
-      return newParams;
-    });
-  };
+  const handleSearch = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+      setCurrentPage(1);
+      setSearchParams(prev => {
+        const newParams = new URLSearchParams(prev);
+        if (query) {
+          newParams.set('search', query);
+        } else {
+          newParams.delete('search');
+        }
+        newParams.set('page', '1');
+        return newParams;
+      });
+    },
+    [setSearchParams]
+  );
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    setSearchParams(prev => {
-      const newParams = new URLSearchParams(prev);
-      newParams.set('page', page.toString());
-      return newParams;
-    });
-  };
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setCurrentPage(page);
+      setSearchParams(prev => {
+        const newParams = new URLSearchParams(prev);
+        newParams.set('page', page.toString());
+        return newParams;
+      });
+    },
+    [setSearchParams]
+  );
 
   if (loading) {
     return (

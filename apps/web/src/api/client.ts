@@ -9,6 +9,9 @@ export class ApiClient {
 
   private refreshPromise: Promise<AuthTokens> | null = null;
 
+  // Request deduplication cache
+  private requestCache = new Map<string, Promise<any>>();
+
   constructor() {
     this.client = axios.create({
       baseURL: API_BASE_URL,
@@ -130,7 +133,22 @@ export class ApiClient {
   }
 
   public get<T = any>(url: string, config?: any): Promise<AxiosResponse<T>> {
-    return this.client.get(url, config);
+    // Create cache key for GET requests
+    const cacheKey = `GET:${url}:${JSON.stringify(config || {})}`;
+
+    // Return cached promise if it exists
+    if (this.requestCache.has(cacheKey)) {
+      return this.requestCache.get(cacheKey)!;
+    }
+
+    // Create new request and cache it
+    const requestPromise = this.client.get(url, config).finally(() => {
+      // Remove from cache after completion (successful or failed)
+      setTimeout(() => this.requestCache.delete(cacheKey), 100);
+    });
+
+    this.requestCache.set(cacheKey, requestPromise);
+    return requestPromise;
   }
 
   public post<T = any>(

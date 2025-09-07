@@ -13,32 +13,78 @@ export function Home() {
 
       {/* Hero Logo Section */}
       <div className='max-w-7xl mx-auto px-6 lg:px-8 py-20 text-center'>
-        <div className='flex items-center justify-center mb-8'>
-          <div className='w-20 h-20 lg:w-24 lg:h-24'>
-            <img
-              src='/logo-mark.svg'
-              alt='Oreliya logo mark'
-              className='w-full h-full object-contain'
-            />
-          </div>
-          <div className='h-16 lg:h-20'>
-            <img
-              src='/logo.svg'
-              alt='Oreliya'
-              className='h-full w-auto object-contain'
-            />
-          </div>
-        </div>
-
         <SectionHeading
-          title='Welcome to Oreliya'
-          subtitle='Crafting timeless jewelry with passion and precision'
+          title='Explore Our Collections'
+          subtitle='Discover the perfect piece for every occasion'
         />
-        <div className='text-center py-12'>
-          <p className='text-lg text-black max-w-2xl mx-auto leading-relaxed'>
-            Our collection is being carefully curated. Check back soon for our
-            latest pieces.
-          </p>
+
+        {/* Category Cards */}
+        <div className='py-12'>
+          <div className='grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 lg:gap-12 max-w-7xl mx-auto px-4'>
+            {/* Engagement Rings Category */}
+            <a
+              href='/products?category=engagement-rings'
+              className='group relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-700 transform hover:-translate-y-2 border border-gray-100 hover:border-gray-200'
+            >
+              <div className='aspect-[3/4] relative bg-white'>
+                <img
+                  src='/images/categories/engagement_rings.png'
+                  alt='Engagement Rings Collection'
+                  className='w-full h-full object-cover group-hover:scale-103 transition-transform duration-1200 ease-out'
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700' />
+                <div className='absolute inset-0 ring-1 ring-inset ring-black/5 group-hover:ring-black/10 transition-all duration-700' />
+              </div>
+            </a>
+
+            {/* Mangalsutra Category */}
+            <a
+              href='/products?category=mangalsutra'
+              className='group relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-700 transform hover:-translate-y-2 border border-gray-100 hover:border-gray-200'
+            >
+              <div className='aspect-[3/4] relative bg-white'>
+                <img
+                  src='/images/categories/Mangalsutra.png'
+                  alt='Mangalsutra Collection'
+                  className='w-full h-full object-cover group-hover:scale-103 transition-transform duration-1200 ease-out'
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700' />
+                <div className='absolute inset-0 ring-1 ring-inset ring-black/5 group-hover:ring-black/10 transition-all duration-700' />
+              </div>
+            </a>
+
+            {/* Earrings Category */}
+            <a
+              href='/products?category=earrings'
+              className='group relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-700 transform hover:-translate-y-2 border border-gray-100 hover:border-gray-200'
+            >
+              <div className='aspect-[3/4] relative bg-white'>
+                <img
+                  src='/images/categories/Earrings.png'
+                  alt='Earrings Collection'
+                  className='w-full h-full object-cover group-hover:scale-103 transition-transform duration-1200 ease-out'
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700' />
+                <div className='absolute inset-0 ring-1 ring-inset ring-black/5 group-hover:ring-black/10 transition-all duration-700' />
+              </div>
+            </a>
+
+            {/* Everyday Category */}
+            <a
+              href='/products?category=everyday'
+              className='group relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-700 transform hover:-translate-y-2 border border-gray-100 hover:border-gray-200'
+            >
+              <div className='aspect-[3/4] relative bg-white'>
+                <img
+                  src='/images/categories/everyday.png'
+                  alt='Everyday Collection'
+                  className='w-full h-full object-cover group-hover:scale-103 transition-transform duration-1200 ease-out'
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700' />
+                <div className='absolute inset-0 ring-1 ring-inset ring-black/5 group-hover:ring-black/10 transition-all duration-700' />
+              </div>
+            </a>
+          </div>
         </div>
       </div>
 

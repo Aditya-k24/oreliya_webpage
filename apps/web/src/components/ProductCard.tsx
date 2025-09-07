@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { memo } from 'react';
 import { PriceTag } from './PriceTag';
 import { Badge } from './Badge';
 
@@ -38,7 +39,7 @@ interface ProductCardProps {
   product: Product;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+const ProductCard = memo(function ProductCard({ product }: ProductCardProps) {
   const mainImage =
     product.images?.[0] || product.imageUrl || '/placeholder-product.jpg';
   const description = product.description || product.subtitle || '';
@@ -137,4 +138,6 @@ export function ProductCard({ product }: ProductCardProps) {
       </div>
     </Link>
   );
-}
+});
+
+export { ProductCard };

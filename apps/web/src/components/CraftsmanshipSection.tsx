@@ -14,7 +14,7 @@ export function CraftsmanshipSection() {
       </div>
       <div className='relative max-w-7xl mx-auto px-6 lg:px-8 py-24'>
         <div className='max-w-xl'>
-          <h3 className='text-3xl md:text-5xl font-bold text-white mb-4'>
+          <h3 className='text-3xl md:text-5xl font-bold text-white mb-10'>
             Your story, our craft.
           </h3>
 
