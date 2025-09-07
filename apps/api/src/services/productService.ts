@@ -251,7 +251,7 @@ export class ProductService {
 
     return {
       success: true,
-      data: { tags },
+      data: { tags: tags as string[] },
     };
   }
 

@@ -20,9 +20,12 @@ export class CartService {
       cart = await this.cartRepository.createCart(userId);
     }
 
-    const totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalItems = cart.items.reduce(
+      (sum: number, item: any) => sum + item.quantity,
+      0
+    );
     const subtotal = cart.items.reduce(
-      (sum, item) => sum + Number(item.price) * item.quantity,
+      (sum: number, item: any) => sum + Number(item.price) * item.quantity,
       0
     );
 
@@ -32,7 +35,7 @@ export class CartService {
         cart: {
           id: cart.id,
           userId: cart.userId,
-          items: cart.items.map(item => ({
+          items: cart.items.map((item: any) => ({
             ...item,
             price: Number(item.price),
             customizations: item.customizations as

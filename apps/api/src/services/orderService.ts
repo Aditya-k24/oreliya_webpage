@@ -38,7 +38,7 @@ export class OrderService {
 
     // Validate stock for all items
     await Promise.all(
-      cart.items.map(item =>
+      cart.items.map((item: any) =>
         this.orderRepository.validateStock(item.productId, item.quantity)
       )
     );
@@ -53,7 +53,7 @@ export class OrderService {
     // Create Stripe checkout session
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: order.items.map(item => ({
+      line_items: order.items.map((item: any) => ({
         price_data: {
           currency: 'usd',
           product_data: {

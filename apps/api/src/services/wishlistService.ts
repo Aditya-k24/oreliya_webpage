@@ -18,7 +18,7 @@ export class WishlistService {
         wishlist: {
           id: `wishlist-${userId}`, // Virtual ID for consistency
           userId: wishlist.userId,
-          items: wishlist.items.map(item => ({
+          items: wishlist.items.map((item: any) => ({
             ...item,
             product: {
               ...item.product,
