@@ -64,7 +64,6 @@ export interface CreateOrderRequest {
   billingAddressId: string;
   shippingAddressId: string;
   notes?: string;
-  dealCode?: string;
 }
 
 export interface OrderResponse {
@@ -72,6 +71,13 @@ export interface OrderResponse {
   data: {
     order: Order;
     checkoutUrl?: string; // Stripe checkout URL
+  };
+}
+
+export interface OrderListResponse {
+  success: boolean;
+  data: {
+    orders: Order[];
   };
 }
 

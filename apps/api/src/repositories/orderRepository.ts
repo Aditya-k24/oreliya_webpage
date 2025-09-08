@@ -170,7 +170,7 @@ export class OrderRepository {
   }
 
   async getOrderByStripeSessionId(stripeSessionId: string) {
-    return this.prisma.order.findUnique({
+    return this.prisma.order.findFirst({
       where: { stripeSessionId },
       include: {
         items: {

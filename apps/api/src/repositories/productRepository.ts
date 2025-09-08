@@ -14,11 +14,23 @@ export class ProductRepository {
   }
 
   async createProduct(data: CreateProductRequest) {
+    // Generate slug from name
+    const slug = ProductRepository.generateSlug(data.name);
+
     return this.prisma.product.create({
       data: {
         ...data,
-        tags: data.tags || [],
-        metadata: data.metadata || {},
+        slug,
+        metadata: data.metadata
+          ? (data.metadata as Prisma.JsonValue)
+          : Prisma.JsonNull,
+        // Don't include variants and customizations in create - they should be created separately
+        variants: undefined,
+        customizations: undefined,
+      },
+      include: {
+        variants: true,
+        customizations: true,
       },
     });
   }
@@ -26,64 +38,53 @@ export class ProductRepository {
   async getProductById(id: string) {
     return this.prisma.product.findUnique({
       where: { id },
+      include: {
+        variants: true,
+        customizations: true,
+      },
     });
   }
 
   async getProductBySlug(slug: string) {
     return this.prisma.product.findUnique({
       where: { slug },
+      include: {
+        variants: true,
+        customizations: true,
+      },
     });
   }
 
   async getProducts(
     filters: ProductFilters = {},
-    sort: ProductSortOptions = {}
+    sort: ProductSortOptions = { field: 'createdAt', order: 'desc' },
+    limit = 20,
+    offset = 0
   ) {
-    const {
-      category,
-      minPrice,
-      maxPrice,
-      search,
-      tags,
-      isActive,
-      isFeatured,
-      isOnSale,
-    } = filters;
-
-    const {
-      field = 'createdAt',
-      order = 'desc',
-      limit = 20,
-      offset = 0,
-    } = sort;
-
     const where: Prisma.ProductWhereInput = {
-      isActive: isActive ?? true,
-      ...(category && { category }),
-      ...(minPrice !== undefined && { price: { gte: minPrice } }),
-      ...(maxPrice !== undefined && { price: { lte: maxPrice } }),
-      ...(search && {
+      isActive: filters.isActive ?? true,
+      ...(filters.category && { category: filters.category }),
+      ...(filters.tags && { tags: { hasSome: filters.tags } }),
+      ...(filters.priceMin && { price: { gte: filters.priceMin } }),
+      ...(filters.priceMax && { price: { lte: filters.priceMax } }),
+      ...(filters.isFeatured && { isFeatured: true }),
+      ...(filters.isOnSale && { isOnSale: true }),
+      ...(filters.search && {
         OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
+          { name: { contains: filters.search, mode: 'insensitive' } },
+          { description: { contains: filters.search, mode: 'insensitive' } },
         ],
       }),
-      ...(tags &&
-        tags.length > 0 && {
-          tags: { hasSome: tags },
-        }),
-      ...(isFeatured !== undefined && { isFeatured }),
-      ...(isOnSale !== undefined && { isOnSale }),
-    };
-
-    const orderBy: Prisma.ProductOrderByWithRelationInput = {
-      [field]: order,
     };
 
     const [products, total] = await Promise.all([
       this.prisma.product.findMany({
         where,
-        orderBy,
+        include: {
+          variants: true,
+          customizations: true,
+        },
+        orderBy: { [sort.field]: sort.order },
         take: limit,
         skip: offset,
       }),
@@ -102,68 +103,84 @@ export class ProductRepository {
       where: { id },
       data: {
         ...data,
-        ...(data.tags && { tags: data.tags }),
-        ...(data.metadata && { metadata: data.metadata }),
+        metadata: data.metadata
+          ? (data.metadata as Prisma.JsonValue)
+          : Prisma.JsonNull,
+        // Don't include variants and customizations in update - they should be updated separately
+        variants: undefined,
+        customizations: undefined,
+      },
+      include: {
+        variants: true,
+        customizations: true,
       },
     });
   }
 
   async deleteProduct(id: string) {
-    return this.prisma.product.update({
+    return this.prisma.product.delete({
       where: { id },
-      data: { isActive: false },
     });
   }
 
-  async getFeaturedProducts(limit = 10) {
+  async getFeaturedProducts() {
     return this.prisma.product.findMany({
-      where: { isActive: true, isFeatured: true },
-      take: limit,
+      where: { isFeatured: true, isActive: true },
+      include: {
+        variants: true,
+        customizations: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async getOnSaleProducts(limit = 10) {
+  async getOnSaleProducts() {
     return this.prisma.product.findMany({
-      where: { isActive: true, isOnSale: true },
-      take: limit,
+      where: { isOnSale: true, isActive: true },
+      include: {
+        variants: true,
+        customizations: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async getRelatedProducts(productId: string, limit = 4) {
+  async getRelatedProducts(productId: string) {
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
-      select: { category: true, tags: true },
+      select: { category: true },
     });
 
     if (!product) return [];
 
     return this.prisma.product.findMany({
       where: {
+        category: product.category,
         id: { not: productId },
         isActive: true,
-        OR: [
-          { category: product.category },
-          { tags: { hasSome: product.tags } },
-        ],
       },
-      take: limit,
-      orderBy: { createdAt: 'desc' },
+      include: {
+        variants: true,
+        customizations: true,
+      },
+      take: 4,
     });
   }
 
-  async searchProducts(query: string, limit = 20) {
+  async searchProducts(query: string) {
     return this.prisma.product.findMany({
       where: {
         isActive: true,
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
           { description: { contains: query, mode: 'insensitive' } },
-          { tags: { hasSome: [query] } },
+          { shortDescription: { contains: query, mode: 'insensitive' } },
         ],
       },
-      take: limit,
+      include: {
+        variants: true,
+        customizations: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -179,25 +196,24 @@ export class ProductRepository {
     return { total, active, featured, onSale };
   }
 
-  async findCategories() {
-    const categories = await this.prisma.product.findMany({
+  async findCategories(): Promise<string[]> {
+    const products = await this.prisma.product.findMany({
       select: { category: true },
-      where: { isActive: true },
       distinct: ['category'],
+      orderBy: { category: 'asc' },
     });
-    return categories.map((c: any) => c.category);
+    return products.map(p => p.category);
   }
 
   async findTags(): Promise<string[]> {
     const products = await this.prisma.product.findMany({
       select: { tags: true },
-      where: { isActive: true },
     });
-    const allTags = products.flatMap((p: any) => p.tags);
-    return [...new Set(allTags)];
+    const allTags = products.flatMap(p => p.tags);
+    return [...new Set(allTags)].sort();
   }
 
-  private static generateSlug(name: string) {
+  private static generateSlug(name: string): string {
     return name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')

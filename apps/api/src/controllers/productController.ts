@@ -1,11 +1,13 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { ProductService } from '../services/productService';
 import {
   CreateProductRequest,
   UpdateProductRequest,
   ProductQueryParams,
+  ProductFilters,
+  ProductSortOptions,
 } from '../types/product';
-import { asyncHandler } from '../utils/asyncHandler';
+import { asyncWrapper } from '../middlewares/asyncWrapper';
 
 export class ProductController {
   private productService: ProductService;
@@ -14,17 +16,24 @@ export class ProductController {
     this.productService = productService;
   }
 
-  // GET /api/products - Get all products with pagination, search, filters, sorting
-  getProducts = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
+  getProducts = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
       const queryParams: ProductQueryParams = {
-        page: req.query.page ? Number(req.query.page) : 1,
-        limit: req.query.limit ? Number(req.query.limit) : 20,
+        page: req.query.page
+          ? parseInt(req.query.page as string, 10)
+          : undefined,
+        limit: req.query.limit
+          ? parseInt(req.query.limit as string, 10)
+          : undefined,
         search: req.query.search as string,
         category: req.query.category as string,
         tags: req.query.tags as string,
-        priceMin: req.query.priceMin ? Number(req.query.priceMin) : undefined,
-        priceMax: req.query.priceMax ? Number(req.query.priceMax) : undefined,
+        priceMin: req.query.priceMin
+          ? parseFloat(req.query.priceMin as string)
+          : undefined,
+        priceMax: req.query.priceMax
+          ? parseFloat(req.query.priceMax as string)
+          : undefined,
         isActive: req.query.isActive
           ? req.query.isActive === 'true'
           : undefined,
@@ -39,94 +48,137 @@ export class ProductController {
         sortOrder: req.query.sortOrder as 'asc' | 'desc',
       };
 
-      const result = await this.productService.getProducts(queryParams);
-      return res.status(200).json(result);
+      // Convert ProductQueryParams to ProductFilters
+      const filters: ProductFilters = {
+        category: queryParams.category,
+        tags: queryParams.tags
+          ? queryParams.tags.split(',').map(tag => tag.trim())
+          : undefined,
+        priceMin: queryParams.priceMin,
+        priceMax: queryParams.priceMax,
+        isActive: queryParams.isActive,
+        isFeatured: queryParams.isFeatured,
+        isOnSale: queryParams.isOnSale,
+        inStock: queryParams.inStock,
+        search: queryParams.search,
+      };
+
+      // Convert to ProductSortOptions
+      const sort: ProductSortOptions = {
+        field:
+          (queryParams.sortBy as
+            | 'name'
+            | 'price'
+            | 'createdAt'
+            | 'updatedAt') || 'createdAt',
+        order: queryParams.sortOrder || 'desc',
+      };
+
+      const result = await this.productService.getProducts(filters, sort);
+      res.json(result);
     }
   );
 
-  // GET /api/products/:slug - Get product by slug
-  getProductBySlug = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
-      const { slug } = req.params;
-      const result = await this.productService.getProductBySlug(slug);
-      return res.status(200).json(result);
-    }
-  );
-
-  // GET /api/products/id/:id - Get product by ID
-  getProductById = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
+  getProductById = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
       const { id } = req.params;
       const result = await this.productService.getProductById(id);
-      return res.status(200).json(result);
+      res.json(result);
     }
   );
 
-  // POST /api/products - Create new product (admin only)
-  createProduct = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
+  getProductBySlug = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const { slug } = req.params;
+      const result = await this.productService.getProductBySlug(slug);
+      res.json(result);
+    }
+  );
+
+  createProduct = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
       const productData: CreateProductRequest = req.body;
-
-      // Basic validation
-      if (
-        !productData.name ||
-        !productData.description ||
-        !productData.price ||
-        !productData.category
-      ) {
-        return res.status(400).json({
-          success: false,
-          message:
-            'Missing required fields: name, description, price, category',
-        });
-      }
-
       const result = await this.productService.createProduct(productData);
-      return res.status(201).json(result);
+      res.status(201).json(result);
     }
   );
 
-  // PUT /api/products/:id - Update product (admin only)
-  updateProduct = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
+  updateProduct = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
       const { id } = req.params;
-      const updateData: UpdateProductRequest = { ...req.body, id };
-
-      const result = await this.productService.updateProduct(id, updateData);
-      return res.status(200).json(result);
+      const productData: UpdateProductRequest = req.body;
+      const result = await this.productService.updateProduct(id, productData);
+      res.json(result);
     }
   );
 
-  // DELETE /api/products/:id - Delete product (admin only)
-  deleteProduct = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
+  deleteProduct = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
       const { id } = req.params;
       const result = await this.productService.deleteProduct(id);
-      return res.status(200).json(result);
+      res.json(result);
     }
   );
 
-  // GET /api/products/deals/featured - Get deals and featured products
-  getDealsAndFeatured = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
+  getFeaturedProducts = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const result = await this.productService.getFeaturedProducts();
+      res.json(result);
+    }
+  );
+
+  getOnSaleProducts = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const result = await this.productService.getOnSaleProducts();
+      res.json(result);
+    }
+  );
+
+  getDealsAndFeatured = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
       const result = await this.productService.getDealsAndFeatured();
-      return res.status(200).json(result);
+      res.json(result);
     }
   );
 
-  // GET /api/products/categories - Get all categories
-  getCategories = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
+  getRelatedProducts = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const { id } = req.params;
+      const result = await this.productService.getRelatedProducts(id);
+      res.json(result);
+    }
+  );
+
+  searchProducts = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const { q } = req.query;
+      if (!q || typeof q !== 'string') {
+        res
+          .status(400)
+          .json({ success: false, message: 'Search query is required' });
+        return;
+      }
+      const result = await this.productService.searchProducts(q);
+      res.json(result);
+    }
+  );
+
+  getProductStats = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const result = await this.productService.getProductStats();
+      res.json(result);
+    }
+  );
+
+  getCategories = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
       const result = await this.productService.getCategories();
-      return res.status(200).json(result);
+      res.json(result);
     }
   );
 
-  // GET /api/products/tags - Get all tags
-  getTags = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
-      const result = await this.productService.getTags();
-      return res.status(200).json(result);
-    }
-  );
+  getTags = asyncWrapper(async (req: Request, res: Response): Promise<void> => {
+    const result = await this.productService.getTags();
+    res.json(result);
+  });
 }

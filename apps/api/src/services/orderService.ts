@@ -1,8 +1,12 @@
 import Stripe from 'stripe';
 import { OrderRepository } from '../repositories/orderRepository';
 import { CartRepository } from '../repositories/cartRepository';
-import { CreateOrderRequest, OrderResponse } from '../types/order';
-import { CustomError } from '../utils/errors';
+import {
+  CreateOrderRequest,
+  OrderResponse,
+  OrderListResponse,
+  OrderItem,
+} from '../types/order';
 
 export class OrderService {
   private orderRepository: OrderRepository;
@@ -23,38 +27,40 @@ export class OrderService {
 
   async createOrder(
     userId: string,
-    data: CreateOrderRequest
+    orderData: CreateOrderRequest
   ): Promise<OrderResponse> {
-    // Get user's cart
+    // Get cart
     const cart = await this.cartRepository.getCartByUserId(userId);
-
-    if (!cart || cart.items.length === 0) {
-      throw new CustomError('Cart is empty', 400);
+    if (!cart || !cart.items || cart.items.length === 0) {
+      throw new Error('Cart is empty');
     }
 
     // Validate stock for all items
-    await Promise.all(
-      cart.items.map((item: any) =>
-        this.orderRepository.validateStock(item.productId, item.quantity)
-      )
+    const stockValidationPromises = cart.items.map(item =>
+      this.orderRepository.validateStock(item.productId, item.quantity)
     );
+    const stockValidationResults = await Promise.all(stockValidationPromises);
+
+    const invalidItems = stockValidationResults.some(isValid => !isValid);
+    if (invalidItems) {
+      throw new Error('Insufficient stock for some products');
+    }
 
     // Create order
     const order = await this.orderRepository.createOrder(
       userId,
-      data,
+      orderData,
       cart.items
     );
 
     // Create Stripe checkout session
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: order.items.map((item: any) => ({
+      line_items: cart.items.map(item => ({
         price_data: {
           currency: 'usd',
           product_data: {
             name: item.product.name,
-            description: item.product.description || '',
             images: item.product.images,
           },
           unit_amount: Math.round(Number(item.price) * 100), // Convert to cents
@@ -62,41 +68,53 @@ export class OrderService {
         quantity: item.quantity,
       })),
       mode: 'payment',
-      success_url: `${process.env.CLIENT_URL}/orders/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/cart`,
+      success_url: `${process.env.FRONTEND_URL}/orders?success=true`,
+      cancel_url: `${process.env.FRONTEND_URL}/cart?cancelled=true`,
       metadata: {
         orderId: order.id,
         userId,
       },
     });
 
-    // Update order with session ID
+    // Update order with Stripe session ID
     await this.orderRepository.updateOrderStripeSession(order.id, session.id);
+
+    // Clear cart after successful order creation
+    await this.cartRepository.clearCart(cart.id);
 
     return {
       success: true,
       data: {
         order: {
           ...order,
-          items: order.items.map((item: any) => ({
-            ...item,
-            price: Number(item.price),
-            product: {
-              ...item.product,
-              price: Number(item.product.price),
-            },
-          })),
+          status: order.status as
+            | 'pending'
+            | 'processing'
+            | 'shipped'
+            | 'delivered'
+            | 'cancelled',
+          subtotal: Number(order.subtotal),
+          taxAmount: Number(order.taxAmount),
+          shippingAmount: Number(order.shippingAmount),
+          discountAmount: Number(order.discountAmount),
+          totalAmount: Number(order.totalAmount),
+          paymentStatus:
+            (order.paymentStatus as 'pending' | 'paid' | 'failed') || 'pending',
+          items: OrderService.mapOrderItems(order.items),
         },
-        checkoutUrl: session.url || undefined,
+        checkoutUrl: session.url,
       },
     };
   }
 
-  async getOrder(userId: string, orderId: string): Promise<OrderResponse> {
+  async getOrderById(orderId: string, userId: string): Promise<OrderResponse> {
     const order = await this.orderRepository.getOrderById(orderId);
+    if (!order) {
+      throw new Error('Order not found');
+    }
 
-    if (!order || order.userId !== userId) {
-      throw new CustomError('Order not found', 404);
+    if (order.userId !== userId) {
+      throw new Error('Unauthorized');
     }
 
     return {
@@ -104,35 +122,47 @@ export class OrderService {
       data: {
         order: {
           ...order,
-          items: order.items.map((item: any) => ({
-            ...item,
-            price: Number(item.price),
-            product: {
-              ...item.product,
-              price: Number(item.product.price),
-            },
-          })),
+          status: order.status as
+            | 'pending'
+            | 'processing'
+            | 'shipped'
+            | 'delivered'
+            | 'cancelled',
+          subtotal: Number(order.subtotal),
+          taxAmount: Number(order.taxAmount),
+          shippingAmount: Number(order.shippingAmount),
+          discountAmount: Number(order.discountAmount),
+          totalAmount: Number(order.totalAmount),
+          paymentStatus:
+            (order.paymentStatus as 'pending' | 'paid' | 'failed') || 'pending',
+          items: OrderService.mapOrderItems(order.items),
         },
       },
     };
   }
 
-  async getUserOrders(userId: string): Promise<OrderResponse> {
+  async getOrdersByUserId(userId: string): Promise<OrderListResponse> {
     const orders = await this.orderRepository.getOrdersByUserId(userId);
 
     return {
       success: true,
       data: {
-        orders: orders.map((order: any) => ({
+        orders: orders.map(order => ({
           ...order,
-          items: order.items.map((item: any) => ({
-            ...item,
-            price: Number(item.price),
-            product: {
-              ...item.product,
-              price: Number(item.product.price),
-            },
-          })),
+          status: order.status as
+            | 'pending'
+            | 'processing'
+            | 'shipped'
+            | 'delivered'
+            | 'cancelled',
+          subtotal: Number(order.subtotal),
+          taxAmount: Number(order.taxAmount),
+          shippingAmount: Number(order.shippingAmount),
+          discountAmount: Number(order.discountAmount),
+          totalAmount: Number(order.totalAmount),
+          paymentStatus:
+            (order.paymentStatus as 'pending' | 'paid' | 'failed') || 'pending',
+          items: OrderService.mapOrderItems(order.items),
         })),
       },
     };
@@ -144,33 +174,35 @@ export class OrderService {
   ): Promise<OrderResponse> {
     const order = await this.orderRepository.updateOrderStatus(orderId, status);
 
-    if (!order) {
-      throw new CustomError('Order not found', 404);
-    }
-
     return {
       success: true,
       data: {
         order: {
           ...order,
-          items: order.items.map((item: any) => ({
-            ...item,
-            price: Number(item.price),
-            product: {
-              ...item.product,
-              price: Number(item.product.price),
-            },
-          })),
+          status: order.status as
+            | 'pending'
+            | 'processing'
+            | 'shipped'
+            | 'delivered'
+            | 'cancelled',
+          subtotal: Number(order.subtotal),
+          taxAmount: Number(order.taxAmount),
+          shippingAmount: Number(order.shippingAmount),
+          discountAmount: Number(order.discountAmount),
+          totalAmount: Number(order.totalAmount),
+          paymentStatus:
+            (order.paymentStatus as 'pending' | 'paid' | 'failed') || 'pending',
+          items: OrderService.mapOrderItems(order.items),
         },
       },
     };
   }
 
-  async handleStripeWebhook(payload: string, signature: string): Promise<void> {
+  async handleStripeWebhook(payload: any, signature: string): Promise<void> {
     const event = this.stripe.webhooks.constructEvent(
       payload,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      process.env.STRIPE_WEBHOOK_SECRET || ''
     );
 
     if (event.type === 'checkout.session.completed') {
@@ -179,15 +211,25 @@ export class OrderService {
 
       if (orderId) {
         await this.orderRepository.updateOrderStatus(orderId, 'paid');
-        // Clear user's cart after successful payment
-        const userId = session.metadata?.userId;
-        if (userId) {
-          const cart = await this.cartRepository.getCartByUserId(userId);
-          if (cart) {
-            await this.cartRepository.clearCart(cart.id);
-          }
-        }
       }
     }
+  }
+
+  private static mapOrderItems(items: any[]): OrderItem[] {
+    return items.map(item => ({
+      id: item.id,
+      productId: item.productId,
+      quantity: item.quantity,
+      price: Number(item.price),
+      customizations:
+        (item.customizations as Record<string, unknown>) || undefined,
+      product: {
+        id: item.product.id,
+        name: item.product.name,
+        slug: item.product.slug,
+        price: Number(item.product.price),
+        images: item.product.images,
+      },
+    }));
   }
 }
