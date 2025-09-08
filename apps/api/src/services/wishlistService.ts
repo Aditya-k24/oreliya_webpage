@@ -1,6 +1,5 @@
 import { WishlistRepository } from '../repositories/wishlistRepository';
 import { WishlistResponse } from '../types/wishlist';
-import { CustomError } from '../utils/errors';
 
 export class WishlistService {
   private wishlistRepository: WishlistRepository;
@@ -36,18 +35,9 @@ export class WishlistService {
     userId: string,
     productId: string
   ): Promise<WishlistResponse> {
-    try {
-      await this.wishlistRepository.addToWishlist(userId, productId);
-      return await this.getWishlist(userId);
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message === 'Product already in wishlist'
-      ) {
-        throw new CustomError('Product is already in your wishlist', 400);
-      }
-      throw error;
-    }
+    await this.wishlistRepository.addToWishlist(userId, productId);
+
+    return this.getWishlist(userId);
   }
 
   async removeFromWishlist(
@@ -55,10 +45,13 @@ export class WishlistService {
     productId: string
   ): Promise<WishlistResponse> {
     await this.wishlistRepository.removeFromWishlist(userId, productId);
+
     return this.getWishlist(userId);
   }
 
-  async isInWishlist(userId: string, productId: string): Promise<boolean> {
-    return this.wishlistRepository.isInWishlist(userId, productId);
+  async clearWishlist(userId: string): Promise<WishlistResponse> {
+    await this.wishlistRepository.clearWishlist(userId);
+
+    return this.getWishlist(userId);
   }
 }

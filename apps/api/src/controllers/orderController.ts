@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { OrderService } from '../services/orderService';
 import { CreateOrderRequest } from '../types/order';
-import { AuthenticatedRequest } from '../types/auth';
-import { asyncHandler } from '../utils/asyncHandler';
+import { asyncWrapper } from '../middlewares/asyncWrapper';
 
 export class OrderController {
   private orderService: OrderService;
@@ -11,45 +10,58 @@ export class OrderController {
     this.orderService = orderService;
   }
 
-  // POST /api/orders - Create new order
-  createOrder = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
-      const authReq = req as AuthenticatedRequest;
-      const userId = authReq.user.id;
-      const data: CreateOrderRequest = req.body;
-
-      if (!data.billingAddressId || !data.shippingAddressId) {
-        return res.status(400).json({
-          success: false,
-          message: 'Billing and shipping address IDs are required',
-        });
+  createOrder = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, message: 'Unauthorized' });
+        return;
       }
 
+      const data: CreateOrderRequest = req.body;
       const result = await this.orderService.createOrder(userId, data);
-      return res.status(201).json(result);
+
+      res.status(201).json(result);
     }
   );
 
-  // GET /api/orders/:id - Get order by ID
-  getOrderById = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
-      const authReq = req as AuthenticatedRequest;
-      const userId = authReq.user.id;
+  getOrder = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, message: 'Unauthorized' });
+        return;
+      }
+
       const { id } = req.params;
+      const result = await this.orderService.getOrder(userId, id);
 
-      const result = await this.orderService.getOrderById(id, userId);
-      return res.status(200).json(result);
+      res.json(result);
     }
   );
 
-  // GET /api/orders - Get user's orders
-  getOrders = asyncHandler(
-    async (req: Request, res: Response, _next: NextFunction) => {
-      const authReq = req as AuthenticatedRequest;
-      const userId = authReq.user.id;
+  getUserOrders = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, message: 'Unauthorized' });
+        return;
+      }
 
-      const result = await this.orderService.getOrdersByUserId(userId);
-      return res.status(200).json(result);
+      const result = await this.orderService.getUserOrders(userId);
+
+      res.json(result);
+    }
+  );
+
+  updateOrderStatus = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      const result = await this.orderService.updateOrderStatus(id, status);
+
+      res.json(result);
     }
   );
 }

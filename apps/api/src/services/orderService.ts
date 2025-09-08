@@ -13,17 +13,12 @@ export class OrderService {
 
   constructor(
     orderRepository: OrderRepository,
-    cartRepository: CartRepository
+    cartRepository: CartRepository,
+    stripe: Stripe
   ) {
     this.orderRepository = orderRepository;
     this.cartRepository = cartRepository;
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeSecretKey) {
-      throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
-    }
-    this.stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2025-06-30.basil',
-    });
+    this.stripe = stripe;
   }
 
   async createOrder(
@@ -32,6 +27,7 @@ export class OrderService {
   ): Promise<OrderResponse> {
     // Get user's cart
     const cart = await this.cartRepository.getCartByUserId(userId);
+
     if (!cart || cart.items.length === 0) {
       throw new CustomError('Cart is empty', 400);
     }
@@ -58,6 +54,7 @@ export class OrderService {
           currency: 'usd',
           product_data: {
             name: item.product.name,
+            description: item.product.description || '',
             images: item.product.images,
           },
           unit_amount: Math.round(Number(item.price) * 100), // Convert to cents
@@ -65,108 +62,132 @@ export class OrderService {
         quantity: item.quantity,
       })),
       mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL}/orders/${order.id}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/cart?canceled=true`,
+      success_url: `${process.env.CLIENT_URL}/orders/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL}/cart`,
       metadata: {
         orderId: order.id,
         userId,
       },
     });
 
-    // Update order with Stripe session ID
-    const updatedOrder = await this.orderRepository.updateOrderStripeSession(
-      order.id,
-      session.id
-    );
-
-    // Clear cart after successful order creation
-    await this.cartRepository.clearCart(cart.id);
+    // Update order with session ID
+    await this.orderRepository.updateOrderStripeSession(order.id, session.id);
 
     return {
       success: true,
       data: {
-        order: updatedOrder as any,
-        checkoutUrl: session.url!,
+        order: {
+          ...order,
+          items: order.items.map((item: any) => ({
+            ...item,
+            price: Number(item.price),
+            product: {
+              ...item.product,
+              price: Number(item.product.price),
+            },
+          })),
+        },
+        checkoutUrl: session.url || undefined,
       },
     };
   }
 
-  async getOrderById(orderId: string, userId: string): Promise<OrderResponse> {
+  async getOrder(userId: string, orderId: string): Promise<OrderResponse> {
     const order = await this.orderRepository.getOrderById(orderId);
 
-    if (!order) {
+    if (!order || order.userId !== userId) {
       throw new CustomError('Order not found', 404);
     }
 
-    if (order.userId !== userId) {
-      throw new CustomError('Unauthorized', 403);
-    }
-
     return {
       success: true,
       data: {
-        order: order as any,
+        order: {
+          ...order,
+          items: order.items.map((item: any) => ({
+            ...item,
+            price: Number(item.price),
+            product: {
+              ...item.product,
+              price: Number(item.product.price),
+            },
+          })),
+        },
       },
     };
   }
 
-  async getOrdersByUserId(
-    userId: string
-  ): Promise<{ success: boolean; data: { orders: any[] } }> {
+  async getUserOrders(userId: string): Promise<OrderResponse> {
     const orders = await this.orderRepository.getOrdersByUserId(userId);
 
     return {
       success: true,
       data: {
-        orders: orders as any[],
+        orders: orders.map((order: any) => ({
+          ...order,
+          items: order.items.map((item: any) => ({
+            ...item,
+            price: Number(item.price),
+            product: {
+              ...item.product,
+              price: Number(item.product.price),
+            },
+          })),
+        })),
       },
     };
   }
 
-  async handleStripeWebhook(event: Stripe.Event): Promise<void> {
-    switch (event.type) {
-      case 'checkout.session.completed':
-        await this.handleCheckoutSessionCompleted(
-          event.data.object as Stripe.Checkout.Session
-        );
-        break;
-      case 'payment_intent.succeeded':
-        await OrderService.handlePaymentIntentSucceeded(
-          event.data.object as Stripe.PaymentIntent
-        );
-        break;
-      case 'payment_intent.payment_failed':
-        await OrderService.handlePaymentIntentFailed(
-          event.data.object as Stripe.PaymentIntent
-        );
-        break;
-      default:
-        console.log(`Unhandled event type: ${event.type}`);
-    }
-  }
+  async updateOrderStatus(
+    orderId: string,
+    status: string
+  ): Promise<OrderResponse> {
+    const order = await this.orderRepository.updateOrderStatus(orderId, status);
 
-  private async handleCheckoutSessionCompleted(
-    session: Stripe.Checkout.Session
-  ): Promise<void> {
-    const orderId = session.metadata?.orderId;
-    if (!orderId) {
-      throw new Error('No order ID in session metadata');
+    if (!order) {
+      throw new CustomError('Order not found', 404);
     }
 
-    await this.orderRepository.updateOrderPaymentStatus(orderId, 'paid');
+    return {
+      success: true,
+      data: {
+        order: {
+          ...order,
+          items: order.items.map((item: any) => ({
+            ...item,
+            price: Number(item.price),
+            product: {
+              ...item.product,
+              price: Number(item.product.price),
+            },
+          })),
+        },
+      },
+    };
   }
 
-  private static async handlePaymentIntentSucceeded(
-    paymentIntent: Stripe.PaymentIntent
-  ): Promise<void> {
-    // Handle payment intent success if needed
-    console.log('Payment intent succeeded:', paymentIntent.id);
-  }
+  async handleStripeWebhook(payload: string, signature: string): Promise<void> {
+    const event = this.stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
 
-  private static async handlePaymentIntentFailed(
-    paymentIntent: Stripe.PaymentIntent
-  ): Promise<void> {
-    // Handle payment intent failure if needed
-    console.log('Payment intent failed:', paymentIntent.id);
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const orderId = session.metadata?.orderId;
+
+      if (orderId) {
+        await this.orderRepository.updateOrderStatus(orderId, 'paid');
+        // Clear user's cart after successful payment
+        const userId = session.metadata?.userId;
+        if (userId) {
+          const cart = await this.cartRepository.getCartByUserId(userId);
+          if (cart) {
+            await this.cartRepository.clearCart(cart.id);
+          }
+        }
+      }
+    }
   }
 }

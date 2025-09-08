@@ -1,20 +1,19 @@
 import { Router } from 'express';
-import type { Router as ExpressRouter } from 'express';
+import Stripe from 'stripe';
 import { WebhookController } from '../controllers/webhookController';
-import { OrderService } from '../services/orderService';
 import { OrderRepository } from '../repositories/orderRepository';
 import { CartRepository } from '../repositories/cartRepository';
-import { prisma } from '../lib/prisma';
 
-const router: ExpressRouter = Router();
+const router = Router();
+const orderRepository = new OrderRepository();
+const cartRepository = new CartRepository();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-12-18.acacia',
+});
 
-// Initialize dependencies
-const orderRepository = new OrderRepository(prisma);
-const cartRepository = new CartRepository(prisma);
-const orderService = new OrderService(orderRepository, cartRepository);
+const orderService = new OrderService(orderRepository, cartRepository, stripe);
 const webhookController = new WebhookController(orderService);
 
-// Webhook routes (no authentication required for Stripe webhooks)
 router.post('/stripe', webhookController.handleStripeWebhook);
 
 export default router;
