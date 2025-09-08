@@ -3,9 +3,10 @@ import { WishlistController } from '../controllers/wishlistController';
 import { WishlistRepository } from '../repositories/wishlistRepository';
 import { WishlistService } from '../services/wishlistService';
 import { authMiddleware } from '../middlewares/authMiddleware';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
-const wishlistRepository = new WishlistRepository();
+const wishlistRepository = new WishlistRepository(prisma);
 const wishlistService = new WishlistService(wishlistRepository);
 const wishlistController = new WishlistController(wishlistService);
 
