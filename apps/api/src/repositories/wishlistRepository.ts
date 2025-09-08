@@ -79,6 +79,12 @@ export class WishlistRepository {
     });
   }
 
+  async clearWishlist(userId: string) {
+    return this.prisma.wishlist.deleteMany({
+      where: { userId },
+    });
+  }
+
   async isInWishlist(userId: string, productId: string) {
     const item = await this.prisma.wishlist.findUnique({
       where: {

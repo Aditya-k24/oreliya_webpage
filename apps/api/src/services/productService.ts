@@ -5,10 +5,6 @@ import {
   ProductFilters,
   ProductSortOptions,
   ProductResponse,
-  ProductsResponse,
-  ProductStatsResponse,
-  CategoriesResponse,
-  TagsResponse,
 } from '../types/product';
 import { CustomError } from '../utils/errors';
 
@@ -81,7 +77,7 @@ export class ProductService {
   async getProducts(
     filters: ProductFilters = {},
     sort: ProductSortOptions = {}
-  ): Promise<ProductsResponse> {
+  ): Promise<any> {
     const { products, total, hasMore } =
       await this.productRepository.getProducts(filters, sort);
 
@@ -139,7 +135,7 @@ export class ProductService {
     return { success: true };
   }
 
-  async getFeaturedProducts(): Promise<ProductsResponse> {
+  async getFeaturedProducts(): Promise<any> {
     const products = await this.productRepository.getFeaturedProducts();
 
     return {
@@ -158,7 +154,7 @@ export class ProductService {
     };
   }
 
-  async getOnSaleProducts(): Promise<ProductsResponse> {
+  async getOnSaleProducts(): Promise<any> {
     const products = await this.productRepository.getOnSaleProducts();
 
     return {
@@ -177,7 +173,34 @@ export class ProductService {
     };
   }
 
-  async getRelatedProducts(productId: string): Promise<ProductsResponse> {
+  async getDealsAndFeatured(): Promise<any> {
+    const [featuredProducts, onSaleProducts] = await Promise.all([
+      this.productRepository.getFeaturedProducts(),
+      this.productRepository.getOnSaleProducts(),
+    ]);
+
+    return {
+      success: true,
+      data: {
+        featured: featuredProducts.map(product => ({
+          ...product,
+          price: Number(product.price),
+          compareAtPrice: product.compareAtPrice
+            ? Number(product.compareAtPrice)
+            : undefined,
+        })),
+        deals: onSaleProducts.map(product => ({
+          ...product,
+          price: Number(product.price),
+          compareAtPrice: product.compareAtPrice
+            ? Number(product.compareAtPrice)
+            : undefined,
+        })),
+      },
+    };
+  }
+
+  async getRelatedProducts(productId: string): Promise<any> {
     const products = await this.productRepository.getRelatedProducts(productId);
 
     return {
@@ -196,7 +219,7 @@ export class ProductService {
     };
   }
 
-  async searchProducts(query: string): Promise<ProductsResponse> {
+  async searchProducts(query: string): Promise<any> {
     const products = await this.productRepository.searchProducts(query);
 
     return {
@@ -215,7 +238,7 @@ export class ProductService {
     };
   }
 
-  async getProductStats(): Promise<ProductStatsResponse> {
+  async getProductStats(): Promise<any> {
     const stats = await this.productRepository.getProductStats();
 
     return {
@@ -224,7 +247,7 @@ export class ProductService {
     };
   }
 
-  async getCategories(): Promise<CategoriesResponse> {
+  async getCategories(): Promise<any> {
     const categories = await this.productRepository.findCategories();
 
     return {
@@ -233,7 +256,7 @@ export class ProductService {
     };
   }
 
-  async getTags(): Promise<TagsResponse> {
+  async getTags(): Promise<any> {
     const tags = await this.productRepository.findTags();
 
     return {
