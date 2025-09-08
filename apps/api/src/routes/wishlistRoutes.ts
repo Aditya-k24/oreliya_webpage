@@ -1,25 +1,20 @@
 import { Router } from 'express';
-import type { Router as ExpressRouter } from 'express';
 import { WishlistController } from '../controllers/wishlistController';
-import { WishlistService } from '../services/wishlistService';
 import { WishlistRepository } from '../repositories/wishlistRepository';
-import { authenticateToken } from '../middlewares/authMiddleware';
-import { prisma } from '../lib/prisma';
+import { WishlistService } from '../services/wishlistService';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
-const router: ExpressRouter = Router();
-
-// Initialize dependencies
-const wishlistRepository = new WishlistRepository(prisma);
+const router = Router();
+const wishlistRepository = new WishlistRepository();
 const wishlistService = new WishlistService(wishlistRepository);
 const wishlistController = new WishlistController(wishlistService);
 
-// All wishlist routes require authentication
-router.use(authenticateToken);
+// Apply auth middleware to all routes
+router.use(authMiddleware);
 
-// Wishlist routes
 router.get('/', wishlistController.getWishlist);
 router.post('/', wishlistController.addToWishlist);
 router.delete('/:productId', wishlistController.removeFromWishlist);
-router.get('/check/:productId', wishlistController.checkWishlist);
+router.delete('/', wishlistController.clearWishlist);
 
 export default router;
