@@ -1,10 +1,4 @@
 {
   "outputDirectory": "apps/web/dist",
-  "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/((?!images|assets|favicon.ico|logo.*\\.svg|.*\\.(png|jpg|jpeg|gif|svg|ico|webp|mp4|webm)).*)",
-      "destination": "/index.html"
-    }
-  ]
+  "framework": "vite"
 }
