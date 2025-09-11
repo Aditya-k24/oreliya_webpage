@@ -19,9 +19,11 @@ module.exports = {
     },
     ecmaVersion: 'latest',
     sourceType: 'module',
+    tsconfigRootDir: __dirname,
     project: [
       './tsconfig.json',
       './apps/*/tsconfig.json',
+      './apps/api/tsconfig.eslint.json',
       './packages/*/tsconfig.json',
     ],
   },
@@ -48,6 +50,21 @@ module.exports = {
     'no-debugger': 'error',
     'max-classes-per-file': 'off',
   },
+  overrides: [
+    {
+      files: ['apps/web/src/**/*.tsx'],
+      rules: {
+        'jsx-a11y/label-has-associated-control': 'off',
+      },
+    },
+    {
+      files: ['apps/web-next/src/**/*.tsx'],
+      rules: {
+        'jsx-a11y/label-has-associated-control': 'off',
+        'no-promise-executor-return': 'off',
+      },
+    },
+  ],
   ignorePatterns: [
     'dist',
     'build',

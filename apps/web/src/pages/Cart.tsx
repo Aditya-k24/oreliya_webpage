@@ -120,6 +120,7 @@ export function Cart() {
                   {/* Quantity Controls */}
                   <div className='flex items-center gap-3'>
                     <button
+                      type='button'
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
                       className='w-8 h-8 flex items-center justify-center border border-gray-300 hover:border-[#1E240A] transition-colors'
                     >
@@ -131,6 +132,7 @@ export function Cart() {
                       {item.quantity}
                     </span>
                     <button
+                      type='button'
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       className='w-8 h-8 flex items-center justify-center border border-gray-300 hover:border-[#1E240A] transition-colors'
                     >
@@ -149,8 +151,10 @@ export function Cart() {
 
                   {/* Remove Button */}
                   <button
+                    type='button'
                     onClick={() => removeItem(item.id)}
                     className='text-gray-400 hover:text-red-500 transition-colors p-2'
+                    aria-label={`Remove ${item.name} from cart`}
                   >
                     <svg
                       className='w-5 h-5'

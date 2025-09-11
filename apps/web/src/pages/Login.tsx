@@ -218,10 +218,8 @@ export function Login() {
                   <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />
                   {isLogin ? 'Signing in...' : 'Creating account...'}
                 </div>
-              ) : isLogin ? (
-                'Sign in'
               ) : (
-                'Create account'
+                <span>{isLogin ? 'Sign in' : 'Create account'}</span>
               )}
             </button>
           </div>

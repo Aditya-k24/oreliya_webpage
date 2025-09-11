@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 
 interface CustomizationForm {
@@ -12,7 +14,7 @@ interface CustomizationForm {
   additionalNotes: string;
 }
 
-export function CustomizationPage() {
+export default function CustomizationPage() {
   const [formData, setFormData] = useState<CustomizationForm>({
     customerName: '',
     email: '',
@@ -38,7 +40,6 @@ export function CustomizationPage() {
     'Brooch',
     'Other',
   ];
-
   const budgetRanges = [
     'Under $500',
     '$500 - $1,000',
@@ -47,7 +48,6 @@ export function CustomizationPage() {
     '$5,000 - $10,000',
     'Over $10,000',
   ];
-
   const timelineOptions = [
     '1-2 weeks',
     '3-4 weeks',
@@ -63,25 +63,15 @@ export function CustomizationPage() {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFormData(prev => ({
-        ...prev,
-        referenceImage: file,
-      }));
-
-      // Create preview URL
+      setFormData(prev => ({ ...prev, referenceImage: file }));
       const reader = new FileReader();
-      reader.onload = event => {
-        setImagePreview(event.target?.result as string);
-      };
+      reader.onload = event => setImagePreview(event.target?.result as string);
       reader.readAsDataURL(file);
     }
   };
@@ -89,15 +79,9 @@ export function CustomizationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
     try {
-      // Simulate API call - replace with actual API endpoint
-      await new Promise<void>(resolve => {
-        setTimeout(() => resolve(), 2000);
-      });
-
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 1500));
       setSubmitSuccess(true);
-      // Reset form after successful submission
       setTimeout(() => {
         setSubmitSuccess(false);
         setFormData({
@@ -112,9 +96,7 @@ export function CustomizationPage() {
           additionalNotes: '',
         });
         setImagePreview(null);
-      }, 3000);
-    } catch (error) {
-      // Error handling - could implement user notification here
+      }, 2000);
     } finally {
       setIsSubmitting(false);
     }
@@ -143,7 +125,6 @@ export function CustomizationPage() {
   return (
     <div className='bg-white'>
       <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        {/* Header */}
         <div className='mb-8 text-center bg-[#F6EEDF] py-12 rounded-2xl'>
           <div className='w-16 h-16 bg-[#1E240A] rounded-full mx-auto mb-6 flex items-center justify-center'>
             <span className='text-white text-2xl'>💎</span>
@@ -157,10 +138,8 @@ export function CustomizationPage() {
           </p>
         </div>
 
-        {/* Form */}
         <div className='bg-white border border-gray-100 rounded-2xl shadow-lg p-6 lg:p-8'>
           <form onSubmit={handleSubmit} className='space-y-6'>
-            {/* Personal Information */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <div>
                 <label
@@ -179,7 +158,6 @@ export function CustomizationPage() {
                   className='w-full px-3 py-2 border-b border-gray-300 focus:border-[#1E240A] bg-transparent outline-none transition-colors'
                 />
               </div>
-
               <div>
                 <label
                   htmlFor='email'
@@ -216,7 +194,6 @@ export function CustomizationPage() {
               />
             </div>
 
-            {/* Jewelry Details */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <div>
                 <label
@@ -241,7 +218,6 @@ export function CustomizationPage() {
                   ))}
                 </select>
               </div>
-
               <div>
                 <label
                   htmlFor='budget'
@@ -258,9 +234,9 @@ export function CustomizationPage() {
                   className='w-full px-3 py-2 border-b border-gray-300 focus:border-[#1E240A] bg-transparent outline-none transition-colors'
                 >
                   <option value=''>Select budget range</option>
-                  {budgetRanges.map(budget => (
-                    <option key={budget} value={budget}>
-                      {budget}
+                  {budgetRanges.map(b => (
+                    <option key={b} value={b}>
+                      {b}
                     </option>
                   ))}
                 </select>
@@ -283,9 +259,9 @@ export function CustomizationPage() {
                 className='w-full px-3 py-2 border-b border-gray-300 focus:border-[#1E240A] bg-transparent outline-none transition-colors'
               >
                 <option value=''>Select timeline</option>
-                {timelineOptions.map(timeline => (
-                  <option key={timeline} value={timeline}>
-                    {timeline}
+                {timelineOptions.map(t => (
+                  <option key={t} value={t}>
+                    {t}
                   </option>
                 ))}
               </select>
@@ -310,7 +286,6 @@ export function CustomizationPage() {
               />
             </div>
 
-            {/* Reference Image Upload */}
             <div>
               <label
                 htmlFor='referenceImage'
@@ -421,7 +396,6 @@ export function CustomizationPage() {
           </form>
         </div>
 
-        {/* Information Section */}
         <div className='mt-8 bg-[#F6EEDF] rounded-2xl p-6'>
           <h3 className='text-lg font-semibold text-[#1E240A] mb-4'>
             How It Works

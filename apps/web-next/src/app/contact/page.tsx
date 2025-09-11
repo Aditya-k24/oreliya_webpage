@@ -1,13 +1,14 @@
+'use client';
+
 import { useState } from 'react';
 
-export function Contact() {
+export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: '',
     message: '',
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (
@@ -15,28 +16,18 @@ export function Contact() {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Simulate form submission
-    await new Promise<void>(resolve => {
-      setTimeout(() => resolve(), 2000);
-    });
-
+    await new Promise<void>(resolve => setTimeout(() => resolve(), 1500));
     setIsSubmitting(false);
-    // Handle form submission logic here
   };
 
   return (
     <div className='bg-white'>
-      {/* Hero Section */}
       <div className='bg-[#F6EEDF] py-20'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8 text-center'>
           <div className='mb-8'>
@@ -57,7 +48,6 @@ export function Contact() {
 
       <div className='max-w-7xl mx-auto px-6 lg:px-8 py-20'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-16'>
-          {/* Contact Information */}
           <div className='space-y-8'>
             <div>
               <h2 className='text-3xl font-light text-[#1E240A] mb-6'>
@@ -192,12 +182,10 @@ export function Contact() {
             </div>
           </div>
 
-          {/* Contact Form */}
           <div className='bg-[#F6EEDF] p-8 rounded-2xl'>
             <h3 className='text-2xl font-medium text-[#1E240A] mb-6'>
               Send Us a Message
             </h3>
-
             <form onSubmit={handleSubmit} className='space-y-6'>
               <div>
                 <label
@@ -217,7 +205,6 @@ export function Contact() {
                   placeholder='Enter your full name'
                 />
               </div>
-
               <div>
                 <label
                   htmlFor='email'
@@ -236,7 +223,6 @@ export function Contact() {
                   placeholder='Enter your email address'
                 />
               </div>
-
               <div>
                 <label
                   htmlFor='subject'
@@ -260,7 +246,6 @@ export function Contact() {
                   <option value='other'>Other</option>
                 </select>
               </div>
-
               <div>
                 <label
                   htmlFor='message'
@@ -279,15 +264,10 @@ export function Contact() {
                   placeholder='Tell us how we can help you...'
                 />
               </div>
-
               <button
                 type='submit'
                 disabled={isSubmitting}
-                className={`w-full py-4 px-6 font-medium rounded border border-[#1E240A] transition-all duration-300 uppercase tracking-wider text-sm ${
-                  isSubmitting
-                    ? 'bg-gray-400 cursor-not-allowed text-white'
-                    : 'bg-[#1E240A] text-white hover:bg-white hover:text-[#1E240A]'
-                }`}
+                className={`w-full py-4 px-6 font-medium rounded border border-[#1E240A] transition-all duration-300 uppercase tracking-wider text-sm ${isSubmitting ? 'bg-gray-400 cursor-not-allowed text-white' : 'bg-[#1E240A] text-white hover:bg-white hover:text-[#1E240A]'}`}
               >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
