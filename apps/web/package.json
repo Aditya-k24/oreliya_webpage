@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
-    "@oreliya/ui": "workspace:*",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.5.0",
     "@types/node": "^24.0.14",
