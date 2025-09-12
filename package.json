@@ -7,7 +7,7 @@
     "dev": "pnpm --parallel --recursive run dev",
     "build": "pnpm --recursive run build",
     "build:api": "cd apps/api && pnpm run build:skip-check",
-    "vercel-build": "cd apps/web-next && pnpm install && pnpm run build",
+    "vercel-build": "cd apps/web-next && pnpm install --ignore-scripts && pnpm run build",
     "test": "pnpm --recursive run test",
     "lint": "pnpm --recursive run lint",
     "lint:fix": "pnpm --recursive run lint:fix",
@@ -19,7 +19,7 @@
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
-    "prepare": "husky install"
+    "prepare": "is-ci || husky install"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
@@ -36,6 +36,7 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
+    "is-ci": "^3.0.1",
     "lint-staged": "^15.2.0",
     "next": "15.5.3",
     "prettier": "^3.1.0",
