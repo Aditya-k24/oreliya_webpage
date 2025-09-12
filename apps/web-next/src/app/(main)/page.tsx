@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { HeroVideo, CraftsmanshipSection, AnnouncementBar } from '@oreliya/ui';
+import {
+  HeroVideo,
+  CraftsmanshipSection,
+  AnnouncementBar,
+} from '../../../components/ui';
 import { getCategories } from '@/features/products/lib/server';
 import type { Category } from '@/types/product';
 

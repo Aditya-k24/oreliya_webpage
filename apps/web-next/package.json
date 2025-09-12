@@ -16,7 +16,6 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
-    "@oreliya/ui": "workspace:*",
     "next": "15.5.3",
     "next-auth": "^4.24.11",
     "react": "19.1.0",
