@@ -52,12 +52,6 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['apps/web/src/**/*.tsx'],
-      rules: {
-        'jsx-a11y/label-has-associated-control': 'off',
-      },
-    },
-    {
       files: ['apps/web-next/src/**/*.tsx'],
       rules: {
         'jsx-a11y/label-has-associated-control': 'off',

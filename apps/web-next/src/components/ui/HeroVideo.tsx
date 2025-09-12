@@ -33,10 +33,7 @@ export function HeroVideo({
         </div>
         <div className='mb-16'>
           <LinkComponent href={href}>
-            <button
-              type='button'
-              className='bg-[#1E240A] text-white font-medium py-4 px-8 border border-[#1E240A] hover:bg-white hover:text-[#1E240A] transition-all duration-300 uppercase tracking-wider text-sm rounded'
-            >
+            <button type='button' className='btn-primary'>
               Custom Design
             </button>
           </LinkComponent>

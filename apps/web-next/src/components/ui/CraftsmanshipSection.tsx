@@ -26,16 +26,10 @@ export function CraftsmanshipSection({
             Your story, our craft.
           </h3>
           <div className='flex gap-4'>
-            <LinkComponent
-              href='/contact'
-              className='px-6 py-3 bg-[#1E240A] text-white font-medium hover:bg-[#2A3A1A] transition-colors uppercase tracking-wider text-sm rounded'
-            >
+            <LinkComponent href='/contact' className='btn-primary'>
               Get in touch
             </LinkComponent>
-            <LinkComponent
-              href='/customization'
-              className='px-6 py-3 border-2 border-white text-white font-medium hover:bg-white hover:text-[#1E240A] transition-all uppercase tracking-wider text-sm rounded'
-            >
+            <LinkComponent href='/customization' className='btn-white-outline'>
               Create your jewellery
             </LinkComponent>
           </div>

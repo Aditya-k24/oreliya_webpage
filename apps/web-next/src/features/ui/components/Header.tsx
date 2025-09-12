@@ -16,7 +16,7 @@ export function Header() {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <header className='bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50'>
+    <header className='bg-[#F6EEDF]/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50'>
       <div className='max-w-7xl mx-auto px-6 lg:px-8'>
         <div className='h-1 bg-[#1E240A]' />
         <div className='flex items-center justify-between h-20'>
@@ -29,7 +29,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`uppercase tracking-widest transition-colors duration-300 ${
+                className={`uppercase tracking-widest transition-all duration-500 ease-out hover:scale-105 ${
                   isActive(item.href)
                     ? 'text-[#1E240A] border-b-2 border-[#1E240A] pb-1'
                     : 'text-[#1E240A] hover:text-[#2A3A1A]'
@@ -42,7 +42,7 @@ export function Header() {
 
           <Link
             href='/'
-            className='absolute left-1/2 transform -translate-x-1/2 flex items-center group'
+            className='absolute left-1/2 transform -translate-x-1/2 flex items-center group transition-transform duration-500 ease-out hover:scale-105'
             aria-label='Oreliya homepage'
           >
             <div className='flex items-center'>
@@ -72,7 +72,7 @@ export function Header() {
           <div className='flex items-center gap-8'>
             <Link
               href={contactLink.href}
-              className={`uppercase tracking-widest transition-colors duration-300 ${
+              className={`uppercase tracking-widest transition-all duration-500 ease-out hover:scale-105 ${
                 isActive(contactLink.href)
                   ? 'text-[#1E240A] border-b-2 border-[#1E240A] pb-1'
                   : 'text-[#1E240A] hover:text-[#2A3A1A]'
