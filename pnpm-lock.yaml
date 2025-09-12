@@ -234,9 +234,6 @@ importers:
 
   apps/web-next:
     dependencies:
-      '@oreliya/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       next:
         specifier: 15.5.3
         version: 15.5.3(@babel/core@7.28.0)(@playwright/test@1.55.0)(react-dom@19.1.0)(react@19.1.0)
