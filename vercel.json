@@ -1,7 +1,15 @@
 {
-  "rootDirectory": "apps/web-next",
-  "buildCommand": "pnpm build",
-  "installCommand": "pnpm install",
-  "framework": "nextjs",
-  "includeFiles": ["apps/web-next/public/**"]
+  "version": 2,
+  "builds": [
+    {
+      "src": "apps/web-next/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "apps/web-next/$1"
+    }
+  ]
 }
