@@ -7,7 +7,7 @@
     "dev": "pnpm --parallel --recursive run dev",
     "build": "pnpm --recursive run build",
     "build:api": "cd apps/api && pnpm run build:skip-check",
-    "vercel-build": "cd apps/web-next && pnpm install && pnpm run build",
+    "vercel-build": "cd apps/web-next && pnpm install --ignore-scripts && pnpm run build",
     "test": "pnpm --recursive run test",
     "lint": "pnpm --recursive run lint",
     "lint:fix": "pnpm --recursive run lint:fix",
