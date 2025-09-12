@@ -1,6 +1,3 @@
 {
-  "rootDirectory": "apps/web-next",
-  "buildCommand": "pnpm run vercel-build",
-  "installCommand": "pnpm install",
   "framework": "nextjs"
 }
