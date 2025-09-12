@@ -1,29 +1,7 @@
-import type { NextAuthOptions, Session } from 'next-auth';
+import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import axios from 'axios';
-import type { JWT } from 'next-auth/jwt';
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api';
-
-type AppUser = {
-  id: string;
-  email: string;
-  name?: string;
-  role?: string;
-};
-
-type AppToken = JWT & {
-  user?: AppUser;
-  accessToken?: string;
-  refreshToken?: string;
-};
-
-type AppSession = Session & {
-  user?: AppUser;
-  accessToken?: string;
-  refreshToken?: string;
-};
+import { config } from '@/lib/config';
+import type { AppUser, AppToken, AppSession } from '../types/auth';
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
@@ -37,29 +15,25 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) return null;
+
         try {
-          const res = await axios.post(`${API_BASE_URL}/auth/login`, {
-            email: credentials.email,
-            password: credentials.password,
+          const response = await fetch(`${config.api.baseUrl}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
           });
-          const data = res.data as {
-            success?: boolean;
-            data?: {
-              user: {
-                id: string;
-                email: string;
-                firstName?: string;
-                lastName?: string;
-                role?: string;
-              };
-              tokens: { accessToken: string; refreshToken: string };
-            };
-          };
+
+          const data = await response.json();
+
           if (data?.success && data?.data?.user && data?.data?.tokens) {
             const { user, tokens } = data.data;
             const name =
               `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
               undefined;
+
             return {
               id: user.id,
               email: user.email,
@@ -67,10 +41,7 @@ export const authOptions: NextAuthOptions = {
               role: user.role,
               accessToken: tokens.accessToken,
               refreshToken: tokens.refreshToken,
-            } as unknown as AppUser & {
-              accessToken: string;
-              refreshToken: string;
-            };
+            } as AppUser & { accessToken: string; refreshToken: string };
           }
           return null;
         } catch {
@@ -80,7 +51,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user }) {
       const t = token as AppToken;
       const u = user as
         | (AppUser & { accessToken?: string; refreshToken?: string })
@@ -95,13 +66,6 @@ export const authOptions: NextAuthOptions = {
           refreshToken: u.refreshToken,
         };
       }
-      if (trigger === 'update' && session) {
-        const s = session as AppSession;
-        nextToken = {
-          ...nextToken,
-          user: { ...nextToken.user, ...s.user },
-        };
-      }
       return nextToken;
     },
     async session({ session, token }) {
@@ -113,8 +77,8 @@ export const authOptions: NextAuthOptions = {
         accessToken: t.accessToken,
         refreshToken: t.refreshToken,
       };
-      return nextSession;
+      return nextSession as any;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: config.auth.secret,
 };

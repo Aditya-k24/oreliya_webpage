@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import axios from 'axios';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api';
@@ -22,11 +21,15 @@ export default function SignUpPage() {
     setLoading(true);
     setError(null);
     try {
-      await axios.post(`${API_BASE_URL}/auth/signup`, {
-        firstName,
-        lastName,
-        email,
-        password,
+      await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+        }),
       });
       const res = await signIn('credentials', {
         email,

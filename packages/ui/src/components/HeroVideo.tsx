@@ -1,4 +1,14 @@
-export function HeroVideo() {
+interface HeroVideoProps {
+  href?: string;
+  linkComponent?: React.ComponentType<any>;
+}
+
+export function HeroVideo({
+  href = '/customization',
+  linkComponent: Link,
+}: HeroVideoProps) {
+  const LinkComponent = Link || 'a';
+
   return (
     <section className='relative w-full h-screen flex items-center justify-center overflow-hidden'>
       <div className='absolute inset-0'>
@@ -22,14 +32,14 @@ export function HeroVideo() {
           </p>
         </div>
         <div className='mb-16'>
-          <a href='/customization'>
+          <LinkComponent href={href}>
             <button
               type='button'
               className='bg-[#1E240A] text-white font-medium py-4 px-8 border border-[#1E240A] hover:bg-white hover:text-[#1E240A] transition-all duration-300 uppercase tracking-wider text-sm rounded'
             >
               Custom Design
             </button>
-          </a>
+          </LinkComponent>
         </div>
       </div>
     </section>

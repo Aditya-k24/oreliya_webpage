@@ -1,4 +1,12 @@
-export function CraftsmanshipSection() {
+interface CraftsmanshipSectionProps {
+  linkComponent?: React.ComponentType<any>;
+}
+
+export function CraftsmanshipSection({
+  linkComponent: Link,
+}: CraftsmanshipSectionProps) {
+  const LinkComponent = Link || 'a';
+
   return (
     <section className='relative overflow-hidden'>
       <div className='absolute inset-0'>
@@ -18,18 +26,18 @@ export function CraftsmanshipSection() {
             Your story, our craft.
           </h3>
           <div className='flex gap-4'>
-            <a
+            <LinkComponent
               href='/contact'
               className='px-6 py-3 bg-[#1E240A] text-white font-medium hover:bg-[#2A3A1A] transition-colors uppercase tracking-wider text-sm rounded'
             >
               Get in touch
-            </a>
-            <a
+            </LinkComponent>
+            <LinkComponent
               href='/customization'
               className='px-6 py-3 border-2 border-white text-white font-medium hover:bg-white hover:text-[#1E240A] transition-all uppercase tracking-wider text-sm rounded'
             >
               Create your jewellery
-            </a>
+            </LinkComponent>
           </div>
         </div>
       </div>

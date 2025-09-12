@@ -1,7 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+
+const navigation = [
+  { name: 'Custom Design', href: '/customization' },
+  { name: 'Heritage', href: '/about' },
+];
+
+const contactLink = { name: 'Contact', href: '/contact' };
 
 export function Header() {
   const pathname = usePathname();
@@ -12,46 +20,50 @@ export function Header() {
       <div className='max-w-7xl mx-auto px-6 lg:px-8'>
         <div className='h-1 bg-[#1E240A]' />
         <div className='flex items-center justify-between h-20'>
-          <nav className='hidden lg:flex items-center gap-12 text-sm'>
-            <Link
-              href='/customization'
-              className={`uppercase tracking-widest transition-colors duration-300 ${
-                isActive('/customization')
-                  ? 'text-[#1E240A] border-b-2 border-[#1E240A] pb-1'
-                  : 'text-[#1E240A] hover:text-[#2A3A1A]'
-              }`}
-            >
-              Custom Design
-            </Link>
-            <Link
-              href='/about'
-              className={`uppercase tracking-widest transition-colors duration-300 ${
-                isActive('/about')
-                  ? 'text-[#1E240A] border-b-2 border-[#1E240A] pb-1'
-                  : 'text-[#1E240A] hover:text-[#2A3A1A]'
-              }`}
-            >
-              Heritage
-            </Link>
+          <nav
+            className='hidden lg:flex items-center gap-12 text-sm'
+            role='navigation'
+            aria-label='Main navigation'
+          >
+            {navigation.map(item => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`uppercase tracking-widest transition-colors duration-300 ${
+                  isActive(item.href)
+                    ? 'text-[#1E240A] border-b-2 border-[#1E240A] pb-1'
+                    : 'text-[#1E240A] hover:text-[#2A3A1A]'
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
           </nav>
 
           <Link
             href='/'
             className='absolute left-1/2 transform -translate-x-1/2 flex items-center group'
+            aria-label='Oreliya homepage'
           >
             <div className='flex items-center'>
               <div className='w-12 h-12 flex items-center justify-center'>
-                <img
+                <Image
                   src='/logo-mark.svg'
-                  alt='Oreliya logo mark'
+                  alt=''
+                  width={48}
+                  height={48}
                   className='w-full h-full object-contain'
+                  priority
                 />
               </div>
               <div className='h-8'>
-                <img
+                <Image
                   src='/logo.svg'
                   alt='Oreliya'
+                  height={32}
+                  width={120}
                   className='h-full w-auto object-contain'
+                  priority
                 />
               </div>
             </div>
@@ -59,14 +71,14 @@ export function Header() {
 
           <div className='flex items-center gap-8'>
             <Link
-              href='/contact'
+              href={contactLink.href}
               className={`uppercase tracking-widest transition-colors duration-300 ${
-                isActive('/contact')
+                isActive(contactLink.href)
                   ? 'text-[#1E240A] border-b-2 border-[#1E240A] pb-1'
                   : 'text-[#1E240A] hover:text-[#2A3A1A]'
               }`}
             >
-              Contact
+              {contactLink.name}
             </Link>
           </div>
         </div>
