@@ -2,5 +2,6 @@
   "rootDirectory": "apps/web-next",
   "buildCommand": "pnpm build",
   "installCommand": "pnpm install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "includeFiles": ["apps/web-next/public/**"]
 }
