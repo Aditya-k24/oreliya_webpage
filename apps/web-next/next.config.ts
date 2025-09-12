@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   // Performance optimizations
   poweredByHeader: false,
+
   compress: true,
 
   // Image optimization
@@ -45,14 +46,6 @@ const nextConfig: NextConfig = {
   // Experimental features for performance
   experimental: {
     optimizePackageImports: ['@heroicons/react', 'lucide-react'],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
   },
 
   // Bundle analysis
@@ -63,6 +56,15 @@ const nextConfig: NextConfig = {
     }
 
     return config;
+  },
+
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
   },
 };
 
