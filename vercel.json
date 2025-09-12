@@ -1,5 +1,4 @@
 {
-  "buildCommand": "cd apps/web-next && CI=true pnpm install && pnpm run build",
-  "installCommand": "pnpm install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "rootDirectory": "apps/web-next"
 }
