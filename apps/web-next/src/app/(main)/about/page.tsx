@@ -28,17 +28,34 @@ export default function AboutPage() {
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-16 items-center'>
           <div>
             <h2 className='text-4xl font-light text-[#1E240A] mb-6 leading-tight'>
-              Our Mission
+              Our Story
             </h2>
-            <p className='text-lg text-gray-600 mb-8 leading-relaxed'>
-              To create exceptional jewelry that transcends time, combining
-              traditional craftsmanship with contemporary design. Every piece is
-              a testament to our commitment to excellence and beauty.
+            <p className='text-lg text-gray-600 mb-6 leading-relaxed'>
+              My love for jewelry has always been more than just an accessory —
+              it&apos;s an expression of who I am. But every time I stepped into
+              a store, I faced the same struggle: I could never find the piece
+              that truly spoke to me. Even after spending thousands, I often
+              walked away settling for something that didn&apos;t feel mine.
             </p>
-            <p className='text-lg text-gray-600 leading-relaxed'>
-              We believe that jewelry should not only adorn but inspire,
-              connecting generations through shared stories and timeless
-              elegance.
+            <p className='text-lg text-gray-600 mb-6 leading-relaxed'>
+              That&apos;s when it struck me — jewelry should never be
+              one-size-fits-all. Every individual is unique, and their jewelry
+              should reflect that uniqueness.
+            </p>
+            <p className='text-lg text-gray-600 mb-6 leading-relaxed'>
+              With this belief, I set out to create something different — a
+              brand where design meets individuality. A space where you
+              don&apos;t just buy jewelry; you define it. Where each piece is
+              thoughtfully crafted to capture your personality, your essence,
+              your story — all while ensuring exceptional quality and fair
+              pricing.
+            </p>
+            <p className='text-lg text-gray-600 mb-4 leading-relaxed font-medium'>
+              This is more than jewelry. It&apos;s art. It&apos;s expression.
+              It&apos;s you.
+            </p>
+            <p className='text-lg text-[#1E240A] font-medium leading-relaxed'>
+              Designed by us, defined by you.
             </p>
           </div>
           <div className='relative'>
