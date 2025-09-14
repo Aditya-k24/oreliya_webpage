@@ -16,18 +16,13 @@ function CategoryCard({ category }: CategoryCardProps) {
   return (
     <Link href={`/products/${category.slug}`}>
       <div className='group cursor-pointer'>
-        <div className='aspect-square bg-gradient-to-br from-[#1E240A] to-[#2A3A1A] rounded-2xl mb-4 overflow-hidden'>
-          <Image
-            src={category.image || '/placeholder-category.jpg'}
-            alt={category.name}
-            width={300}
-            height={300}
-            className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
-          />
-        </div>
-        <h3 className='text-lg font-medium text-[#1E240A] text-center group-hover:text-[#2A3A1A] transition-colors'>
-          {category.name}
-        </h3>
+        <Image
+          src={category.image || '/placeholder-category.jpg'}
+          alt={category.name}
+          width={300}
+          height={400}
+          className='w-full aspect-[3/4] object-cover rounded-2xl group-hover:scale-105 transition-transform duration-300'
+        />
       </div>
     </Link>
   );
@@ -39,7 +34,7 @@ export default async function Page() {
   return (
     <>
       <AnnouncementBar />
-      <div className='bg-[#1E240A]'>
+      <div className='bg-[#F6EEDF]'>
         <HeroVideo linkComponent={Link} />
 
         {/* Explore Our Collections section */}
