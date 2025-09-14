@@ -87,11 +87,9 @@ export default function ContactPage() {
                     Visit Our Studio
                   </h3>
                   <p className='text-gray-600 leading-relaxed'>
-                    123 Luxury Lane
+                    Borivali & Bhayandar
                     <br />
-                    Jewelry District
-                    <br />
-                    New York, NY 10001
+                    Mumbai, India
                   </p>
                 </div>
               </div>
@@ -117,9 +115,7 @@ export default function ContactPage() {
                     Email Us
                   </h3>
                   <p className='text-gray-600 leading-relaxed'>
-                    hello@oreliya.com
-                    <br />
-                    custom@oreliya.com
+                    palak.oreliya@gmail.com
                   </p>
                 </div>
               </div>
@@ -145,9 +141,9 @@ export default function ContactPage() {
                     Call Us
                   </h3>
                   <p className='text-gray-600 leading-relaxed'>
-                    +1 (555) 123-4567
+                    +91 8433845198
                     <br />
-                    Mon-Fri: 9AM-6PM EST
+                    Mon-Fri: 9AM-6PM IST
                   </p>
                 </div>
               </div>
@@ -170,12 +166,40 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className='text-lg font-medium text-[#1E240A] mb-2'>
-                    Response Time
+                    Follow Us
                   </h3>
                   <p className='text-gray-600 leading-relaxed'>
-                    We typically respond within
+                    Instagram: @oreliya.in
                     <br />
-                    24 hours during business days
+                    Stay updated with our latest designs
+                  </p>
+                </div>
+              </div>
+
+              <div className='flex items-start gap-4'>
+                <div className='w-12 h-12 bg-[#1E240A] rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <svg
+                    className='w-6 h-6 text-white'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={1.5}
+                      d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className='text-lg font-medium text-[#1E240A] mb-2'>
+                    Meet Our Founder
+                  </h3>
+                  <p className='text-gray-600 leading-relaxed'>
+                    Palak Nagori
+                    <br />
+                    Founder & Creative Director
                   </p>
                 </div>
               </div>
