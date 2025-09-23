@@ -13,7 +13,7 @@ export function HeroVideo({
     <section className='relative w-full h-screen flex items-center justify-center overflow-hidden'>
       <div className='absolute inset-0'>
         <video
-          src='/home.mp4'
+          src='/assets/videos/home.mp4'
           autoPlay
           muted
           loop

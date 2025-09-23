@@ -11,7 +11,7 @@ export function CraftsmanshipSection({
     <section className='relative overflow-hidden'>
       <div className='absolute inset-0'>
         <video
-          src='/our-craft.mp4'
+          src='/assets/videos/our-craft.mp4'
           autoPlay
           muted
           loop

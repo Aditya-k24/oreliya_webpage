@@ -48,7 +48,7 @@ export function Header() {
             <div className='flex items-center'>
               <div className='w-12 h-12 flex items-center justify-center'>
                 <Image
-                  src='/logo-mark.svg'
+                  src='/assets/logos/logo-mark.svg'
                   alt=''
                   width={48}
                   height={48}
@@ -58,7 +58,7 @@ export function Header() {
               </div>
               <div className='h-8'>
                 <Image
-                  src='/logo.svg'
+                  src='/assets/logos/logo.svg'
                   alt='Oreliya'
                   height={32}
                   width={120}

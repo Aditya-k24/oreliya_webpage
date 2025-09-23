@@ -16,14 +16,14 @@ export function Footer() {
             <div className='flex items-center justify-center mb-8'>
               <div className='w-16 h-16 flex items-center justify-center'>
                 <img
-                  src='/logo-mark-white.svg'
+                  src='/assets/logos/logo-mark-white.svg'
                   alt='Oreliya logo mark'
                   className='w-full h-full object-contain'
                 />
               </div>
               <div className='h-12'>
                 <img
-                  src='/logo-white.svg'
+                  src='/assets/logos/logo-white.svg'
                   alt='Oreliya'
                   className='h-full w-auto object-contain'
                 />
@@ -185,7 +185,7 @@ export function Footer() {
             <div className='flex items-center mb-6 md:mb-0'>
               <div className='w-6 h-6 mr-4'>
                 <img
-                  src='/logo-mark-white.svg'
+                  src='/assets/logos/logo-mark-white.svg'
                   alt='Oreliya'
                   className='w-full h-full object-contain'
                 />

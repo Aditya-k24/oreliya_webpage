@@ -46,6 +46,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  icons: {
+    icon: [{ url: '/assets/logos/favicon.svg', type: 'image/svg+xml' }],
+    shortcut: '/assets/logos/favicon.svg',
+    apple: '/assets/logos/favicon.svg',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
