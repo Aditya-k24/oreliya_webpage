@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/features/ui/components/Header';
 import { Footer } from '@/features/ui/components/Footer';
+import { SessionProvider } from '@/components/providers/SessionProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -94,11 +95,13 @@ export default function RootLayout({
   return (
     <html lang='en' className={`${inter.variable} ${playfair.variable}`}>
       <body className='font-sans antialiased'>
-        <div className='min-h-screen flex flex-col'>
-          <Header />
-          <main className='flex-1'>{children}</main>
-          <Footer />
-        </div>
+        <SessionProvider>
+          <div className='min-h-screen flex flex-col'>
+            <Header />
+            <main className='flex-1'>{children}</main>
+            <Footer />
+          </div>
+        </SessionProvider>
       </body>
     </html>
   );

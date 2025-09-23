@@ -10,6 +10,8 @@ export default function ContactPage() {
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -17,13 +19,49 @@ export default function ContactPage() {
     >
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Reset status when user starts typing again
+    if (submitStatus !== 'idle') {
+      setSubmitStatus('idle');
+      setErrorMessage('');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise<void>(resolve => setTimeout(() => resolve(), 1500));
-    setIsSubmitting(false);
+    setSubmitStatus('idle');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        // Reset form on success
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        });
+      } else {
+        setSubmitStatus('error');
+        setErrorMessage(data.error || 'Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+      setErrorMessage('Network error. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -210,6 +248,31 @@ export default function ContactPage() {
             <h3 className='text-2xl font-medium text-[#1E240A] mb-6'>
               Send Us a Message
             </h3>
+            
+            {/* Success Message */}
+            {submitStatus === 'success' && (
+              <div className='mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg'>
+                <div className='flex items-center'>
+                  <svg className='w-5 h-5 mr-2' fill='currentColor' viewBox='0 0 20 20'>
+                    <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clipRule='evenodd' />
+                  </svg>
+                  Thank you! Your message has been sent successfully. We&apos;ll get back to you soon.
+                </div>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {submitStatus === 'error' && (
+              <div className='mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg'>
+                <div className='flex items-center'>
+                  <svg className='w-5 h-5 mr-2' fill='currentColor' viewBox='0 0 20 20'>
+                    <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clipRule='evenodd' />
+                  </svg>
+                  {errorMessage}
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className='space-y-6'>
               <div>
                 <label
@@ -291,9 +354,15 @@ export default function ContactPage() {
               <button
                 type='submit'
                 disabled={isSubmitting}
-                className={`w-full py-4 px-6 font-medium rounded border border-[#1E240A] transition-all duration-300 uppercase tracking-wider text-sm ${isSubmitting ? 'bg-gray-400 cursor-not-allowed text-white' : 'bg-[#1E240A] text-white hover:bg-white hover:text-[#1E240A]'}`}
+                className={`w-full py-4 px-6 font-medium rounded border border-[#1E240A] transition-all duration-300 uppercase tracking-wider text-sm ${
+                  isSubmitting 
+                    ? 'bg-gray-400 cursor-not-allowed text-white' 
+                    : submitStatus === 'success'
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-[#1E240A] text-white hover:bg-white hover:text-[#1E240A]'
+                }`}
               >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
+                {isSubmitting ? 'Sending...' : submitStatus === 'success' ? 'Message Sent!' : 'Send Message'}
               </button>
             </form>
           </div>

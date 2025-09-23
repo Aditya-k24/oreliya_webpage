@@ -17,7 +17,7 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials.password) return null;
 
         try {
-          const response = await fetch(`${config.api.baseUrl}/auth/login`, {
+          const response = await fetch('http://localhost:3001/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -44,7 +44,8 @@ export const authOptions: NextAuthOptions = {
             } as AppUser & { accessToken: string; refreshToken: string };
           }
           return null;
-        } catch {
+        } catch (error) {
+          console.error('Login error:', error);
           return null;
         }
       },
@@ -78,6 +79,22 @@ export const authOptions: NextAuthOptions = {
         refreshToken: t.refreshToken,
       };
       return nextSession as any;
+    },
+    async redirect({ url, baseUrl }) {
+      // If user is signing in, redirect to homepage
+      if (url === baseUrl || url === `${baseUrl}/login`) {
+        return `${baseUrl}/`;
+      }
+      // If it's a relative URL, make it absolute
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      // If it's an external URL, allow it
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      // Default to homepage
+      return `${baseUrl}/`;
     },
   },
   secret: config.auth.secret,

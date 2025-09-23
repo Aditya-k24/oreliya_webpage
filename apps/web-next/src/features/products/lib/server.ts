@@ -54,9 +54,13 @@ export const getProducts = createProductCache(
 
       const response = await apiClient.get<{
         success: boolean;
-        data: Product[];
+        data: {
+          products: Product[];
+          total: number;
+          hasMore: boolean;
+        };
       }>(endpoint);
-      return response.success ? response.data : [];
+      return response.success ? response.data.products : [];
     } catch (error) {
       return [];
     }

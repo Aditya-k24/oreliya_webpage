@@ -33,13 +33,82 @@ export function middleware(_request: NextRequest) {
 }
 
 export default withAuth(
-  function authMiddleware(_req) {
-    // Add any additional auth logic here
+  function authMiddleware(req) {
+    const { pathname } = req.nextUrl;
+    
+    // Allow public access to these routes
+    const publicRoutes = [
+      '/',
+      '/products',
+      '/products/[id]',
+      '/about',
+      '/customization',
+      '/contact',
+      '/login',
+      '/register',
+      '/api/auth',
+      '/uploads'
+    ];
+    
+    // Check if the current path matches any public route pattern
+    const isPublicRoute = publicRoutes.some(route => {
+      if (route.includes('[id]')) {
+        // Handle dynamic routes like /products/[id]
+        const pattern = route.replace('[id]', '[^/]+');
+        const regex = new RegExp(`^${pattern}$`);
+        return regex.test(pathname) || pathname.startsWith('/products/');
+      }
+      return pathname === route || pathname.startsWith(route);
+    });
+    
+    // Allow public routes
+    if (isPublicRoute) {
+      return NextResponse.next();
+    }
+    
+    // Protect admin routes
+    if (pathname.startsWith('/admin')) {
+      const token = req.nextauth.token;
+      if (!token || token.role !== 'admin') {
+        return NextResponse.redirect(new URL('/login', req.url));
+      }
+    }
+    
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token, req }) => {
+        const { pathname } = req.nextUrl;
+        
+        // Allow public routes without authentication
+        const publicRoutes = [
+          '/',
+          '/products',
+          '/products/[id]',
+          '/about',
+          '/customization',
+          '/contact',
+          '/login',
+          '/register',
+          '/api/auth',
+          '/uploads'
+        ];
+        
+        const isPublicRoute = publicRoutes.some(route => {
+          if (route.includes('[id]')) {
+            return pathname.startsWith('/products/');
+          }
+          return pathname === route || pathname.startsWith(route);
+        });
+        
+        if (isPublicRoute) {
+          return true;
+        }
+        
+        // Require authentication for other routes
+        return !!token;
+      },
     },
     pages: {
       signIn: '/login',

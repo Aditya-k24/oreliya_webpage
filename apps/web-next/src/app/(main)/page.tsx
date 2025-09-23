@@ -5,51 +5,80 @@ import {
   CraftsmanshipSection,
   AnnouncementBar,
 } from '@/components/ui';
-import { getCategories } from '@/features/products/lib/server';
-import type { Category } from '@/types/product';
 
-interface CategoryCardProps {
-  category: Category;
-}
+const categories = [
+  {
+    name: 'Engagement Rings',
+    image: '/images/categories/engagement_rings.png',
+    href: '/products?category=Engagement Rings',
+  },
+  {
+    name: 'Everyday Jewelry',
+    image: '/images/categories/everyday.png',
+    href: '/products?category=Everyday Jewelry',
+  },
+  {
+    name: 'Earrings',
+    image: '/images/categories/Earrings.png',
+    href: '/products?category=Earrings',
+  },
+  {
+    name: 'Mangalsutra',
+    image: '/images/categories/Mangalsutra.png',
+    href: '/products?category=Mangalsutra',
+  },
+];
 
-function CategoryCard({ category }: CategoryCardProps) {
-  return (
-    <Link href={`/products/${category.slug}`}>
-      <div className='group cursor-pointer'>
-        <Image
-          src={category.image || '/placeholder-category.jpg'}
-          alt={category.name}
-          width={300}
-          height={400}
-          className='w-full aspect-[3/4] object-cover rounded-2xl group-hover:scale-105 transition-transform duration-300'
-        />
-      </div>
-    </Link>
-  );
-}
-
-export default async function Page() {
-  const categories = await getCategories();
-
+export default function Page() {
   return (
     <>
       <AnnouncementBar />
       <div className='bg-[#F6EEDF]'>
         <HeroVideo linkComponent={Link} />
 
-        {/* Explore Our Collections section */}
+        {/* Categories section */}
         <section className='max-w-7xl mx-auto px-6 lg:px-8 py-20 text-center'>
           <h2 className='text-3xl font-medium text-[#1E240A] mb-6'>
             Explore Our Collections
           </h2>
           <p className='text-gray-600 mb-12'>
-            Discover the perfect piece for every occasion
+            Discover our exquisite collection of handcrafted jewelry pieces
           </p>
 
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 lg:gap-12'>
-            {categories.map(category => (
-              <CategoryCard key={category.id} category={category} />
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
+            {categories.map((category) => (
+              <Link
+                key={category.name}
+                href={category.href}
+                className="group"
+              >
+                <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 group-hover:scale-105">
+                  <div className="relative h-64 w-full">
+                    <Image
+                      src={category.image}
+                      alt={category.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-lg text-[#1E240A]">
+                      {category.name}
+                    </h3>
+                  </div>
+                </div>
+              </Link>
             ))}
+          </div>
+
+          <div className="mt-8">
+            <Link 
+              href="/products"
+              className="inline-flex items-center px-8 py-3 bg-[#1E240A] text-white rounded-lg hover:bg-[#2A3A1A] transition-colors duration-200"
+            >
+              View All Products
+            </Link>
           </div>
         </section>
 
