@@ -32,7 +32,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (status === 'loading') return;
     
-    if (!session || session.user?.role !== 'admin') {
+    if (!session || (session.user as any)?.role !== 'admin') {
       router.push('/login');
       return;
     }
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
       const response = await fetch(`/api/products/${productId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${session?.accessToken}`,
+          'Authorization': `Bearer ${(session as any)?.accessToken}`,
         },
       });
       
@@ -89,14 +89,14 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!session || session.user?.role !== 'admin') {
+  if (!session || (session.user as any)?.role !== 'admin') {
     return null;
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {error && (
           <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
             {error}

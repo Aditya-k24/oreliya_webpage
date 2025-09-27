@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
+    "build:production": "NODE_ENV=production next build",
     "start": "next start",
+    "start:production": "NODE_ENV=production next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "type-check": "tsc --noEmit",
@@ -13,7 +15,11 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "analyze": "ANALYZE=true next build",
+    "preview": "next build && next start",
+    "clean": "rm -rf .next out",
+    "postbuild": "next-sitemap"
   },
   "dependencies": {
     "next": "15.5.3",

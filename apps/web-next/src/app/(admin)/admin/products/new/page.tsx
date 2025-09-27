@@ -66,7 +66,7 @@ export default function NewProductPage() {
   useEffect(() => {
     if (status === 'loading') return;
     
-    if (!session || session.user?.role !== 'admin') {
+    if (!session || (session.user as any)?.role !== 'admin') {
       router.push('/login');
       return;
     }
@@ -119,8 +119,8 @@ export default function NewProductPage() {
 
   const removeImageField = (index: number) => {
     if (formData.images.length > 1) {
-      const newImages = formData.images.filter((_, i) => i !== index);
-      const newImageFiles = formData.imageFiles.filter((_, i) => i !== index);
+      const newImages = formData.images.filter((_: any, i: number) => i !== index);
+      const newImageFiles = formData.imageFiles.filter((_: any, i: number) => i !== index);
       const newFormData = { ...formData, images: newImages, imageFiles: newImageFiles };
       setFormData(newFormData);
       saveToCache(newFormData);
@@ -196,7 +196,7 @@ export default function NewProductPage() {
         price: parseFloat(formData.price),
         compareAtPrice: formData.compareAtPrice ? parseFloat(formData.compareAtPrice) : undefined,
         category: formData.category,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        tags: formData.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag),
         images: uploadedImages.filter(img => img.trim()),
         isActive: formData.isActive,
         isFeatured: formData.isFeatured,
@@ -208,7 +208,7 @@ export default function NewProductPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.accessToken}`,
+          'Authorization': `Bearer ${(session as any)?.accessToken}`,
         },
         body: JSON.stringify(productData),
       });
@@ -242,7 +242,7 @@ export default function NewProductPage() {
     );
   }
 
-  if (!session || session.user?.role !== 'admin') {
+  if (!session || (session.user as any)?.role !== 'admin') {
     return null;
   }
 
@@ -518,7 +518,7 @@ export default function NewProductPage() {
                     </div>
 
                     <div className="space-y-6">
-                      {formData.images.map((image, index) => (
+                      {formData.images.map((image: string, index: number) => (
                         <div key={index} className="bg-gray-50 border border-gray-200 rounded-xl p-6">
                           <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-medium text-gray-900">

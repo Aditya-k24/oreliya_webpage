@@ -94,7 +94,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
 
             <div className="text-3xl font-bold text-[#1E240A]">
-              ${product.price.toFixed(2)}
+              ₹{product.price.toLocaleString('en-IN')}
             </div>
 
             <div className="prose prose-gray max-w-none">
@@ -130,7 +130,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
 
             <div className="text-sm text-gray-500">
-              <p>Free shipping on orders over $100</p>
+              <p>Free shipping on orders over ₹5,000</p>
               <p>30-day return policy</p>
               <p>Lifetime warranty on craftsmanship</p>
             </div>

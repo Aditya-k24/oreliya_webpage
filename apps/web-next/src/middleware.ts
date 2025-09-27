@@ -2,11 +2,14 @@ import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(_request: NextRequest) {
+export function middleware(request: NextRequest) {
   // Security headers
   const response = NextResponse.next();
 
-  // CSP headers
+  // Enhanced CSP headers for production
+  const isProduction = process.env.NODE_ENV === 'production';
+  const apiBaseUrl = process.env.API_BASE_URL || 'http://localhost:3001';
+  
   response.headers.set(
     'Content-Security-Policy',
     [
@@ -15,19 +18,28 @@ export function middleware(_request: NextRequest) {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' http://localhost:3001",
+      `connect-src 'self' ${apiBaseUrl}`,
       "frame-ancestors 'none'",
-    ].join('; ')
+      "base-uri 'self'",
+      "form-action 'self'",
+      isProduction ? "upgrade-insecure-requests" : "",
+    ].filter(Boolean).join('; ')
   );
 
-  // Security headers
+  // Enhanced security headers
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   response.headers.set(
     'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=()'
+    'camera=(), microphone=(), geolocation=(), payment=(), usb=()'
   );
+
+  // Rate limiting headers (basic)
+  response.headers.set('X-RateLimit-Limit', '100');
+  response.headers.set('X-RateLimit-Remaining', '99');
 
   return response;
 }
@@ -69,7 +81,9 @@ export default withAuth(
     // Protect admin routes
     if (pathname.startsWith('/admin')) {
       const token = req.nextauth.token;
-      if (!token || token.role !== 'admin') {
+      // Check if token has admin role - try different possible structures
+      const userRole = (token as any)?.user?.role || (token as any)?.role;
+      if (!token || userRole !== 'admin') {
         return NextResponse.redirect(new URL('/login', req.url));
       }
     }

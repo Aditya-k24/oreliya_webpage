@@ -15,7 +15,7 @@ const navigation = [
 
 export function Header() {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
@@ -39,7 +39,7 @@ export function Header() {
   return (
     <>
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-40 transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-50 transform transition-transform duration-300 ease-in-out ${
         showSidebar ? 'translate-x-0' : '-translate-x-full'
       }`}>
         {/* Top accent line */}
@@ -59,7 +59,7 @@ export function Header() {
           </button>
           
           {/* Navigation */}
-          <nav className='space-y-4' role='navigation' aria-label='Main navigation'>
+          <nav className='space-y-4 mt-12' role='navigation' aria-label='Main navigation'>
             {navigation.map(item => (
               <Link
                 key={item.href}
@@ -75,6 +75,42 @@ export function Header() {
               </Link>
             ))}
           </nav>
+
+          {/* Admin section - only show if user is admin */}
+          {(session?.user as any)?.role === 'admin' && (
+            <div className='mt-8 pt-6 border-t border-[#1E240A]/10'>
+              <h3 className='text-sm font-medium text-[#1E240A]/60 uppercase tracking-wide mb-4 px-4'>
+                Admin Panel
+              </h3>
+              <nav className='space-y-2' role='navigation' aria-label='Admin navigation'>
+                <Link
+                  href='/admin'
+                  onClick={() => setShowSidebar(false)}
+                  className={`block px-4 py-2 text-sm rounded-lg transition-colors duration-200 ${
+                    isActive('/admin')
+                      ? 'text-[#1E240A] bg-[#1E240A]/10 border-l-4 border-[#1E240A]'
+                      : 'text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href='/admin/products/new'
+                  onClick={() => setShowSidebar(false)}
+                  className='block px-4 py-2 text-sm text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
+                >
+                  Add Product
+                </Link>
+                <Link
+                  href='/admin/products'
+                  onClick={() => setShowSidebar(false)}
+                  className='block px-4 py-2 text-sm text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
+                >
+                  Manage Products
+                </Link>
+              </nav>
+            </div>
+          )}
 
           {/* Products section */}
           <div className='mt-8 pt-6 border-t border-[#1E240A]/10'>
@@ -116,8 +152,8 @@ export function Header() {
       </div>
 
       {/* Main header with centered logo */}
-      <header className='bg-[#F6EEDF]/90 backdrop-blur-sm border-b border-[#1E240A]/10 sticky top-0 z-50'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+      <header className='bg-[#F6EEDF]/90 backdrop-blur-sm border-b border-[#1E240A]/10 sticky top-0 z-40'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           {/* Top accent line */}
           <div className='h-0.5 bg-[#1E240A]' />
           
@@ -141,7 +177,7 @@ export function Header() {
                 className='flex items-center group transition-transform duration-300 hover:scale-105'
                 aria-label='Oreliya homepage'
               >
-                <div className='flex items-center space-x-4'>
+                <div className='flex items-center'>
                   <div className='w-12 h-12 flex items-center justify-center'>
                     <Image
                       src='/assets/logos/logo-mark.svg'
@@ -183,7 +219,7 @@ export function Header() {
                   {showUserMenu && (
                     <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50'>
                       <div className='py-1'>
-                        {session.user?.role === 'admin' && (
+                        {(session.user as any)?.role === 'admin' && (
                           <Link
                             href='/admin'
                             className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200'
@@ -255,14 +291,14 @@ export function Header() {
             className='lg:hidden fixed inset-0 bg-black/50 z-30'
             onClick={() => setShowMobileMenu(false)}
           />
-          <div className='lg:hidden fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-40 transform transition-transform duration-300 ease-in-out'>
+          <div className='lg:hidden fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-50 transform transition-transform duration-300 ease-in-out'>
             {/* Top accent line */}
             <div className='h-0.5 bg-[#1E240A]' />
             
             {/* Mobile sidebar content */}
             <div className='p-6'>
               {/* Navigation */}
-              <nav className='space-y-4' role='navigation' aria-label='Main navigation'>
+              <nav className='space-y-4 mt-8' role='navigation' aria-label='Main navigation'>
                 {navigation.map(item => (
                   <Link
                     key={item.href}
@@ -278,6 +314,42 @@ export function Header() {
                   </Link>
                 ))}
               </nav>
+
+              {/* Admin section - only show if user is admin */}
+              {(session?.user as any)?.role === 'admin' && (
+                <div className='mt-8 pt-6 border-t border-[#1E240A]/10'>
+                  <h3 className='text-sm font-medium text-[#1E240A]/60 uppercase tracking-wide mb-4 px-4'>
+                    Admin Panel
+                  </h3>
+                  <nav className='space-y-2' role='navigation' aria-label='Admin navigation'>
+                    <Link
+                      href='/admin'
+                      onClick={() => setShowMobileMenu(false)}
+                      className={`block px-4 py-2 text-sm rounded-lg transition-colors duration-200 ${
+                        isActive('/admin')
+                          ? 'text-[#1E240A] bg-[#1E240A]/10 border-l-4 border-[#1E240A]'
+                          : 'text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5'
+                      }`}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href='/admin/products/new'
+                      onClick={() => setShowMobileMenu(false)}
+                      className='block px-4 py-2 text-sm text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
+                    >
+                      Add Product
+                    </Link>
+                    <Link
+                      href='/admin/products'
+                      onClick={() => setShowMobileMenu(false)}
+                      className='block px-4 py-2 text-sm text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
+                    >
+                      Manage Products
+                    </Link>
+                  </nav>
+                </div>
+              )}
 
               {/* Products section */}
               <div className='mt-8 pt-6 border-t border-[#1E240A]/10'>

@@ -72,7 +72,7 @@ export const getProductById = (id: string) =>
   createProductCache(async (): Promise<Product | null> => {
     try {
       const response = await apiClient.get<{ success: boolean; data: Product }>(
-        `/products/${id}`
+        `/products?id=${id}`
       );
       return response.success ? response.data : null;
     } catch (error) {

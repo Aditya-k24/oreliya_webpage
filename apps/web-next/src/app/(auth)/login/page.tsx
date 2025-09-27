@@ -9,50 +9,68 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
-    setLoading(false);
-    if (res?.error) {
-      setError('Invalid email or password');
-      return;
+    
+    try {
+      const res = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+      
+      if (res?.error) {
+        setError('Invalid email or password');
+        return;
+      }
+      
+      if (res?.ok) {
+        setSuccess('Login successful! Redirecting...');
+        // Redirect based on user role
+        setTimeout(() => {
+          if (email === 'admin@oreliya.com') {
+            router.push('/admin');
+          } else {
+            router.push('/');
+          }
+          router.refresh();
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An error occurred during login');
+    } finally {
+      setLoading(false);
     }
-    // NextAuth will handle the redirect via the redirect callback
-    router.push('/');
   };
 
   return (
-    <div className='min-h-screen bg-[#F6EEDF] flex items-center justify-center px-4'>
+    <div className='min-h-screen bg-[#F6EEDF] flex items-center justify-center px-6 lg:px-8 pt-2'>
       <div className='max-w-md w-full'>
-        {/* Logo/Brand */}
-        <div className='text-center mb-8'>
-          <h1 className='text-4xl font-bold text-[#1E240A] mb-2'>Oreliya</h1>
-          <p className='text-gray-600'>Welcome back to your jewelry collection</p>
+        {/* Welcome Message */}
+        <div className='text-center mb-4'>
+          <h1 className='text-3xl font-light text-[#1E240A]'>Welcome Back</h1>
         </div>
 
         {/* Login Form */}
-        <div className='bg-white rounded-2xl shadow-xl p-8 border border-gray-100'>
-          <div className='mb-6'>
-            <h2 className='text-2xl font-semibold text-[#1E240A] mb-2'>Sign In</h2>
-            <p className='text-gray-600'>Enter your credentials to access your account</p>
+        <div className='bg-white rounded-2xl shadow-xl p-8 border border-[#1E240A]/10'>
+          <div className='mb-8'>
+            <h2 className='text-2xl font-medium text-[#1E240A]'>Sign In</h2>
           </div>
 
           <form onSubmit={onSubmit} className='space-y-6'>
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2' htmlFor='email'>
+              <label className='block text-sm font-medium text-[#1E240A] mb-2' htmlFor='email'>
                 Email Address
               </label>
               <input
                 id='email'
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200'
+                className='w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]'
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 type='email'
@@ -62,12 +80,12 @@ export default function LoginPage() {
             </div>
             
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2' htmlFor='password'>
+              <label className='block text-sm font-medium text-[#1E240A] mb-2' htmlFor='password'>
                 Password
               </label>
               <input
                 id='password'
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200'
+                className='w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]'
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 type='password'
@@ -77,7 +95,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className='bg-red-50 border border-red-200 rounded-lg p-3'>
+              <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
                 <p className='text-red-600 text-sm flex items-center'>
                   <svg className='w-4 h-4 mr-2' fill='currentColor' viewBox='0 0 20 20'>
                     <path fillRule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z' clipRule='evenodd' />
@@ -87,9 +105,20 @@ export default function LoginPage() {
               </div>
             )}
 
+            {success && (
+              <div className='bg-green-50 border border-green-200 rounded-lg p-4'>
+                <p className='text-green-600 text-sm flex items-center'>
+                  <svg className='w-4 h-4 mr-2' fill='currentColor' viewBox='0 0 20 20'>
+                    <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clipRule='evenodd' />
+                  </svg>
+                  {success}
+                </p>
+              </div>
+            )}
+
             <button 
               type='submit' 
-              className='w-full bg-[#1E240A] text-white py-3 px-4 rounded-lg font-medium hover:bg-[#2A3A1A] focus:ring-2 focus:ring-[#1E240A] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center' 
+              className='w-full bg-[#1E240A] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#2A3A1A] focus:ring-2 focus:ring-[#1E240A] focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center uppercase tracking-wider text-sm' 
               disabled={loading}
             >
               {loading ? (
@@ -107,10 +136,10 @@ export default function LoginPage() {
           </form>
 
           {/* Additional Info */}
-          <div className='mt-6 text-center'>
-            <p className='text-sm text-gray-500'>
-              Don't have an account?{' '}
-              <a href='/register' className='text-[#1E240A] hover:text-[#2A3A1A] font-medium'>
+          <div className='mt-8 text-center'>
+            <p className='text-sm text-[#1E240A]/70'>
+              Don&apos;t have an account?{' '}
+              <a href='/register' className='text-[#1E240A] hover:text-[#2A3A1A] font-medium transition-colors duration-200'>
                 Sign up here
               </a>
             </p>
@@ -118,8 +147,9 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className='text-center mt-8'>
-          <p className='text-xs text-gray-400'>
+        <div className='text-center mt-12'>
+          <div className='w-16 h-px bg-[#1E240A]/20 mx-auto mb-4'></div>
+          <p className='text-xs text-[#1E240A]/50 uppercase tracking-wider'>
             © 2024 Oreliya. All rights reserved.
           </p>
         </div>

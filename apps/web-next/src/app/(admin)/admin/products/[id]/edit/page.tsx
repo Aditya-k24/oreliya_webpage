@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -55,7 +55,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   useEffect(() => {
     if (status === 'loading') return;
     
-    if (!session || session.user?.role !== 'admin') {
+    if (!session || (session.user as any)?.role !== 'admin') {
       router.push('/login');
       return;
     }
@@ -150,7 +150,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.accessToken}`,
+          'Authorization': `Bearer ${(session as any)?.accessToken}`,
         },
         body: JSON.stringify(productData),
       });
@@ -183,7 +183,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     );
   }
 
-  if (!session || session.user?.role !== 'admin') {
+  if (!session || (session.user as any)?.role !== 'admin') {
     return null;
   }
 

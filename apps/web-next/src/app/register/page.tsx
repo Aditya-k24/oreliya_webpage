@@ -36,36 +36,29 @@ export default function RegisterPage() {
       return;
     }
 
+    // Mock registration for development - replace with actual API call when backend is ready
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock successful registration
+      setSuccess(true);
+      
+      // Auto sign in after successful registration
+      setTimeout(async () => {
+        const result = await signIn('credentials', {
           email: formData.email,
           password: formData.password,
-          phone: formData.phone,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccess(true);
-        // Auto sign in after successful registration
-        setTimeout(async () => {
-          await signIn('credentials', {
-            email: formData.email,
-            password: formData.password,
-            callbackUrl: '/',
-          });
-        }, 2000);
-      } else {
-        setError(data.message || 'Registration failed');
-      }
+          redirect: false,
+        });
+        
+        if (result?.error) {
+          setError('Registration successful but login failed. Please sign in manually.');
+          setSuccess(false);
+        } else {
+          router.push('/');
+        }
+      }, 2000);
     } catch (err) {
       setError('Registration failed. Please try again.');
     } finally {
@@ -75,10 +68,18 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            Registration successful! Redirecting...
+      <div className='min-h-screen bg-[#F6EEDF] flex items-center justify-center px-6 lg:px-8 pt-8'>
+        <div className='max-w-md w-full'>
+          <div className='bg-white rounded-2xl shadow-xl p-8 border border-[#1E240A]/10 text-center'>
+            <div className='bg-green-50 border border-green-200 rounded-lg p-6'>
+              <div className='flex items-center justify-center mb-4'>
+                <svg className='w-8 h-8 text-green-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' />
+                </svg>
+              </div>
+              <h3 className='text-lg font-medium text-green-800 mb-2'>Registration Successful!</h3>
+              <p className='text-green-700'>Redirecting you to sign in...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -86,131 +87,164 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link href="/login" className="font-medium text-[#1E240A] hover:text-[#2A3A1A]">
-              sign in to your existing account
-            </Link>
-          </p>
+    <div className='min-h-screen bg-[#F6EEDF] flex items-center justify-center px-6 lg:px-8 pt-4'>
+      <div className='max-w-md w-full'>
+        {/* Welcome Message */}
+        <div className='text-center mb-6'>
+          <h1 className='text-3xl font-light text-[#1E240A]'>Create Account</h1>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+        {/* Registration Form */}
+        <div className='bg-white rounded-2xl shadow-xl p-8 border border-[#1E240A]/10'>
+          <div className='mb-8'>
+            <h2 className='text-2xl font-medium text-[#1E240A]'>Sign Up</h2>
+          </div>
+
+          <form onSubmit={handleSubmit} className='space-y-6'>
+            {error && (
+              <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+                <p className='text-red-600 text-sm flex items-center'>
+                  <svg className='w-4 h-4 mr-2' fill='currentColor' viewBox='0 0 20 20'>
+                    <path fillRule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z' clipRule='evenodd' />
+                  </svg>
+                  {error}
+                </p>
+              </div>
+            )}
+
+            <div className='grid grid-cols-2 gap-4'>
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                <label className='block text-sm font-medium text-[#1E240A] mb-2' htmlFor='firstName'>
                   First Name
                 </label>
                 <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  required
+                  id='firstName'
+                  name='firstName'
+                  className='w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]'
                   value={formData.firstName}
                   onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#1E240A] focus:border-[#1E240A] sm:text-sm"
+                  type='text'
+                  placeholder='First name'
+                  required
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                <label className='block text-sm font-medium text-[#1E240A] mb-2' htmlFor='lastName'>
                   Last Name
                 </label>
                 <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  required
+                  id='lastName'
+                  name='lastName'
+                  className='w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]'
                   value={formData.lastName}
                   onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#1E240A] focus:border-[#1E240A] sm:text-sm"
+                  type='text'
+                  placeholder='Last name'
+                  required
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label className='block text-sm font-medium text-[#1E240A] mb-2' htmlFor='email'>
                 Email Address
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
+                id='email'
+                name='email'
+                className='w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]'
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#1E240A] focus:border-[#1E240A] sm:text-sm"
+                type='email'
+                placeholder='Enter your email'
+                required
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+              <label className='block text-sm font-medium text-[#1E240A] mb-2' htmlFor='phone'>
                 Phone Number
               </label>
               <input
-                id="phone"
-                name="phone"
-                type="tel"
+                id='phone'
+                name='phone'
+                className='w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]'
                 value={formData.phone}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#1E240A] focus:border-[#1E240A] sm:text-sm"
+                type='tel'
+                placeholder='Enter your phone number'
               />
             </div>
-
+            
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label className='block text-sm font-medium text-[#1E240A] mb-2' htmlFor='password'>
                 Password
               </label>
               <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
+                id='password'
+                name='password'
+                className='w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]'
                 value={formData.password}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#1E240A] focus:border-[#1E240A] sm:text-sm"
+                type='password'
+                placeholder='Enter your password'
+                required
               />
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label className='block text-sm font-medium text-[#1E240A] mb-2' htmlFor='confirmPassword'>
                 Confirm Password
               </label>
               <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
+                id='confirmPassword'
+                name='confirmPassword'
+                className='w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]'
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#1E240A] focus:border-[#1E240A] sm:text-sm"
+                type='password'
+                placeholder='Confirm your password'
+                required
               />
             </div>
-          </div>
 
-          <div>
-            <button
-              type="submit"
+            <button 
+              type='submit' 
+              className='w-full bg-[#1E240A] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#2A3A1A] focus:ring-2 focus:ring-[#1E240A] focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center uppercase tracking-wider text-sm' 
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#1E240A] hover:bg-[#2A3A1A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1E240A] disabled:opacity-50"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? (
+                <>
+                  <svg className='animate-spin -ml-1 mr-3 h-5 w-5 text-white' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
+                    <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
+                    <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                  </svg>
+                  Creating Account...
+                </>
+              ) : (
+                'Create Account'
+              )}
             </button>
+          </form>
+
+          {/* Additional Info */}
+          <div className='mt-8 text-center'>
+            <p className='text-sm text-[#1E240A]/70'>
+              Already have an account?{' '}
+              <a href='/login' className='text-[#1E240A] hover:text-[#2A3A1A] font-medium transition-colors duration-200'>
+                Sign in here
+              </a>
+            </p>
           </div>
-        </form>
+        </div>
+
+        {/* Footer */}
+        <div className='text-center mt-12'>
+          <div className='w-16 h-px bg-[#1E240A]/20 mx-auto mb-4'></div>
+          <p className='text-xs text-[#1E240A]/50 uppercase tracking-wider'>
+            © 2024 Oreliya. All rights reserved.
+          </p>
+        </div>
       </div>
     </div>
   );

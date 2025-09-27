@@ -52,7 +52,7 @@ function ProductCard({ product }: ProductCardProps) {
           </p>
           <div className="flex justify-between items-center">
             <span className="text-xl font-bold text-[#1E240A]">
-              ${product.price.toFixed(2)}
+              ₹{product.price.toLocaleString('en-IN')}
             </span>
             <span className="text-sm text-gray-500 capitalize">
               {product.category}

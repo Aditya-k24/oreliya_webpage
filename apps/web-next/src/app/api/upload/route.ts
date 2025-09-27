@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { validateFileUpload, sanitizeInput } from '@/lib/validation';
+import { createErrorResponse, AppError } from '@/lib/error-handler';
+import { logger } from '@/lib/logger';
+
+const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '10485760'); // 10MB
+const ALLOWED_TYPES = (process.env.ALLOWED_FILE_TYPES || 'image/jpeg,image/png,image/webp').split(',');
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,8 +15,11 @@ export async function POST(request: NextRequest) {
     const file: File | null = data.get('image') as unknown as File;
 
     if (!file) {
-      return NextResponse.json({ success: false, message: 'No file uploaded' }, { status: 400 });
+      throw new AppError('No file uploaded', 400);
     }
+
+    // Validate file
+    validateFileUpload(file, MAX_FILE_SIZE, ALLOWED_TYPES);
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
@@ -23,8 +32,8 @@ export async function POST(request: NextRequest) {
 
     // Generate unique filename with clean name
     const timestamp = Date.now();
-    // Clean filename: remove spaces, special chars, and ensure safe filename
-    const cleanName = file.name
+    const originalName = sanitizeInput(file.name);
+    const cleanName = originalName
       .replace(/\s+/g, '-')           // Replace spaces with hyphens
       .replace(/[^a-zA-Z0-9.-]/g, '') // Remove special characters except dots and hyphens
       .replace(/--+/g, '-')           // Replace multiple hyphens with single
@@ -38,12 +47,18 @@ export async function POST(request: NextRequest) {
     // Return the public URL
     const url = `/uploads/${filename}`;
     
+    logger.info('File uploaded successfully', { 
+      filename, 
+      size: file.size, 
+      type: file.type 
+    });
+    
     return NextResponse.json({ success: true, url });
   } catch (error) {
-    console.error('Upload error:', error);
-    return NextResponse.json(
-      { success: false, message: 'Failed to upload file' },
-      { status: 500 }
-    );
+    logger.error('File upload failed', { error: error instanceof Error ? error.message : error });
+    const errorResponse = createErrorResponse(error);
+    return NextResponse.json(errorResponse, { 
+      status: error instanceof AppError ? error.statusCode : 500 
+    });
   }
 }
