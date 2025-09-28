@@ -31,10 +31,15 @@ export function HeroVideo({
             Designed by us, Defined by you.
           </p>
         </div>
-        <div className='mb-16'>
+        <div className='mb-16 flex flex-col sm:flex-row gap-4 items-center justify-center'>
           <LinkComponent href={href}>
             <button type='button' className='btn-primary'>
-              Custom Design
+              Customise
+            </button>
+          </LinkComponent>
+          <LinkComponent href='/products'>
+            <button type='button' className='btn-secondary'>
+              Shop Now
             </button>
           </LinkComponent>
         </div>

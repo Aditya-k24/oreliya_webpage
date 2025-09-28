@@ -8,14 +8,14 @@ import {
 
 const categories = [
   {
-    name: 'Engagement Rings',
+    name: 'Rings',
     image: '/images/categories/engagement_rings.png',
-    href: '/products?category=Engagement Rings',
+    href: '/products?category=Rings',
   },
   {
-    name: 'Everyday Jewelry',
-    image: '/images/categories/everyday.png',
-    href: '/products?category=Everyday Jewelry',
+    name: 'Necklace',
+    image: '/images/categories/Mangalsutra.png',
+    href: '/products?category=Necklace',
   },
   {
     name: 'Earrings',
@@ -23,9 +23,9 @@ const categories = [
     href: '/products?category=Earrings',
   },
   {
-    name: 'Mangalsutra',
-    image: '/images/categories/Mangalsutra.png',
-    href: '/products?category=Mangalsutra',
+    name: 'Everyday Rings',
+    image: '/images/categories/everyday.png',
+    href: '/products?category=Rings&subcategory=Everyday Rings',
   },
 ];
 
@@ -52,21 +52,14 @@ export default function Page() {
                 href={category.href}
                 className="group"
               >
-                <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 group-hover:scale-105">
-                  <div className="relative h-64 w-full">
-                    <Image
-                      src={category.image}
-                      alt={category.name}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg text-[#1E240A]">
-                      {category.name}
-                    </h3>
-                  </div>
+                <div className="relative w-full h-96 rounded-lg overflow-hidden transition-transform duration-300 group-hover:scale-105">
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  />
                 </div>
               </Link>
             ))}

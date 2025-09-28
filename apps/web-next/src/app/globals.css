@@ -75,7 +75,7 @@
   }
 
   .btn-secondary {
-    @apply relative overflow-hidden bg-transparent text-[#1E240A] font-medium py-4 px-8 rounded border border-[#1E240A] transition-all duration-500 ease-out hover:bg-[#1E240A] hover:text-white hover:shadow-lg hover:shadow-[#1E240A]/20 hover:-translate-y-0.5 hover:scale-[1.02] uppercase tracking-wider text-sm;
+    @apply relative overflow-hidden bg-white text-[#1E240A] font-medium py-4 px-8 rounded border border-[#1E240A] transition-all duration-500 ease-out hover:bg-[#1E240A] hover:text-white hover:shadow-lg hover:shadow-[#1E240A]/20 hover:-translate-y-0.5 hover:scale-[1.02] uppercase tracking-wider text-sm;
     transform-origin: center;
   }
 

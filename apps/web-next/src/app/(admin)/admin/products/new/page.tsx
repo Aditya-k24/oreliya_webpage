@@ -481,10 +481,11 @@ export default function NewProductPage() {
                           className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200"
                         >
                           <option value="">Select a category</option>
-                          <option value="Engagement Rings">Engagement Rings</option>
-                          <option value="Everyday Jewelry">Everyday Jewelry</option>
+                          <option value="Rings">Rings</option>
                           <option value="Earrings">Earrings</option>
-                          <option value="Mangalsutra">Mangalsutra</option>
+                          <option value="Bracelet">Bracelet</option>
+                          <option value="Necklace">Necklace</option>
+                          <option value="Eira Collection">Eira Collection</option>
                         </select>
                       </div>
 

@@ -79,7 +79,7 @@ export function Footer() {
                     href='/about'
                     className='text-white/70 hover:text-[#F6EEDF] transition-all duration-300 text-sm font-light tracking-wide block py-1'
                   >
-                    Heritage
+                    About Us
                   </Link>
                 </li>
                 <li>

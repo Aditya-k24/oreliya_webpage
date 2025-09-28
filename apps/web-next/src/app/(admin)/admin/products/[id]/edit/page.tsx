@@ -373,10 +373,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#1E240A] focus:border-[#1E240A] sm:text-sm"
                   >
                     <option value="">Select a category</option>
-                    <option value="Engagement Rings">Engagement Rings</option>
-                    <option value="Everyday Jewelry">Everyday Jewelry</option>
+                    <option value="Rings">Rings</option>
                     <option value="Earrings">Earrings</option>
-                    <option value="Mangalsutra">Mangalsutra</option>
+                    <option value="Bracelet">Bracelet</option>
+                    <option value="Necklace">Necklace</option>
+                    <option value="Eira Collection">Eira Collection</option>
                   </select>
                 </div>
 
