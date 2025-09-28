@@ -15,7 +15,7 @@ interface UserProfile {
 }
 
 export default function AccountPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -96,6 +96,16 @@ export default function AccountPage() {
           email,
         });
       }
+      
+      // Update the session to reflect changes in navbar and other components
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          name,
+          email,
+        },
+      });
       
     } catch (err) {
       setError('Failed to update profile. Please try again.');
