@@ -211,7 +211,12 @@ export function Header() {
                     className='flex items-center space-x-2 p-2 rounded-md text-[#1E240A] hover:bg-[#1E240A]/10 transition-colors duration-200'
                   >
                     <span className='text-sm font-medium'>{session.user?.name || session.user?.email}</span>
-                    <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <svg 
+                      className={`w-4 h-4 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} 
+                      fill='none' 
+                      stroke='currentColor' 
+                      viewBox='0 0 24 24'
+                    >
                       <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
                     </svg>
                   </button>
