@@ -20,6 +20,9 @@ export default function AccountPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -51,8 +54,49 @@ export default function AccountPage() {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock password change - replace with actual API call when backend is ready
-    console.log('Password change requested');
+    setPasswordLoading(true);
+    setError(null);
+    setPasswordSuccess(null);
+    
+    const formData = new FormData(e.target as HTMLFormElement);
+    const currentPassword = formData.get('currentPassword') as string;
+    const newPassword = formData.get('newPassword') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+    
+    // Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setError('All password fields are required');
+      setPasswordLoading(false);
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      setError('New passwords do not match');
+      setPasswordLoading(false);
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      setError('New password must be at least 6 characters long');
+      setPasswordLoading(false);
+      return;
+    }
+    
+    try {
+      // Mock password change - replace with actual API call when backend is ready
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
+      
+      setPasswordSuccess('Password changed successfully!');
+      setShowPasswordSection(false);
+      
+      // Reset form
+      (e.target as HTMLFormElement).reset();
+      
+    } catch (err) {
+      setError('Failed to change password. Please try again.');
+    } finally {
+      setPasswordLoading(false);
+    }
   };
 
   if (status === 'loading' || loading) {
@@ -172,53 +216,97 @@ export default function AccountPage() {
             </div>
 
             {/* Password Settings */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-[#1E240A]/10">
-              <h2 className="text-xl font-medium text-[#1E240A] mb-6">Password Settings</h2>
-              
-              <form onSubmit={handleChangePassword} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-[#1E240A] mb-2" htmlFor="currentPassword">
-                    Current Password
-                  </label>
-                  <input
-                    id="currentPassword"
-                    type="password"
-                    className="w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]"
-                    placeholder="Enter your current password"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-[#1E240A] mb-2" htmlFor="newPassword">
-                    New Password
-                  </label>
-                  <input
-                    id="newPassword"
-                    type="password"
-                    className="w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]"
-                    placeholder="Enter your new password"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-[#1E240A] mb-2" htmlFor="confirmPassword">
-                    Confirm New Password
-                  </label>
-                  <input
-                    id="confirmPassword"
-                    type="password"
-                    className="w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]"
-                    placeholder="Confirm your new password"
-                  />
-                </div>
-                
-                <button 
-                  type="submit" 
-                  className="w-full bg-[#1E240A] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#2A3A1A] focus:ring-2 focus:ring-[#1E240A] focus:ring-offset-2 transition-all duration-200 uppercase tracking-wider text-sm"
+            <div className="bg-white rounded-2xl shadow-xl border border-[#1E240A]/10">
+              <button
+                onClick={() => setShowPasswordSection(!showPasswordSection)}
+                className="w-full p-8 text-left flex items-center justify-between hover:bg-[#F6EEDF]/20 transition-colors duration-200 rounded-2xl"
+              >
+                <h2 className="text-xl font-medium text-[#1E240A]">Password Settings</h2>
+                <svg 
+                  className={`w-5 h-5 text-[#1E240A] transition-transform duration-200 ${showPasswordSection ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
                 >
-                  Change Password
-                </button>
-              </form>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {showPasswordSection && (
+                <div className="px-8 pb-8 border-t border-[#1E240A]/10 pt-6">
+                  {passwordSuccess && (
+                    <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      {passwordSuccess}
+                    </div>
+                  )}
+                  
+                  <form onSubmit={handleChangePassword} className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-[#1E240A] mb-2" htmlFor="currentPassword">
+                        Current Password
+                      </label>
+                      <input
+                        id="currentPassword"
+                        name="currentPassword"
+                        type="password"
+                        required
+                        className="w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]"
+                        placeholder="Enter your current password"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-[#1E240A] mb-2" htmlFor="newPassword">
+                        New Password
+                      </label>
+                      <input
+                        id="newPassword"
+                        name="newPassword"
+                        type="password"
+                        required
+                        minLength={6}
+                        className="w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]"
+                        placeholder="Enter your new password (min 6 characters)"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-[#1E240A] mb-2" htmlFor="confirmPassword">
+                        Confirm New Password
+                      </label>
+                      <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        required
+                        className="w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]"
+                        placeholder="Confirm your new password"
+                      />
+                    </div>
+                    
+                    <button 
+                      type="submit" 
+                      disabled={passwordLoading}
+                      className="w-full bg-[#1E240A] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#2A3A1A] focus:ring-2 focus:ring-[#1E240A] focus:ring-offset-2 transition-all duration-200 uppercase tracking-wider text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    >
+                      {passwordLoading ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Changing Password...
+                        </>
+                      ) : (
+                        'Change Password'
+                      )}
+                    </button>
+                  </form>
+                </div>
+              )}
             </div>
           </div>
 
