@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -33,19 +33,53 @@ export default function AccountPage() {
       router.push('/login');
       return;
     }
-
-    // Mock user profile data - replace with actual API call when backend is ready
-    const mockProfile: UserProfile = {
-      id: (session.user as any)?.id || '1',
-      email: session.user?.email || '',
-      name: session.user?.name || '',
-      role: (session.user as any)?.role || 'user',
-      createdAt: new Date().toISOString(),
-      lastLogin: new Date().toISOString(),
+    
+    // Fetch user profile from API
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch('/api/user/profile');
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          const userProfile: UserProfile = {
+            id: data.data.id,
+            email: data.data.email,
+            name: data.data.name,
+            role: data.data.role,
+            createdAt: '2024-01-15',
+            lastLogin: new Date().toISOString().split('T')[0],
+          };
+          setProfile(userProfile);
+        } else {
+          // Fallback to session data if API fails
+          const mockProfile: UserProfile = {
+            id: (session.user as any)?.id || '1',
+            email: session.user?.email || '',
+            name: session.user?.name || '',
+            role: (session.user as any)?.role || 'user',
+            createdAt: new Date().toISOString(),
+            lastLogin: new Date().toISOString(),
+          };
+          setProfile(mockProfile);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        // Fallback to session data
+        const mockProfile: UserProfile = {
+          id: (session.user as any)?.id || '1',
+          email: session.user?.email || '',
+          name: session.user?.name || '',
+          role: (session.user as any)?.role || 'user',
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        };
+        setProfile(mockProfile);
+      } finally {
+        setLoading(false);
+      }
     };
-
-    setProfile(mockProfile);
-    setLoading(false);
+    
+    fetchProfile();
   }, [session, status, router]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -72,19 +106,22 @@ export default function AccountPage() {
     }
     
     try {
-      // Check if email is already taken by another user
-      if (email !== profile?.email) {
-        // Mock email check - replace with actual API call when backend is ready
-        const existingEmails = ['admin@oreliya.com', 'user@oreliya.com'];
-        if (existingEmails.includes(email)) {
-          setError('This email is already registered to another account');
-          setProfileLoading(false);
-          return;
-        }
-      }
+      // Call the API to update the user profile
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email }),
+      });
       
-      // Mock profile update - replace with actual API call when backend is ready
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setError(data.message || 'Failed to update profile');
+        setProfileLoading(false);
+        return;
+      }
       
       setProfileSuccess('Profile updated successfully!');
       
@@ -92,20 +129,15 @@ export default function AccountPage() {
       if (profile) {
         setProfile({
           ...profile,
-          name,
-          email,
+          name: data.data.name,
+          email: data.data.email,
         });
       }
       
-      // Update the session to reflect changes in navbar and other components
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          name,
-          email,
-        },
-      });
+      // Wait a moment for the success message to show, then refresh the page
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
       
     } catch (err) {
       setError('Failed to update profile. Please try again.');
