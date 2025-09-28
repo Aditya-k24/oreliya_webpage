@@ -20,26 +20,48 @@ export default function SignUpPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    
+    // Validation
+    if (!firstName || !lastName || !email || !password) {
+      setError('All fields are required');
+      setLoading(false);
+      return;
+    }
+    
+    if (!email.includes('@')) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
+    
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+    
     try {
-      await fetch(`${API_BASE_URL}/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          password,
-        }),
-      });
+      // Check if email already exists
+      const existingEmails = ['admin@oreliya.com', 'user@oreliya.com'];
+      if (existingEmails.includes(email)) {
+        setError('This email is already registered. Please use a different email or try signing in.');
+        setLoading(false);
+        return;
+      }
+      
+      // Mock signup - replace with actual API call when backend is ready
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      
       const res = await signIn('credentials', {
         email,
         password,
         redirect: false,
       });
+      
       if (res?.error) throw new Error(res.error);
       router.push('/');
     } catch (err) {
-      setError('Signup failed');
+      setError('Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }

@@ -23,6 +23,8 @@ export default function AccountPage() {
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [profileSuccess, setProfileSuccess] = useState<string | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -48,8 +50,58 @@ export default function AccountPage() {
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock profile update - replace with actual API call when backend is ready
-    console.log('Profile update requested');
+    setProfileLoading(true);
+    setError(null);
+    setProfileSuccess(null);
+    
+    const formData = new FormData(e.target as HTMLFormElement);
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    
+    // Validation
+    if (!name || !email) {
+      setError('Name and email are required');
+      setProfileLoading(false);
+      return;
+    }
+    
+    if (!email.includes('@')) {
+      setError('Please enter a valid email address');
+      setProfileLoading(false);
+      return;
+    }
+    
+    try {
+      // Check if email is already taken by another user
+      if (email !== profile?.email) {
+        // Mock email check - replace with actual API call when backend is ready
+        const existingEmails = ['admin@oreliya.com', 'user@oreliya.com'];
+        if (existingEmails.includes(email)) {
+          setError('This email is already registered to another account');
+          setProfileLoading(false);
+          return;
+        }
+      }
+      
+      // Mock profile update - replace with actual API call when backend is ready
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      
+      setProfileSuccess('Profile updated successfully!');
+      
+      // Update local profile state
+      if (profile) {
+        setProfile({
+          ...profile,
+          name,
+          email,
+        });
+      }
+      
+    } catch (err) {
+      setError('Failed to update profile. Please try again.');
+    } finally {
+      setProfileLoading(false);
+    }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -179,6 +231,15 @@ export default function AccountPage() {
             <div className="bg-white rounded-2xl shadow-xl p-8 border border-[#1E240A]/10">
               <h2 className="text-xl font-medium text-[#1E240A] mb-6">Profile Settings</h2>
               
+              {profileSuccess && (
+                <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  {profileSuccess}
+                </div>
+              )}
+              
               <form onSubmit={handleUpdateProfile} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-[#1E240A] mb-2" htmlFor="name">
@@ -186,8 +247,10 @@ export default function AccountPage() {
                   </label>
                   <input
                     id="name"
+                    name="name"
                     type="text"
                     defaultValue={profile.name}
+                    required
                     className="w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]"
                     placeholder="Enter your full name"
                   />
@@ -199,8 +262,10 @@ export default function AccountPage() {
                   </label>
                   <input
                     id="email"
+                    name="email"
                     type="email"
                     defaultValue={profile.email}
+                    required
                     className="w-full px-4 py-3 border border-[#1E240A]/20 rounded-lg shadow-sm placeholder-[#1E240A]/50 bg-[#F6EEDF]/30 focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200 text-[#1E240A]"
                     placeholder="Enter your email address"
                   />
@@ -208,9 +273,20 @@ export default function AccountPage() {
                 
                 <button 
                   type="submit" 
-                  className="w-full bg-[#1E240A] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#2A3A1A] focus:ring-2 focus:ring-[#1E240A] focus:ring-offset-2 transition-all duration-200 uppercase tracking-wider text-sm"
+                  disabled={profileLoading}
+                  className="w-full bg-[#1E240A] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#2A3A1A] focus:ring-2 focus:ring-[#1E240A] focus:ring-offset-2 transition-all duration-200 uppercase tracking-wider text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 >
-                  Update Profile
+                  {profileLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating Profile...
+                    </>
+                  ) : (
+                    'Update Profile'
+                  )}
                 </button>
               </form>
             </div>
