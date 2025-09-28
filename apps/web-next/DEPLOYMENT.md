@@ -1,112 +1,110 @@
 # Production Deployment Guide
 
-## Prerequisites
+This comprehensive guide covers deploying the Oreliya web application to production with all necessary configurations and optimizations.
 
-1. **Environment Variables**: Set up all required environment variables
-2. **Database**: Configure your production database
-3. **API Backend**: Ensure your API backend is running and accessible
-4. **File Storage**: Configure file upload storage (AWS S3, Cloudinary, etc.)
+## 🚀 Quick Start
 
-## Environment Variables
+### Prerequisites
+- Node.js 18+ installed
+- pnpm package manager
+- Domain name and SSL certificate
+- Environment variables configured
 
-Create a `.env.production` file with the following variables:
+### 1. Environment Variables
+
+Create a `.env.production` file with these **REQUIRED** variables:
 
 ```bash
-# NextAuth Configuration
-NEXTAUTH_URL=https://your-domain.com
-NEXTAUTH_SECRET=your-super-secret-key-here
+# NextAuth Configuration (REQUIRED)
+NEXTAUTH_URL=https://yourdomain.com
+NEXTAUTH_SECRET=your-super-secure-production-secret-key-min-32-chars
 
-# API Configuration
-API_BASE_URL=https://your-api-domain.com/api
+# API Configuration (REQUIRED)
+API_BASE_URL=https://yourdomain.com/api
 
-# Database (if using)
-DATABASE_URL=your-production-database-url
+# Email Configuration (REQUIRED)
+RESEND_API_KEY=re_your_resend_api_key_here
 
-# File Upload
-MAX_FILE_SIZE=10485760
+# File Upload Configuration
+MAX_FILE_SIZE=5242880
 ALLOWED_FILE_TYPES=image/jpeg,image/png,image/webp
 
 # Security
-JWT_SECRET=your-jwt-secret-key-here
-ENCRYPTION_KEY=your-encryption-key-here
+CORS_ORIGIN=https://yourdomain.com
 
-# Logging
-LOG_LEVEL=info
+# Database (when implemented)
+DATABASE_URL=postgresql://user:pass@host:5432/dbname
+
+# Analytics (optional)
+GOOGLE_ANALYTICS_ID=GA_MEASUREMENT_ID
 ```
 
-## Build and Deploy
-
-### 1. Build for Production
+### 2. Production Build
 
 ```bash
 # Install dependencies
 pnpm install
 
-# Type check
-pnpm type-check
+# Run production build
+pnpm run build:production
 
-# Lint check
-pnpm lint
-
-# Build for production
-pnpm build:production
+# Test production build locally
+pnpm run start:production
 ```
 
-### 2. Start Production Server
+## 🔧 Platform-Specific Deployment
 
-```bash
-pnpm start:production
-```
+### Vercel (Recommended)
 
-### 3. Deploy to Vercel
+1. **Connect Repository**: Link your GitHub repository to Vercel
+2. **Set Environment Variables**: Add all required env vars in Vercel dashboard
+3. **Configure Build Settings**:
+   - Build Command: `pnpm run build:production`
+   - Output Directory: `.next`
+   - Install Command: `pnpm install`
+4. **Deploy**: Push to main branch triggers automatic deployment
 
-```bash
-# Install Vercel CLI
-npm i -g vercel
+### Netlify
 
-# Deploy
-vercel --prod
-```
+1. **Connect Repository**: Link your GitHub repository
+2. **Build Settings**:
+   - Build Command: `pnpm run build:production`
+   - Publish Directory: `.next`
+   - Install Command: `pnpm install`
+3. **Environment Variables**: Add in Netlify dashboard
+4. **Deploy**: Automatic on push to main
 
-### 4. Deploy to Docker
+### Docker Deployment
 
+Create `Dockerfile`:
 ```dockerfile
 FROM node:18-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
-
-COPY package.json pnpm-lock.yaml* ./
-RUN corepack enable pnpm && pnpm i --frozen-lockfile
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm
+RUN pnpm install --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-ENV NEXT_TELEMETRY_DISABLED 1
-RUN corepack enable pnpm && pnpm build:production
+RUN npm install -g pnpm
+RUN pnpm run build:production
 
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
@@ -120,78 +118,115 @@ ENV HOSTNAME "0.0.0.0"
 CMD ["node", "server.js"]
 ```
 
-## Security Checklist
-
-- [ ] All environment variables are set
-- [ ] NEXTAUTH_SECRET is a strong, random string
-- [ ] API endpoints are secured with proper authentication
-- [ ] File uploads are validated and sanitized
-- [ ] CORS is properly configured
-- [ ] Rate limiting is implemented
-- [ ] Security headers are enabled
-- [ ] HTTPS is enforced
-- [ ] Database connections are encrypted
-- [ ] Logs don't contain sensitive information
-
-## Performance Optimizations
-
-- [ ] Images are optimized
-- [ ] Bundle is minified
-- [ ] Static assets are cached
-- [ ] Database queries are optimized
-- [ ] CDN is configured
-- [ ] Compression is enabled
-
-## Monitoring
-
-- [ ] Error tracking (Sentry, Bugsnag)
-- [ ] Performance monitoring (New Relic, DataDog)
-- [ ] Log aggregation (ELK, Splunk)
-- [ ] Uptime monitoring
-- [ ] Security scanning
-
-## Backup Strategy
-
-- [ ] Database backups
-- [ ] File storage backups
-- [ ] Configuration backups
-- [ ] Disaster recovery plan
-
-## Testing
-
+Build and run:
 ```bash
-# Run tests
-pnpm test:run
-
-# Run E2E tests
-pnpm test:e2e
-
-# Type check
-pnpm type-check
-
-# Lint check
-pnpm lint
+docker build -t oreliya-web .
+docker run -p 3000:3000 --env-file .env.production oreliya-web
 ```
 
-## Troubleshooting
+## 🔒 Security Checklist
+
+- [ ] **HTTPS Enabled**: SSL certificate installed and configured
+- [ ] **Environment Variables**: All secrets properly configured
+- [ ] **CORS**: Configured for your domain only
+- [ ] **Rate Limiting**: Enabled (100 requests/15 minutes)
+- [ ] **Security Headers**: CSP, HSTS, X-Frame-Options enabled
+- [ ] **File Upload**: Size and type restrictions in place
+- [ ] **Authentication**: NextAuth properly configured
+- [ ] **Database**: Connection secured with SSL
+
+## 📊 Monitoring & Analytics
+
+### Health Check
+Monitor your application health:
+```bash
+curl https://yourdomain.com/api/health
+```
+
+### Error Tracking
+- Built-in error boundary catches React errors
+- API errors logged with structured logging
+- Health check endpoint for monitoring
+
+### Performance
+- Next.js automatic optimizations enabled
+- Image optimization configured
+- Static generation where possible
+
+## 🚨 Troubleshooting
 
 ### Common Issues
 
-1. **Authentication not working**: Check NEXTAUTH_SECRET and NEXTAUTH_URL
-2. **File uploads failing**: Check file size limits and allowed types
-3. **API calls failing**: Verify API_BASE_URL and CORS settings
-4. **Build failures**: Check for TypeScript errors and missing dependencies
+1. **Build Fails**: Check all environment variables are set
+2. **Authentication Issues**: Verify NEXTAUTH_SECRET and NEXTAUTH_URL
+3. **File Upload Issues**: Check MAX_FILE_SIZE and ALLOWED_FILE_TYPES
+4. **Email Issues**: Verify RESEND_API_KEY is valid
+
+### Debug Mode
+Enable debug mode in development:
+```bash
+NODE_ENV=development pnpm dev
+```
 
 ### Logs
+Check application logs:
+- **Vercel**: Dashboard → Functions → View Logs
+- **Docker**: `docker logs container-name`
+- **PM2**: `pm2 logs oreliya-web`
 
-Check application logs for errors:
-```bash
-# Vercel
-vercel logs
+## 📈 Performance Optimization
 
-# Docker
-docker logs <container-name>
+### Before Deployment
+- [ ] Run `pnpm run build:production` successfully
+- [ ] Test all authentication flows
+- [ ] Verify file upload functionality
+- [ ] Check admin dashboard access
+- [ ] Test product creation/editing
 
-# PM2
-pm2 logs
+### After Deployment
+- [ ] Run health check: `/api/health`
+- [ ] Test sign-in/sign-up flows
+- [ ] Verify admin functionality
+- [ ] Check file uploads work
+- [ ] Monitor error rates
+
+## 🔄 CI/CD Pipeline
+
+### GitHub Actions Example
+```yaml
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install -g pnpm
+      - run: pnpm install
+      - run: pnpm run build:production
+      - run: pnpm run test
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.ORG_ID }}
+          vercel-project-id: ${{ secrets.PROJECT_ID }}
 ```
+
+## 📞 Support
+
+If you encounter issues during deployment:
+1. Check the health endpoint: `/api/health`
+2. Review application logs
+3. Verify environment variables
+4. Test authentication flows
+5. Check file upload functionality
+
+Your application should be fully functional in production with all features working correctly!

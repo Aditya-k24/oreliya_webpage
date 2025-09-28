@@ -2,7 +2,51 @@ import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// Simple in-memory rate limiting store
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+function rateLimit(request: NextRequest, limit: number = 100, windowMs: number = 15 * 60 * 1000) {
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+  const now = Date.now();
+  const windowStart = now - windowMs;
+  
+  // Clean up old entries
+  for (const [key, value] of rateLimitStore.entries()) {
+    if (value.resetTime < now) {
+      rateLimitStore.delete(key);
+    }
+  }
+  
+  const current = rateLimitStore.get(ip);
+  
+  if (!current || current.resetTime < now) {
+    rateLimitStore.set(ip, { count: 1, resetTime: now + windowMs });
+    return { success: true, remaining: limit - 1 };
+  }
+  
+  if (current.count >= limit) {
+    return { success: false, remaining: 0 };
+  }
+  
+  current.count++;
+  return { success: true, remaining: limit - current.count };
+}
+
 export function middleware(request: NextRequest) {
+  // Apply rate limiting
+  const rateLimitResult = rateLimit(request, 100, 15 * 60 * 1000); // 100 requests per 15 minutes
+  
+  if (!rateLimitResult.success) {
+    return new NextResponse('Too Many Requests', { 
+      status: 429,
+      headers: {
+        'Retry-After': '900', // 15 minutes
+        'X-RateLimit-Limit': '100',
+        'X-RateLimit-Remaining': '0',
+      }
+    });
+  }
+
   // Security headers
   const response = NextResponse.next();
 
@@ -37,9 +81,9 @@ export function middleware(request: NextRequest) {
     'camera=(), microphone=(), geolocation=(), payment=(), usb=()'
   );
 
-  // Rate limiting headers (basic)
+  // Rate limiting headers
   response.headers.set('X-RateLimit-Limit', '100');
-  response.headers.set('X-RateLimit-Remaining', '99');
+  response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
 
   return response;
 }

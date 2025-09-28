@@ -4,6 +4,7 @@ import './globals.css';
 import { Header } from '@/features/ui/components/Header';
 import { Footer } from '@/features/ui/components/Footer';
 import { SessionProvider } from '@/components/providers/SessionProvider';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -96,11 +97,13 @@ export default function RootLayout({
     <html lang='en' className={`${inter.variable} ${playfair.variable}`}>
       <body className='font-sans antialiased'>
         <SessionProvider>
-          <div className='min-h-screen flex flex-col'>
-            <Header />
-            <main className='flex-1'>{children}</main>
-            <Footer />
-          </div>
+          <ErrorBoundary>
+            <div className='min-h-screen flex flex-col'>
+              <Header />
+              <main className='flex-1'>{children}</main>
+              <Footer />
+            </div>
+          </ErrorBoundary>
         </SessionProvider>
       </body>
     </html>

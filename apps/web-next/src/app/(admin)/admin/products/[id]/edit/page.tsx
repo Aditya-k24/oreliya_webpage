@@ -27,7 +27,7 @@ interface Product {
   updatedAt: string;
 }
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -35,6 +35,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
+  const [productId, setProductId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -52,6 +53,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     salePercentage: '',
   });
 
+  // Resolve params
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setProductId(resolvedParams.id);
+    });
+  }, [params]);
+
   useEffect(() => {
     if (status === 'loading') return;
     
@@ -59,13 +67,19 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       router.push('/login');
       return;
     }
+  }, [session, status, router]);
 
-    fetchProduct();
-  }, [session, status, router, params.id]);
+  useEffect(() => {
+    if (productId) {
+      fetchProduct();
+    }
+  }, [productId]);
 
   const fetchProduct = async () => {
+    if (!productId) return;
+    
     try {
-      const response = await fetch(`/api/products/${params.id}`);
+      const response = await fetch(`/api/products?id=${productId}`);
       const data = await response.json();
       
       if (data.success) {
@@ -146,7 +160,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         salePercentage: formData.salePercentage ? parseInt(formData.salePercentage) : undefined,
       };
 
-      const response = await fetch(`/api/products/${params.id}`, {
+      const response = await fetch(`/api/products/${productId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

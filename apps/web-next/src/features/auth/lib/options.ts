@@ -21,52 +21,80 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        console.log('🔍 Authorize called with:', credentials);
-        
         if (!credentials?.email || !credentials.password) {
-          console.log('❌ Missing credentials');
           return null;
         }
 
-        // Mock authentication for development - this will work immediately
-        if (credentials.email === 'admin@oreliya.com' && credentials.password === 'admin123') {
-          console.log('✅ Admin credentials matched');
-          return {
-            id: 'admin-1',
-            email: 'admin@oreliya.com',
-            name: 'Admin User',
-            role: 'admin',
-            accessToken: 'mock-admin-token',
-            refreshToken: 'mock-admin-refresh-token',
-          } as AppUser & { accessToken: string; refreshToken: string };
-        }
+        try {
+          // In production, attempt to authenticate with real API
+          if (process.env.NODE_ENV === 'production') {
+            const response = await fetch(`${config.api.baseUrl}/auth/login`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            });
 
-        if (credentials.email === 'user@oreliya.com' && credentials.password === 'user123') {
-          return {
-            id: 'user-2',
-            email: 'user@oreliya.com',
-            name: 'Regular User',
-            role: 'user',
-            accessToken: 'mock-user-token',
-            refreshToken: 'mock-user-refresh-token',
-          } as AppUser & { accessToken: string; refreshToken: string };
-        }
+            if (response.ok) {
+              const data = await response.json();
+              return {
+                id: data.user.id,
+                email: data.user.email,
+                name: data.user.name,
+                role: data.user.role,
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken,
+              } as AppUser & { accessToken: string; refreshToken: string };
+            }
+          }
 
-        // Allow any email/password combination for newly registered users (mock)
-        if (credentials.email && credentials.password && 
-            credentials.email !== 'admin@oreliya.com' && 
-            credentials.email !== 'user@oreliya.com') {
-          return {
-            id: `new-user-${Date.now()}`,
-            email: credentials.email,
-            name: credentials.email.split('@')[0],
-            role: 'user',
-            accessToken: 'mock-new-user-token',
-            refreshToken: 'mock-new-user-refresh-token',
-          } as AppUser & { accessToken: string; refreshToken: string };
-        }
+          // Development fallback with mock authentication
+          if (credentials.email === 'admin@oreliya.com' && credentials.password === 'admin123') {
+            return {
+              id: 'admin-1',
+              email: 'admin@oreliya.com',
+              name: 'Admin User',
+              role: 'admin',
+              accessToken: 'mock-admin-token',
+              refreshToken: 'mock-admin-refresh-token',
+            } as AppUser & { accessToken: string; refreshToken: string };
+          }
 
-        return null;
+          if (credentials.email === 'user@oreliya.com' && credentials.password === 'user123') {
+            return {
+              id: 'user-2',
+              email: 'user@oreliya.com',
+              name: 'Regular User',
+              role: 'user',
+              accessToken: 'mock-user-token',
+              refreshToken: 'mock-user-refresh-token',
+            } as AppUser & { accessToken: string; refreshToken: string };
+          }
+
+          // Allow any email/password combination for newly registered users (development only)
+          if (process.env.NODE_ENV === 'development' && 
+              credentials.email && credentials.password && 
+              credentials.email !== 'admin@oreliya.com' && 
+              credentials.email !== 'user@oreliya.com') {
+            return {
+              id: `new-user-${Date.now()}`,
+              email: credentials.email,
+              name: credentials.email.split('@')[0],
+              role: 'user',
+              accessToken: 'mock-new-user-token',
+              refreshToken: 'mock-new-user-refresh-token',
+            } as AppUser & { accessToken: string; refreshToken: string };
+          }
+
+          return null;
+        } catch (error) {
+          console.error('Authentication error:', error);
+          return null;
+        }
       },
     }),
   ],
