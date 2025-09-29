@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+// import { useSearchParams } from 'next/navigation';
 import { SearchAndFilter } from '@/features/ui/components/SearchAndFilter';
 import type { Product } from '@/types/product';
 
-// Mock function to get products (replace with your actual data fetching)
+// Function to get products from the API
 async function getProducts(): Promise<Product[]> {
   try {
-    const response = await fetch('/api/products');
+    const response = await fetch('http://localhost:3001/api/products');
     const data = await response.json();
     return data.success ? data.data.products : [];
   } catch (error) {
@@ -81,13 +81,19 @@ function ProductCard({ product }: ProductCardProps) {
 }
 
 export default function ProductsPage() {
-  const searchParams = useSearchParams();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
 
-  const category = searchParams.get('category');
-  const subcategory = searchParams.get('subcategory');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSearchParams(new URLSearchParams(window.location.search));
+    }
+  }, []);
+
+  const category = searchParams?.get('category');
+  const subcategory = searchParams?.get('subcategory');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -163,13 +169,13 @@ export default function ProductsPage() {
           )}
         </div>
 
-        {/* Search and Filter Component */}
-        <div className="mb-8">
-          <SearchAndFilter 
-            products={allProducts} 
-            onFilteredProducts={setFilteredProducts}
-          />
-        </div>
+            {/* Search and Filter Component */}
+            <div className="mb-8">
+              <SearchAndFilter 
+                products={allProducts} 
+                onFilteredProducts={setFilteredProducts}
+              />
+            </div>
 
         {/* Products Grid */}
         {filteredProducts.length === 0 ? (

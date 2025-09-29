@@ -20,7 +20,7 @@ router.get('/deals/featured', productController.getDealsAndFeatured);
 router.get('/categories', productController.getCategories);
 router.get('/tags', productController.getTags);
 router.get('/id/:id', productController.getProductById);
-router.get('/:slug', productController.getProductBySlug);
+router.get('/slug/:slug', productController.getProductBySlug);
 
 // Admin-only routes (require authentication + admin role)
 router.post(

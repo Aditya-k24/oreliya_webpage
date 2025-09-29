@@ -153,11 +153,19 @@ model ProductVariant {
 model ProductCustomization {
   id               String   @id @default(cuid())
   productId        String
-  name             String   // e.g., "Engraving Text"
-  type             String   // e.g., "text", "image", "color", "select"
+  attribute        String   // e.g., "Engraving Text", "Metal Type", "Ring Size"
+  type             String   // e.g., "text", "image", "color", "select", "number"
   required         Boolean  @default(false)
   options          String[] // For select type: ["option1", "option2"]
   priceAdjustment  Decimal? @db.Decimal(10, 2)
+  minValue         Int?     // For number type (e.g., ring size min)
+  maxValue         Int?     // For number type (e.g., ring size max)
+  maxLength        Int?     // For text type (e.g., engraving max chars)
+  pattern          String?  // For text validation (e.g., regex pattern)
+  helpText         String?  // Helper text for user guidance
+  category         String?  // Category-specific customization (rings, earrings, etc.)
+  isEnabled        Boolean  @default(true)
+  sortOrder        Int      @default(0)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

@@ -11,10 +11,18 @@ export interface ProductVariant {
 export interface ProductCustomization {
   id: string;
   name: string;
-  type: 'text' | 'image' | 'color' | 'select';
+  type: 'text' | 'image' | 'color' | 'select' | 'number';
   required: boolean;
   options?: string[];
   priceAdjustment?: number;
+  minValue?: number;
+  maxValue?: number;
+  maxLength?: number;
+  pattern?: string;
+  helpText?: string;
+  category?: string;
+  isEnabled: boolean;
+  sortOrder: number;
 }
 
 export interface Product {
@@ -50,10 +58,18 @@ export interface CreateProductVariantRequest {
 
 export interface CreateProductCustomizationRequest {
   name: string;
-  type: 'text' | 'image' | 'color' | 'select';
+  type: 'text' | 'image' | 'color' | 'select' | 'number';
   required: boolean;
   options?: string[];
   priceAdjustment?: number;
+  minValue?: number;
+  maxValue?: number;
+  maxLength?: number;
+  pattern?: string;
+  helpText?: string;
+  category?: string;
+  isEnabled?: boolean;
+  sortOrder?: number;
 }
 
 export interface CreateProductRequest {

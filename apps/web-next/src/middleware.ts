@@ -8,7 +8,7 @@ const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 function rateLimit(request: NextRequest, limit: number = 100, windowMs: number = 15 * 60 * 1000) {
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
   const now = Date.now();
-  const windowStart = now - windowMs;
+  // const windowStart = now - windowMs;
   
   // Clean up old entries
   for (const [key, value] of rateLimitStore.entries()) {

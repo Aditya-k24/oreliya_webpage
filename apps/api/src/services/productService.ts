@@ -29,9 +29,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         },
@@ -55,9 +55,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         },
@@ -81,9 +81,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         },
@@ -94,7 +94,10 @@ export class ProductService {
   async getProducts(
     filters: ProductFilters = {},
     sort: ProductSortOptions = { field: 'createdAt', order: 'desc' }
-  ): Promise<any> {
+  ): Promise<{
+    success: boolean;
+    data: { products: any[]; total: number; hasMore: boolean };
+  }> {
     const { products, total, hasMore } =
       await this.productRepository.getProducts(filters, sort);
 
@@ -107,9 +110,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -140,9 +143,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         },
@@ -162,7 +165,10 @@ export class ProductService {
     return { success: true };
   }
 
-  async getFeaturedProducts(): Promise<any> {
+  async getFeaturedProducts(): Promise<{
+    success: boolean;
+    data: { products: any[]; total: number; hasMore: boolean };
+  }> {
     const products = await this.productRepository.getFeaturedProducts();
 
     return {
@@ -174,9 +180,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -186,7 +192,10 @@ export class ProductService {
     };
   }
 
-  async getOnSaleProducts(): Promise<any> {
+  async getOnSaleProducts(): Promise<{
+    success: boolean;
+    data: { products: any[]; total: number; hasMore: boolean };
+  }> {
     const products = await this.productRepository.getOnSaleProducts();
 
     return {
@@ -198,9 +207,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -210,7 +219,10 @@ export class ProductService {
     };
   }
 
-  async getDealsAndFeatured(): Promise<any> {
+  async getDealsAndFeatured(): Promise<{
+    success: boolean;
+    data: { featured: any[]; deals: any[] };
+  }> {
     const [featuredProducts, onSaleProducts] = await Promise.all([
       this.productRepository.getFeaturedProducts(),
       this.productRepository.getOnSaleProducts(),
@@ -225,9 +237,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -237,9 +249,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -247,7 +259,10 @@ export class ProductService {
     };
   }
 
-  async getRelatedProducts(productId: string): Promise<any> {
+  async getRelatedProducts(productId: string): Promise<{
+    success: boolean;
+    data: { products: any[]; total: number; hasMore: boolean };
+  }> {
     const products = await this.productRepository.getRelatedProducts(productId);
 
     return {
@@ -259,9 +274,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -271,7 +286,10 @@ export class ProductService {
     };
   }
 
-  async searchProducts(query: string): Promise<any> {
+  async searchProducts(query: string): Promise<{
+    success: boolean;
+    data: { products: any[]; total: number; hasMore: boolean };
+  }> {
     const products = await this.productRepository.searchProducts(query);
 
     return {
@@ -283,9 +301,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants(product.variants || []),
+          variants: ProductService.mapVariants((product as any).variants || []),
           customizations: ProductService.mapCustomizations(
-            product.customizations || []
+            (product as any).customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -295,7 +313,7 @@ export class ProductService {
     };
   }
 
-  async getProductStats(): Promise<any> {
+  async getProductStats(): Promise<{ success: boolean; data: { stats: any } }> {
     const stats = await this.productRepository.getProductStats();
 
     return {
@@ -304,7 +322,10 @@ export class ProductService {
     };
   }
 
-  async getCategories(): Promise<any> {
+  async getCategories(): Promise<{
+    success: boolean;
+    data: { categories: string[] };
+  }> {
     const categories = await this.productRepository.findCategories();
 
     return {
@@ -313,7 +334,7 @@ export class ProductService {
     };
   }
 
-  async getTags(): Promise<any> {
+  async getTags(): Promise<{ success: boolean; data: { tags: string[] } }> {
     const tags = await this.productRepository.findTags();
 
     return {
@@ -322,31 +343,45 @@ export class ProductService {
     };
   }
 
-  private static mapVariants(variants: any[]): ProductVariant[] {
-    return variants.map(variant => ({
-      id: variant.id,
-      size: variant.size || undefined,
-      material: variant.material || undefined,
-      price: Number(variant.price),
-      stockQuantity: variant.stockQuantity,
-      sku: variant.sku,
-      isActive: variant.isActive,
-    }));
+  private static mapVariants(variants: unknown[]): ProductVariant[] {
+    return variants.map((variant: unknown) => {
+      const v = variant as any;
+      return {
+        id: v.id,
+        size: v.size || undefined,
+        material: v.material || undefined,
+        price: Number(v.price),
+        stockQuantity: v.stockQuantity,
+        sku: v.sku,
+        isActive: v.isActive,
+      };
+    });
   }
 
   private static mapCustomizations(
-    customizations: any[]
+    customizations: unknown[]
   ): ProductCustomization[] {
-    return customizations.map(customization => ({
-      id: customization.id,
-      name: customization.name,
-      type: customization.type as 'text' | 'image' | 'color' | 'select',
-      required: customization.required,
-      options: customization.options || undefined,
-      priceAdjustment: customization.priceAdjustment
-        ? Number(customization.priceAdjustment)
-        : undefined,
-    }));
+    return customizations.map((customization: unknown) => {
+      const c = customization as any;
+      return {
+        id: c.id,
+        name: c.attribute,
+        type: c.type as 'text' | 'image' | 'color' | 'select' | 'number',
+        required: c.required,
+        options: c.options || undefined,
+        priceAdjustment: c.priceAdjustment
+          ? Number(c.priceAdjustment)
+          : undefined,
+        minValue: c.minValue || undefined,
+        maxValue: c.maxValue || undefined,
+        maxLength: c.maxLength || undefined,
+        pattern: c.pattern || undefined,
+        helpText: c.helpText || undefined,
+        category: c.category || undefined,
+        isEnabled: c.isEnabled ?? true,
+        sortOrder: c.sortOrder || 0,
+      };
+    });
   }
 
   private static validateSortField(

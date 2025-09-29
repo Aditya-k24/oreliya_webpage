@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ProductCustomizationManager from '@/components/admin/ProductCustomizationManager';
+// import type { ProductCustomization } from '@/types/product';
 
 // Cache key for form data
 const FORM_CACHE_KEY = 'product-form-cache';
@@ -37,6 +39,7 @@ export default function NewProductPage() {
             isFeatured: parsed.isFeatured ?? false,
             isOnSale: parsed.isOnSale ?? false,
             salePercentage: parsed.salePercentage || '',
+            customizations: parsed.customizations || [],
           };
         } catch (error) {
           console.error('Error parsing cached form data:', error);
@@ -58,6 +61,7 @@ export default function NewProductPage() {
       isFeatured: false,
       isOnSale: false,
       salePercentage: '',
+      customizations: [],
     };
   };
 
@@ -202,6 +206,7 @@ export default function NewProductPage() {
         isFeatured: formData.isFeatured,
         isOnSale: formData.isOnSale,
         salePercentage: formData.salePercentage ? parseInt(formData.salePercentage) : undefined,
+        customizations: formData.customizations,
       };
 
       const response = await fetch('/api/products', {
@@ -481,11 +486,12 @@ export default function NewProductPage() {
                           className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A] transition-colors duration-200"
                         >
                           <option value="">Select a category</option>
-                          <option value="Rings">Rings</option>
-                          <option value="Earrings">Earrings</option>
-                          <option value="Bracelet">Bracelet</option>
-                          <option value="Necklace">Necklace</option>
-                          <option value="Eira Collection">Eira Collection</option>
+                          <option value="rings">Rings</option>
+                          <option value="earrings">Earrings</option>
+                          <option value="bracelets">Bracelets</option>
+                          <option value="necklaces">Necklaces</option>
+                          <option value="mangalsutra">Mangalsutra</option>
+                          <option value="other">Other</option>
                         </select>
                       </div>
 
@@ -727,6 +733,18 @@ export default function NewProductPage() {
                     )}
                   </div>
 
+                  {/* Product Customizations */}
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+                    <ProductCustomizationManager
+                      productId=""
+                      productCategory={formData.category}
+                      existingCustomizations={formData.customizations}
+                      onCustomizationsChange={(customizations) => {
+                        setFormData(prev => ({ ...prev, customizations }));
+                      }}
+                    />
+                  </div>
+
                   {/* Action Buttons */}
                   <div className="bg-gray-50 -mx-6 -mb-8 px-6 py-6 sm:-mx-8 sm:px-8 sm:py-8 rounded-b-2xl">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
@@ -751,6 +769,7 @@ export default function NewProductPage() {
                                 isFeatured: false,
                                 isOnSale: false,
                                 salePercentage: '',
+                                customizations: [],
                               });
                             }
                           }}

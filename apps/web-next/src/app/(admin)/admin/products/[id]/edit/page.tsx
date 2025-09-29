@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ProductCustomizationManager from '@/components/admin/ProductCustomizationManager';
+import type { ProductCustomization } from '@/types/product';
 
 // Cache key for form data
-const FORM_CACHE_KEY = 'product-edit-cache';
+// const FORM_CACHE_KEY = 'product-edit-cache';
 
 interface Product {
   id: string;
@@ -23,6 +25,7 @@ interface Product {
   isFeatured: boolean;
   isOnSale: boolean;
   salePercentage?: number;
+  customizations?: ProductCustomization[];
   createdAt: string;
   updatedAt: string;
 }
@@ -37,7 +40,22 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [product, setProduct] = useState<Product | null>(null);
   const [productId, setProductId] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    slug: string;
+    description: string;
+    shortDescription: string;
+    price: string;
+    compareAtPrice: string;
+    category: string;
+    tags: string;
+    images: string[];
+    isActive: boolean;
+    isFeatured: boolean;
+    isOnSale: boolean;
+    salePercentage: string;
+    customizations: ProductCustomization[];
+  }>({
     name: '',
     slug: '',
     description: '',
@@ -51,6 +69,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     isFeatured: false,
     isOnSale: false,
     salePercentage: '',
+    customizations: [],
   });
 
   // Resolve params
@@ -73,6 +92,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     if (productId) {
       fetchProduct();
     }
+     
   }, [productId]);
 
   const fetchProduct = async () => {
@@ -99,6 +119,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           isFeatured: productData.isFeatured,
           isOnSale: productData.isOnSale,
           salePercentage: productData.salePercentage?.toString() || '',
+          customizations: productData.customizations || [],
         });
       } else {
         setError('Failed to fetch product');
@@ -158,6 +179,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         isFeatured: formData.isFeatured,
         isOnSale: formData.isOnSale,
         salePercentage: formData.salePercentage ? parseInt(formData.salePercentage) : undefined,
+        customizations: formData.customizations,
       };
 
       const response = await fetch(`/api/products/${productId}`, {
@@ -373,11 +395,12 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#1E240A] focus:border-[#1E240A] sm:text-sm"
                   >
                     <option value="">Select a category</option>
-                    <option value="Rings">Rings</option>
-                    <option value="Earrings">Earrings</option>
-                    <option value="Bracelet">Bracelet</option>
-                    <option value="Necklace">Necklace</option>
-                    <option value="Eira Collection">Eira Collection</option>
+                    <option value="rings">Rings</option>
+                    <option value="earrings">Earrings</option>
+                    <option value="bracelets">Bracelets</option>
+                    <option value="necklaces">Necklaces</option>
+                    <option value="mangalsutra">Mangalsutra</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
 
@@ -499,6 +522,18 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   />
                 </div>
               )}
+
+              {/* Product Customizations */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+                <ProductCustomizationManager
+                  productId={productId || ''}
+                  productCategory={formData.category}
+                  existingCustomizations={formData.customizations}
+                  onCustomizationsChange={(customizations) => {
+                    setFormData(prev => ({ ...prev, customizations }));
+                  }}
+                />
+              </div>
 
               <div className="flex justify-end space-x-3">
                 <Link

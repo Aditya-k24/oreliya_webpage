@@ -61,41 +61,43 @@ async function main() {
     skipDuplicates: true,
   });
 
-  // Create products
-  console.log('Creating products...');
+  // Create comprehensive test products with all jewelry categories
+  console.log('Creating comprehensive test products...');
+  
+  // 1. Diamond Engagement Ring (Rings category)
   await prisma.product.upsert({
-    where: { slug: 'diamond-ring' },
+    where: { slug: 'diamond-engagement-ring' },
     update: {},
     create: {
-      name: 'Diamond Ring',
-      slug: 'diamond-ring',
-      description: 'Beautiful diamond ring',
-      shortDescription: 'Elegant diamond ring',
-      price: 999.99,
-      compareAtPrice: 1299.99,
-      images: ['ring1.jpg', 'ring2.jpg'],
-      category: 'Jewelry',
-      tags: ['diamond', 'ring', 'jewelry'],
+      name: 'Diamond Engagement Ring',
+      slug: 'diamond-engagement-ring',
+      description: 'Exquisite diamond engagement ring with customizable metal and stone options',
+      shortDescription: 'Perfect for your special moment',
+      price: 2999.99,
+      compareAtPrice: 3999.99,
+      images: ['/images/rings/engagement-ring-1.jpg', '/images/rings/engagement-ring-2.jpg'],
+      category: 'rings',
+      tags: ['diamond', 'ring', 'engagement', 'jewelry'],
       isActive: true,
       isFeatured: true,
       isOnSale: true,
-      salePercentage: 23,
+      salePercentage: 25,
       variants: {
         create: [
           {
             size: '7',
             material: 'Gold',
-            price: 999.99,
+            price: 2999.99,
             stockQuantity: 5,
-            sku: 'RING-001-7',
+            sku: 'RING-ENG-001-7',
             isActive: true,
           },
           {
             size: '8',
             material: 'Gold',
-            price: 999.99,
+            price: 2999.99,
             stockQuantity: 3,
-            sku: 'RING-001-8',
+            sku: 'RING-ENG-001-8',
             isActive: true,
           },
         ],
@@ -103,41 +105,93 @@ async function main() {
       customizations: {
         create: [
           {
-            name: 'Engraving',
+            attribute: 'Metal Type',
+            type: 'select',
+            required: true,
+            options: ['Yellow Gold', 'White Gold', 'Rose Gold'],
+            priceAdjustment: 0,
+            category: 'rings',
+            sortOrder: 1,
+          },
+          {
+            attribute: 'Purity',
+            type: 'select',
+            required: true,
+            options: ['22kt', '18kt', '14kt', '9kt'],
+            priceAdjustment: 0,
+            category: 'rings',
+            sortOrder: 2,
+          },
+          {
+            attribute: 'Stone',
+            type: 'select',
+            required: true,
+            options: ['Natural Diamond', 'Lab Diamond', 'Moissanite'],
+            priceAdjustment: 0,
+            category: 'rings',
+            sortOrder: 3,
+          },
+          {
+            attribute: 'Ring Size',
+            type: 'number',
+            required: true,
+            minValue: 5,
+            maxValue: 18,
+            priceAdjustment: 0,
+            category: 'rings',
+            sortOrder: 4,
+          },
+          {
+            attribute: 'Carat Size',
+            type: 'select',
+            required: true,
+            options: ['0.25', '0.5', '0.75', '1', '2', '3', '4', '5'],
+            priceAdjustment: 0,
+            category: 'rings',
+            sortOrder: 5,
+          },
+          {
+            attribute: 'Engraving',
             type: 'text',
             required: false,
-            options: [],
-            priceAdjustment: 50.0,
+            maxLength: 20,
+            pattern: '^[A-Za-z0-9 ]{0,20}$',
+            helpText: 'Up to 20 characters (letters, numbers, spaces)',
+            priceAdjustment: 50,
+            category: 'rings',
+            sortOrder: 6,
           },
         ],
       },
     },
   });
 
+  // 2. Pearl Earrings (Earrings category)
   await prisma.product.upsert({
-    where: { slug: 'luxury-watch' },
+    where: { slug: 'pearl-drop-earrings' },
     update: {},
     create: {
-      name: 'Luxury Watch',
-      slug: 'luxury-watch',
-      description: 'Premium luxury watch',
-      shortDescription: 'Elegant timepiece',
-      price: 2499.99,
-      compareAtPrice: 2999.99,
-      images: ['watch1.jpg', 'watch2.jpg'],
-      category: 'Watches',
-      tags: ['watch', 'luxury', 'timepiece'],
+      name: 'Pearl Drop Earrings',
+      slug: 'pearl-drop-earrings',
+      description: 'Elegant pearl drop earrings with customizable metal and stone options',
+      shortDescription: 'Timeless elegance for any occasion',
+      price: 899.99,
+      compareAtPrice: 1199.99,
+      images: ['/images/earrings/pearl-drop-1.jpg', '/images/earrings/pearl-drop-2.jpg'],
+      category: 'earrings',
+      tags: ['pearl', 'earrings', 'drop', 'jewelry'],
       isActive: true,
       isFeatured: true,
-      isOnSale: false,
+      isOnSale: true,
+      salePercentage: 25,
       variants: {
         create: [
           {
-            size: '42mm',
-            material: 'Stainless Steel',
-            price: 2499.99,
-            stockQuantity: 2,
-            sku: 'WATCH-001-42',
+            size: 'One Size',
+            material: 'Gold',
+            price: 899.99,
+            stockQuantity: 8,
+            sku: 'EARR-PEARL-001',
             isActive: true,
           },
         ],
@@ -145,11 +199,274 @@ async function main() {
       customizations: {
         create: [
           {
-            name: 'Case Material',
+            attribute: 'Metal Type',
+            type: 'select',
+            required: true,
+            options: ['Yellow Gold', 'White Gold', 'Rose Gold'],
+            priceAdjustment: 0,
+            category: 'earrings',
+            sortOrder: 1,
+          },
+          {
+            attribute: 'Purity',
+            type: 'select',
+            required: true,
+            options: ['22kt', '18kt', '14kt', '9kt'],
+            priceAdjustment: 0,
+            category: 'earrings',
+            sortOrder: 2,
+          },
+          {
+            attribute: 'Stone',
+            type: 'select',
+            required: true,
+            options: ['Natural Pearl', 'Cultured Pearl', 'Synthetic Pearl'],
+            priceAdjustment: 0,
+            category: 'earrings',
+            sortOrder: 3,
+          },
+          {
+            attribute: 'Carat Size',
+            type: 'select',
+            required: true,
+            options: ['0.25', '0.5', '0.75', '1', '2', '3', '4', '5'],
+            priceAdjustment: 0,
+            category: 'earrings',
+            sortOrder: 4,
+          },
+        ],
+      },
+    },
+  });
+
+  // 3. Gold Bracelet (Bracelets category)
+  await prisma.product.upsert({
+    where: { slug: 'gold-chain-bracelet' },
+    update: {},
+    create: {
+      name: 'Gold Chain Bracelet',
+      slug: 'gold-chain-bracelet',
+      description: 'Classic gold chain bracelet with customizable metal and optional stone options',
+      shortDescription: 'Versatile and elegant',
+      price: 1299.99,
+      compareAtPrice: 1599.99,
+      images: ['/images/bracelets/gold-chain-1.jpg', '/images/bracelets/gold-chain-2.jpg'],
+      category: 'bracelets',
+      tags: ['gold', 'bracelet', 'chain', 'jewelry'],
+      isActive: true,
+      isFeatured: true,
+      isOnSale: true,
+      salePercentage: 19,
+      variants: {
+        create: [
+          {
+            size: '7 inches',
+            material: 'Gold',
+            price: 1299.99,
+            stockQuantity: 6,
+            sku: 'BRAC-GOLD-001-7',
+            isActive: true,
+          },
+          {
+            size: '8 inches',
+            material: 'Gold',
+            price: 1299.99,
+            stockQuantity: 4,
+            sku: 'BRAC-GOLD-001-8',
+            isActive: true,
+          },
+        ],
+      },
+      customizations: {
+        create: [
+          {
+            attribute: 'Metal Type',
+            type: 'select',
+            required: true,
+            options: ['Yellow Gold', 'White Gold', 'Rose Gold'],
+            priceAdjustment: 0,
+            category: 'bracelets',
+            sortOrder: 1,
+          },
+          {
+            attribute: 'Purity',
+            type: 'select',
+            required: true,
+            options: ['22kt', '18kt', '14kt', '9kt'],
+            priceAdjustment: 0,
+            category: 'bracelets',
+            sortOrder: 2,
+          },
+          {
+            attribute: 'Stone',
+            type: 'select',
+            required: true,
+            options: ['Natural Diamond', 'Lab Diamond', 'Moissanite'],
+            priceAdjustment: 0,
+            category: 'bracelets',
+            sortOrder: 3,
+          },
+          {
+            attribute: 'Carat Size',
+            type: 'select',
+            required: false,
+            options: ['0.25', '0.5', '0.75', '1', '2', '3', '4', '5'],
+            priceAdjustment: 0,
+            category: 'bracelets',
+            sortOrder: 4,
+          },
+        ],
+      },
+    },
+  });
+
+  // 4. Diamond Necklace (Necklaces category)
+  await prisma.product.upsert({
+    where: { slug: 'diamond-pendant-necklace' },
+    update: {},
+    create: {
+      name: 'Diamond Pendant Necklace',
+      slug: 'diamond-pendant-necklace',
+      description: 'Stunning diamond pendant necklace with customizable metal and stone options',
+      shortDescription: 'A statement piece for special occasions',
+      price: 1999.99,
+      compareAtPrice: 2499.99,
+      images: ['/images/necklaces/diamond-pendant-1.jpg', '/images/necklaces/diamond-pendant-2.jpg'],
+      category: 'necklaces',
+      tags: ['diamond', 'necklace', 'pendant', 'jewelry'],
+      isActive: true,
+      isFeatured: true,
+      isOnSale: true,
+      salePercentage: 20,
+      variants: {
+        create: [
+          {
+            size: '18 inches',
+            material: 'Gold',
+            price: 1999.99,
+            stockQuantity: 7,
+            sku: 'NECK-DIAMOND-001-18',
+            isActive: true,
+          },
+          {
+            size: '20 inches',
+            material: 'Gold',
+            price: 1999.99,
+            stockQuantity: 5,
+            sku: 'NECK-DIAMOND-001-20',
+            isActive: true,
+          },
+        ],
+      },
+      customizations: {
+        create: [
+          {
+            attribute: 'Metal Type',
+            type: 'select',
+            required: true,
+            options: ['Yellow Gold', 'White Gold', 'Rose Gold'],
+            priceAdjustment: 0,
+            category: 'necklaces',
+            sortOrder: 1,
+          },
+          {
+            attribute: 'Purity',
+            type: 'select',
+            required: true,
+            options: ['22kt', '18kt', '14kt', '9kt'],
+            priceAdjustment: 0,
+            category: 'necklaces',
+            sortOrder: 2,
+          },
+          {
+            attribute: 'Stone',
+            type: 'select',
+            required: true,
+            options: ['Natural Diamond', 'Lab Diamond', 'Moissanite'],
+            priceAdjustment: 0,
+            category: 'necklaces',
+            sortOrder: 3,
+          },
+          {
+            attribute: 'Carat Size',
+            type: 'select',
+            required: false,
+            options: ['0.25', '0.5', '0.75', '1', '2', '3', '4', '5'],
+            priceAdjustment: 0,
+            category: 'necklaces',
+            sortOrder: 4,
+          },
+        ],
+      },
+    },
+  });
+
+  // 5. Luxury Watch (Watches category)
+  await prisma.product.upsert({
+    where: { slug: 'luxury-watch' },
+    update: {},
+    create: {
+      name: 'Luxury Watch',
+      slug: 'luxury-watch',
+      description: 'Premium luxury watch with customizable case material and features',
+      shortDescription: 'Elegant timepiece for the discerning',
+      price: 2499.99,
+      compareAtPrice: 2999.99,
+      images: ['/images/watches/luxury-watch-1.jpg', '/images/watches/luxury-watch-2.jpg'],
+      category: 'watches',
+      tags: ['watch', 'luxury', 'timepiece'],
+      isActive: true,
+      isFeatured: true,
+      isOnSale: true,
+      salePercentage: 17,
+      variants: {
+        create: [
+          {
+            size: '42mm',
+            material: 'Stainless Steel',
+            price: 2499.99,
+            stockQuantity: 3,
+            sku: 'WATCH-LUX-001-42',
+            isActive: true,
+          },
+          {
+            size: '44mm',
+            material: 'Stainless Steel',
+            price: 2499.99,
+            stockQuantity: 2,
+            sku: 'WATCH-LUX-001-44',
+            isActive: true,
+          },
+        ],
+      },
+      customizations: {
+        create: [
+          {
+            attribute: 'Case Material',
             type: 'select',
             required: true,
             options: ['Stainless Steel', 'Gold', 'Platinum'],
             priceAdjustment: 0,
+            category: 'watches',
+            sortOrder: 1,
+          },
+          {
+            attribute: 'Strap Material',
+            type: 'select',
+            required: true,
+            options: ['Leather', 'Metal', 'Rubber'],
+            priceAdjustment: 0,
+            category: 'watches',
+            sortOrder: 2,
+          },
+          {
+            attribute: 'Dial Color',
+            type: 'select',
+            required: true,
+            options: ['Black', 'White', 'Blue', 'Silver'],
+            priceAdjustment: 0,
+            category: 'watches',
+            sortOrder: 3,
           },
         ],
       },
@@ -178,7 +495,12 @@ async function main() {
   console.log('- 2 roles created');
   console.log('- 2 users created');
   console.log('- 2 categories created');
-  console.log('- 2 products created');
+  console.log('- 5 comprehensive test products created:');
+  console.log('  • Diamond Engagement Ring (rings) - 6 customizations');
+  console.log('  • Pearl Drop Earrings (earrings) - 4 customizations');
+  console.log('  • Gold Chain Bracelet (bracelets) - 4 customizations');
+  console.log('  • Diamond Pendant Necklace (necklaces) - 4 customizations');
+  console.log('  • Luxury Watch (watches) - 3 customizations');
   console.log('- 1 deal created');
 }
 

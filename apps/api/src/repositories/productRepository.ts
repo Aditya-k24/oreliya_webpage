@@ -21,12 +21,35 @@ export class ProductRepository {
       data: {
         ...data,
         slug,
+        category: data.category as any,
         metadata: data.metadata
           ? (data.metadata as Prisma.JsonValue)
           : Prisma.JsonNull,
-        // Don't include variants and customizations in create - they should be created separately
+        // Create customizations if provided
+        customizations: data.customizations
+          ? {
+              create: data.customizations.map(
+                customization =>
+                  ({
+                    attribute: customization.name,
+                    type: customization.type,
+                    required: customization.required,
+                    options: customization.options || [],
+                    priceAdjustment: customization.priceAdjustment,
+                    minValue: customization.minValue,
+                    maxValue: customization.maxValue,
+                    maxLength: customization.maxLength,
+                    pattern: customization.pattern,
+                    helpText: customization.helpText,
+                    category: customization.category,
+                    isEnabled: customization.isEnabled ?? true,
+                    sortOrder: customization.sortOrder || 0,
+                  }) as any
+              ),
+            }
+          : undefined,
+        // Don't include variants in create - they should be created separately
         variants: undefined,
-        customizations: undefined,
       },
       include: {
         variants: true,
@@ -63,7 +86,7 @@ export class ProductRepository {
   ) {
     const where: Prisma.ProductWhereInput = {
       isActive: filters.isActive ?? true,
-      ...(filters.category && { category: filters.category }),
+      ...(filters.category && { category: filters.category as any }),
       ...(filters.tags && { tags: { hasSome: filters.tags } }),
       ...(filters.priceMin && { price: { gte: filters.priceMin } }),
       ...(filters.priceMax && { price: { lte: filters.priceMax } }),
@@ -103,12 +126,36 @@ export class ProductRepository {
       where: { id },
       data: {
         ...data,
+        category: data.category as any,
         metadata: data.metadata
           ? (data.metadata as Prisma.JsonValue)
           : Prisma.JsonNull,
-        // Don't include variants and customizations in update - they should be updated separately
+        // Update customizations if provided
+        customizations: data.customizations
+          ? {
+              deleteMany: {}, // Delete all existing customizations
+              create: data.customizations.map(
+                customization =>
+                  ({
+                    attribute: customization.name,
+                    type: customization.type,
+                    required: customization.required,
+                    options: customization.options || [],
+                    priceAdjustment: customization.priceAdjustment,
+                    minValue: customization.minValue,
+                    maxValue: customization.maxValue,
+                    maxLength: customization.maxLength,
+                    pattern: customization.pattern,
+                    helpText: customization.helpText,
+                    category: customization.category,
+                    isEnabled: customization.isEnabled ?? true,
+                    sortOrder: customization.sortOrder || 0,
+                  }) as any
+              ),
+            }
+          : undefined,
+        // Don't include variants in update - they should be updated separately
         variants: undefined,
-        customizations: undefined,
       },
       include: {
         variants: true,

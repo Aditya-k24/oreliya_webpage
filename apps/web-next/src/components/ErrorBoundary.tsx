@@ -47,7 +47,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
             </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h2>
             <p className="text-gray-600 mb-6">
-              We're sorry, but something unexpected happened. Please try refreshing the page.
+              We&apos;re sorry, but something unexpected happened. Please try refreshing the page.
             </p>
             <div className="space-y-3">
               <button
@@ -86,7 +86,7 @@ export const DefaultErrorFallback: React.FC<{ error?: Error; resetError: () => v
       </div>
       <h2 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h2>
       <p className="text-gray-600 mb-6">
-        We're sorry, but something unexpected happened. Please try refreshing the page.
+        We&apos;re sorry, but something unexpected happened. Please try refreshing the page.
       </p>
       {process.env.NODE_ENV === 'development' && error && (
         <details className="text-left mb-6">

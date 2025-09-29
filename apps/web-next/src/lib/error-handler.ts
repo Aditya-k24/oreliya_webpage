@@ -34,7 +34,7 @@ export const handleError = (error: unknown) => {
 };
 
 export const createErrorResponse = (error: unknown) => {
-  const { message, statusCode } = handleError(error);
+  const { message } = handleError(error);
   
   return {
     success: false,

@@ -5,6 +5,15 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { prisma } from './lib/prisma';
 
+// Import routes
+import productRoutes from './routes/productRoutes';
+import authRoutes from './routes/authRoutes';
+import cartRoutes from './routes/cartRoutes';
+import orderRoutes from './routes/orderRoutes';
+import addressRoutes from './routes/addressRoutes';
+import wishlistRoutes from './routes/wishlistRoutes';
+import webhookRoutes from './routes/webhookRoutes';
+
 // Load environment variables
 dotenv.config();
 
@@ -41,6 +50,15 @@ app.get('/health', async (req, res) => {
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from Oreliya API!' });
 });
+
+// Mount route handlers
+app.use('/api/products', productRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/addresses', addressRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/webhooks', webhookRoutes);
 
 // Database test endpoint
 app.get('/api/db-test', async (req, res) => {

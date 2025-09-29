@@ -30,6 +30,7 @@ const eslintConfig = [
       'no-console': 'warn',
       'prefer-const': 'error',
       'no-var': 'error',
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
   {

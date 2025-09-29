@@ -71,11 +71,13 @@ export const getProducts = createProductCache(
 export const getProductById = (id: string) =>
   createProductCache(async (): Promise<Product | null> => {
     try {
-      const response = await apiClient.get<{ success: boolean; data: Product }>(
-        `/products?id=${id}`
+      const response = await apiClient.get<{ success: boolean; data: { product: Product } }>(
+        `/products/id/${id}`
       );
-      return response.success ? response.data : null;
+      return response.success ? response.data.product : null;
     } catch (error) {
+      console.error('Error fetching product:', error);
+      // Return null for missing products instead of throwing
       return null;
     }
   }, `product-${id}`)();

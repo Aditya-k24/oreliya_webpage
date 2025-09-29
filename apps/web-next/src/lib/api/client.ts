@@ -6,12 +6,12 @@ export class ApiClient {
 
   constructor(
     baseUrl: string = process.env.NEXT_PUBLIC_API_BASE_URL ||
-      'http://localhost:3002/api'
+      'http://localhost:3001/api'
   ) {
     this.baseUrl = baseUrl;
   }
 
-  // eslint-disable-next-line class-methods-use-this
+   
   private async getAuthToken(): Promise<string | null> {
     // Try server-side session first
     try {
@@ -44,7 +44,17 @@ export class ApiClient {
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
+      // Try to get error details from response
+      let errorMessage = `API request failed: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+      } catch {
+        // If we can't parse the error response, use the status text
+      }
+      throw new Error(errorMessage);
     }
 
     return response.json();
