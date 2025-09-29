@@ -49,29 +49,29 @@ function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.id}`} className="group">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 group-hover:scale-105">
-        <div className="relative h-64 w-full">
-          <Image
-            src={product.images[0] ? getImageUrl(product.images[0]) : '/placeholder-product.svg'}
-            alt={product.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        </div>
-        <div className="p-4">
-          <h3 className="font-semibold text-lg text-[#1E240A] mb-2 line-clamp-2">
+      <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-xl">
+        {/* Background Image */}
+        <Image
+          src={product.images[0] ? getImageUrl(product.images[0]) : '/placeholder-product.svg'}
+          alt={product.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+        
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+        
+        {/* Content overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+          <h3 className="font-semibold text-lg mb-2 line-clamp-2 drop-shadow-lg">
             {product.name}
           </h3>
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-            {product.description}
-          </p>
-          <div className="flex justify-between items-center">
-            <span className="text-xl font-bold text-[#1E240A]">
+          
+          <div className="flex flex-col">
+            <span className="text-xs text-white/80 font-medium drop-shadow">Starting from</span>
+            <span className="text-lg font-bold text-white drop-shadow-lg">
               ₹{product.price.toLocaleString('en-IN')}
-            </span>
-            <span className="text-sm text-gray-500 capitalize">
-              {product.category}
             </span>
           </div>
         </div>

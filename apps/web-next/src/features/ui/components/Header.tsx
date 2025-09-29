@@ -322,7 +322,7 @@ export function Header() {
                 <div className='flex items-center space-x-3'>
                   <button
                     onClick={() => signIn('credentials', { callbackUrl: '/' })}
-                    className='px-4 py-2 text-sm font-medium text-[#1E240A] hover:text-[#2A3A1A] transition-colors duration-200'
+                    className='px-4 py-2 text-sm font-medium text-[#1E240A] hover:text-[#2A3A1A] transition-colors duration-200 cursor-pointer'
                   >
                     Sign In
                   </button>
