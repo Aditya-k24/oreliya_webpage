@@ -42,6 +42,7 @@ export default function AdminDashboard() {
 
   const fetchProducts = async () => {
     try {
+      // Use internal API route so newly created products (mock in dev) are visible
       const response = await fetch('/api/products');
       const data = await response.json();
       
@@ -57,24 +58,37 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteProduct = async (productId: string) => {
+  const handleDeleteProduct = async (product: any) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
     
     try {
-      const response = await fetch(`/api/products/${productId}`, {
+      console.log('Deleting product:', product);
+      console.log('Session:', session);
+      
+      // Try to delete by ID first via internal API (uses session)
+      let response = await fetch(`/api/products/${product.id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${(session as any)?.accessToken}`,
-        },
       });
       
+      // If delete by ID fails, try delete by slug
+      if (!response.ok && product.slug) {
+        console.log('Trying delete by slug:', product.slug);
+        response = await fetch(`/api/products/slug/${product.slug}`, {
+          method: 'DELETE',
+        });
+      }
+      
       if (response.ok) {
-        setProducts(products.filter(p => p.id !== productId));
+        setProducts(products.filter(p => p.id !== product.id));
+        setError(null); // Clear any previous errors
       } else {
-        setError('Failed to delete product');
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('Delete failed:', response.status, errorData);
+        setError(`Failed to delete product: ${errorData.message || 'Unknown error'}`);
       }
     } catch (err) {
-      setError('Error deleting product');
+      console.error('Delete error:', err);
+      setError(`Error deleting product: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 
@@ -217,7 +231,7 @@ export default function AdminDashboard() {
                               Edit
                             </Link>
                             <button
-                              onClick={() => handleDeleteProduct(product.id)}
+                              onClick={() => handleDeleteProduct(product)}
                               className="text-red-600 hover:text-red-900"
                             >
                               Delete

@@ -95,60 +95,59 @@ export default function NewProductPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     
-    let newFormData;
-    if (type === 'checkbox') {
-      const checked = (e.target as HTMLInputElement).checked;
-      newFormData = { ...formData, [name]: checked };
-    } else {
-      newFormData = { ...formData, [name]: value };
-    }
-    
-    setFormData(newFormData);
-    saveToCache(newFormData);
+    // Use functional updates to avoid stale state and re-render loops
+    setFormData(prev => {
+      const next = {
+        ...prev,
+        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+      } as typeof prev;
+      // persist outside of render
+      queueMicrotask(() => saveToCache(next));
+      return next;
+    });
   };
 
   const handleImageChange = (index: number, value: string) => {
-    const newImages = [...formData.images];
-    newImages[index] = value;
-    const newFormData = { ...formData, images: newImages };
-    setFormData(newFormData);
-    saveToCache(newFormData);
+    setFormData(prev => {
+      const newImages = [...prev.images];
+      newImages[index] = value;
+      const next = { ...prev, images: newImages };
+      queueMicrotask(() => saveToCache(next));
+      return next;
+    });
   };
 
   const addImageField = () => {
-    const newFormData = { ...formData, images: [...formData.images, ''] };
-    setFormData(newFormData);
-    saveToCache(newFormData);
+    setFormData(prev => {
+      const next = { ...prev, images: [...prev.images, ''] };
+      queueMicrotask(() => saveToCache(next));
+      return next;
+    });
   };
 
   const removeImageField = (index: number) => {
-    if (formData.images.length > 1) {
-      const newImages = formData.images.filter((_: any, i: number) => i !== index);
-      const newImageFiles = formData.imageFiles.filter((_: any, i: number) => i !== index);
-      const newFormData = { ...formData, images: newImages, imageFiles: newImageFiles };
-      setFormData(newFormData);
-      saveToCache(newFormData);
-    }
+    setFormData(prev => {
+      if (prev.images.length <= 1) return prev;
+      const newImages = prev.images.filter((_: unknown, i: number) => i !== index);
+      const newImageFiles = prev.imageFiles.filter((_: unknown, i: number) => i !== index);
+      const next = { ...prev, images: newImages, imageFiles: newImageFiles };
+      queueMicrotask(() => saveToCache(next));
+      return next;
+    });
   };
 
   const handleFileUpload = (index: number, files: FileList | null) => {
-    if (files && files[0]) {
-      const file = files[0];
-      const newImageFiles = [...formData.imageFiles];
+    if (!files || !files[0]) return;
+    const file = files[0];
+    setFormData(prev => {
+      const newImageFiles = [...prev.imageFiles];
       newImageFiles[index] = file;
-      
-      // Create a preview URL for the uploaded file
-      const newImages = [...formData.images];
+      const newImages = [...prev.images];
       newImages[index] = URL.createObjectURL(file);
-      
-      const newFormData = { 
-        ...formData, 
-        images: newImages, 
-        imageFiles: newImageFiles 
-      };
-      setFormData(newFormData);
-      saveToCache(newFormData);
-    }
+      const next = { ...prev, images: newImages, imageFiles: newImageFiles };
+      queueMicrotask(() => saveToCache(next));
+      return next;
+    });
   };
 
   const uploadImageFile = async (file: File): Promise<string> => {

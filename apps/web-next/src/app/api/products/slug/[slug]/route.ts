@@ -4,15 +4,19 @@ import * as store from '@/lib/dev-products-store';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { id } = await params;
-    const removed = store.removeById(id);
-    console.log(`Deleting product ${id} (dev mode), removedFromStore=${removed}`);
-    return NextResponse.json({ success: true, message: 'Product deleted successfully' }, { status: 200 });
+    const { slug } = await params;
+    const removed = store.removeBySlug(slug);
+    console.log(`Deleting product with slug ${slug} (dev mode), removedFromStore=${removed}`);
+    
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Product deleted successfully' 
+    });
   } catch (error) {
-    console.error('Error deleting product:', error);
+    console.error('Error deleting product by slug:', error);
     return NextResponse.json(
       { success: false, message: 'Failed to delete product' },
       { status: 500 }

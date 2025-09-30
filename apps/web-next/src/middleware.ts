@@ -33,18 +33,23 @@ function rateLimit(request: NextRequest, limit: number = 100, windowMs: number =
 }
 
 export function middleware(request: NextRequest) {
-  // Apply rate limiting
-  const rateLimitResult = rateLimit(request, 100, 15 * 60 * 1000); // 100 requests per 15 minutes
-  
-  if (!rateLimitResult.success) {
-    return new NextResponse('Too Many Requests', { 
-      status: 429,
-      headers: {
-        'Retry-After': '900', // 15 minutes
-        'X-RateLimit-Limit': '100',
-        'X-RateLimit-Remaining': '0',
-      }
-    });
+  const { pathname } = request.nextUrl;
+  const isApi = pathname.startsWith('/api');
+
+  // Only rate-limit API routes; never rate-limit page navigations
+  let rateLimitResult: { success: boolean; remaining: number } = { success: true, remaining: 100 };
+  if (isApi) {
+    rateLimitResult = rateLimit(request, 100, 15 * 60 * 1000); // 100 requests per 15 minutes
+    if (!rateLimitResult.success) {
+      return new NextResponse('Too Many Requests', {
+        status: 429,
+        headers: {
+          'Retry-After': '900', // 15 minutes
+          'X-RateLimit-Limit': '100',
+          'X-RateLimit-Remaining': '0',
+        }
+      });
+    }
   }
 
   // Security headers
@@ -81,9 +86,11 @@ export function middleware(request: NextRequest) {
     'camera=(), microphone=(), geolocation=(), payment=(), usb=()'
   );
 
-  // Rate limiting headers
-  response.headers.set('X-RateLimit-Limit', '100');
-  response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
+  // Rate limiting headers (only for API routes)
+  if (isApi) {
+    response.headers.set('X-RateLimit-Limit', '100');
+    response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
+  }
 
   return response;
 }

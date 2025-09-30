@@ -61,417 +61,104 @@ async function main() {
     skipDuplicates: true,
   });
 
-  // Create comprehensive test products with all jewelry categories
-  console.log('Creating comprehensive test products...');
-  
-  // 1. Diamond Engagement Ring (Rings category)
-  await prisma.product.upsert({
-    where: { slug: 'diamond-engagement-ring' },
-    update: {},
-    create: {
-      name: 'Diamond Engagement Ring',
-      slug: 'diamond-engagement-ring',
-      description: 'Exquisite diamond engagement ring with customizable metal and stone options',
-      shortDescription: 'Perfect for your special moment',
-      price: 2999.99,
-      compareAtPrice: 3999.99,
-      images: ['/images/rings/engagement-ring-1.jpg', '/images/rings/engagement-ring-2.jpg'],
+  // Remove demo seed products if present
+  console.log('Removing existing demo products...');
+  await prisma.product.deleteMany({
+    where: {
+      slug: {
+        in: [
+          'diamond-engagement-ring',
+          'pearl-drop-earrings',
+          'gold-chain-bracelet',
+          'diamond-pendant-necklace',
+          'luxury-watch',
+        ],
+      },
+    },
+  });
+
+  console.log('Creating minimal dummy products...');
+  const dummyProducts = [
+    {
+      name: 'Dummy Ring',
+      slug: 'dummy-ring',
+      description: 'Minimal ring for testing.',
+      shortDescription: 'Test ring',
+      price: 1000.0,
+      images: ['/placeholder-product.svg'],
       category: 'rings',
-      tags: ['diamond', 'ring', 'engagement', 'jewelry'],
+      tags: ['dummy', 'rings'],
       isActive: true,
-      isFeatured: true,
-      isOnSale: true,
-      salePercentage: 25,
-      variants: {
-        create: [
-          {
-            size: '7',
-            material: 'Gold',
-            price: 2999.99,
-            stockQuantity: 5,
-            sku: 'RING-ENG-001-7',
-            isActive: true,
-          },
-          {
-            size: '8',
-            material: 'Gold',
-            price: 2999.99,
-            stockQuantity: 3,
-            sku: 'RING-ENG-001-8',
-            isActive: true,
-          },
-        ],
-      },
-      customizations: {
-        create: [
-          {
-            attribute: 'Metal Type',
-            type: 'select',
-            required: true,
-            options: ['Yellow Gold', 'White Gold', 'Rose Gold'],
-            priceAdjustment: 0,
-            category: 'rings',
-            sortOrder: 1,
-          },
-          {
-            attribute: 'Purity',
-            type: 'select',
-            required: true,
-            options: ['22kt', '18kt', '14kt', '9kt'],
-            priceAdjustment: 0,
-            category: 'rings',
-            sortOrder: 2,
-          },
-          {
-            attribute: 'Stone',
-            type: 'select',
-            required: true,
-            options: ['Natural Diamond', 'Lab Diamond', 'Moissanite'],
-            priceAdjustment: 0,
-            category: 'rings',
-            sortOrder: 3,
-          },
-          {
-            attribute: 'Ring Size',
-            type: 'number',
-            required: true,
-            minValue: 5,
-            maxValue: 18,
-            priceAdjustment: 0,
-            category: 'rings',
-            sortOrder: 4,
-          },
-          {
-            attribute: 'Carat Size',
-            type: 'select',
-            required: true,
-            options: ['0.25', '0.5', '0.75', '1', '2', '3', '4', '5'],
-            priceAdjustment: 0,
-            category: 'rings',
-            sortOrder: 5,
-          },
-          {
-            attribute: 'Engraving',
-            type: 'text',
-            required: false,
-            maxLength: 20,
-            pattern: '^[A-Za-z0-9 ]{0,20}$',
-            helpText: 'Up to 20 characters (letters, numbers, spaces)',
-            priceAdjustment: 50,
-            category: 'rings',
-            sortOrder: 6,
-          },
-        ],
-      },
     },
-  });
-
-  // 2. Pearl Earrings (Earrings category)
-  await prisma.product.upsert({
-    where: { slug: 'pearl-drop-earrings' },
-    update: {},
-    create: {
-      name: 'Pearl Drop Earrings',
-      slug: 'pearl-drop-earrings',
-      description: 'Elegant pearl drop earrings with customizable metal and stone options',
-      shortDescription: 'Timeless elegance for any occasion',
-      price: 899.99,
-      compareAtPrice: 1199.99,
-      images: ['/images/earrings/pearl-drop-1.jpg', '/images/earrings/pearl-drop-2.jpg'],
+    {
+      name: 'Dummy Earrings',
+      slug: 'dummy-earrings',
+      description: 'Minimal earrings for testing.',
+      shortDescription: 'Test earrings',
+      price: 800.0,
+      images: ['/placeholder-product.svg'],
       category: 'earrings',
-      tags: ['pearl', 'earrings', 'drop', 'jewelry'],
+      tags: ['dummy', 'earrings'],
       isActive: true,
-      isFeatured: true,
-      isOnSale: true,
-      salePercentage: 25,
-      variants: {
-        create: [
-          {
-            size: 'One Size',
-            material: 'Gold',
-            price: 899.99,
-            stockQuantity: 8,
-            sku: 'EARR-PEARL-001',
-            isActive: true,
-          },
-        ],
-      },
-      customizations: {
-        create: [
-          {
-            attribute: 'Metal Type',
-            type: 'select',
-            required: true,
-            options: ['Yellow Gold', 'White Gold', 'Rose Gold'],
-            priceAdjustment: 0,
-            category: 'earrings',
-            sortOrder: 1,
-          },
-          {
-            attribute: 'Purity',
-            type: 'select',
-            required: true,
-            options: ['22kt', '18kt', '14kt', '9kt'],
-            priceAdjustment: 0,
-            category: 'earrings',
-            sortOrder: 2,
-          },
-          {
-            attribute: 'Stone',
-            type: 'select',
-            required: true,
-            options: ['Natural Pearl', 'Cultured Pearl', 'Synthetic Pearl'],
-            priceAdjustment: 0,
-            category: 'earrings',
-            sortOrder: 3,
-          },
-          {
-            attribute: 'Carat Size',
-            type: 'select',
-            required: true,
-            options: ['0.25', '0.5', '0.75', '1', '2', '3', '4', '5'],
-            priceAdjustment: 0,
-            category: 'earrings',
-            sortOrder: 4,
-          },
-        ],
-      },
     },
-  });
-
-  // 3. Gold Bracelet (Bracelets category)
-  await prisma.product.upsert({
-    where: { slug: 'gold-chain-bracelet' },
-    update: {},
-    create: {
-      name: 'Gold Chain Bracelet',
-      slug: 'gold-chain-bracelet',
-      description: 'Classic gold chain bracelet with customizable metal and optional stone options',
-      shortDescription: 'Versatile and elegant',
-      price: 1299.99,
-      compareAtPrice: 1599.99,
-      images: ['/images/bracelets/gold-chain-1.jpg', '/images/bracelets/gold-chain-2.jpg'],
+    {
+      name: 'Dummy Bracelet',
+      slug: 'dummy-bracelet',
+      description: 'Minimal bracelet for testing.',
+      shortDescription: 'Test bracelet',
+      price: 1200.0,
+      images: ['/placeholder-product.svg'],
       category: 'bracelets',
-      tags: ['gold', 'bracelet', 'chain', 'jewelry'],
+      tags: ['dummy', 'bracelets'],
       isActive: true,
-      isFeatured: true,
-      isOnSale: true,
-      salePercentage: 19,
-      variants: {
-        create: [
-          {
-            size: '7 inches',
-            material: 'Gold',
-            price: 1299.99,
-            stockQuantity: 6,
-            sku: 'BRAC-GOLD-001-7',
-            isActive: true,
-          },
-          {
-            size: '8 inches',
-            material: 'Gold',
-            price: 1299.99,
-            stockQuantity: 4,
-            sku: 'BRAC-GOLD-001-8',
-            isActive: true,
-          },
-        ],
-      },
-      customizations: {
-        create: [
-          {
-            attribute: 'Metal Type',
-            type: 'select',
-            required: true,
-            options: ['Yellow Gold', 'White Gold', 'Rose Gold'],
-            priceAdjustment: 0,
-            category: 'bracelets',
-            sortOrder: 1,
-          },
-          {
-            attribute: 'Purity',
-            type: 'select',
-            required: true,
-            options: ['22kt', '18kt', '14kt', '9kt'],
-            priceAdjustment: 0,
-            category: 'bracelets',
-            sortOrder: 2,
-          },
-          {
-            attribute: 'Stone',
-            type: 'select',
-            required: true,
-            options: ['Natural Diamond', 'Lab Diamond', 'Moissanite'],
-            priceAdjustment: 0,
-            category: 'bracelets',
-            sortOrder: 3,
-          },
-          {
-            attribute: 'Carat Size',
-            type: 'select',
-            required: false,
-            options: ['0.25', '0.5', '0.75', '1', '2', '3', '4', '5'],
-            priceAdjustment: 0,
-            category: 'bracelets',
-            sortOrder: 4,
-          },
-        ],
-      },
     },
-  });
-
-  // 4. Diamond Necklace (Necklaces category)
-  await prisma.product.upsert({
-    where: { slug: 'diamond-pendant-necklace' },
-    update: {},
-    create: {
-      name: 'Diamond Pendant Necklace',
-      slug: 'diamond-pendant-necklace',
-      description: 'Stunning diamond pendant necklace with customizable metal and stone options',
-      shortDescription: 'A statement piece for special occasions',
-      price: 1999.99,
-      compareAtPrice: 2499.99,
-      images: ['/images/necklaces/diamond-pendant-1.jpg', '/images/necklaces/diamond-pendant-2.jpg'],
+    {
+      name: 'Dummy Necklace',
+      slug: 'dummy-necklace',
+      description: 'Minimal necklace for testing.',
+      shortDescription: 'Test necklace',
+      price: 1500.0,
+      images: ['/placeholder-product.svg'],
       category: 'necklaces',
-      tags: ['diamond', 'necklace', 'pendant', 'jewelry'],
+      tags: ['dummy', 'necklaces'],
       isActive: true,
-      isFeatured: true,
-      isOnSale: true,
-      salePercentage: 20,
-      variants: {
-        create: [
-          {
-            size: '18 inches',
-            material: 'Gold',
-            price: 1999.99,
-            stockQuantity: 7,
-            sku: 'NECK-DIAMOND-001-18',
-            isActive: true,
-          },
-          {
-            size: '20 inches',
-            material: 'Gold',
-            price: 1999.99,
-            stockQuantity: 5,
-            sku: 'NECK-DIAMOND-001-20',
-            isActive: true,
-          },
-        ],
-      },
-      customizations: {
-        create: [
-          {
-            attribute: 'Metal Type',
-            type: 'select',
-            required: true,
-            options: ['Yellow Gold', 'White Gold', 'Rose Gold'],
-            priceAdjustment: 0,
-            category: 'necklaces',
-            sortOrder: 1,
-          },
-          {
-            attribute: 'Purity',
-            type: 'select',
-            required: true,
-            options: ['22kt', '18kt', '14kt', '9kt'],
-            priceAdjustment: 0,
-            category: 'necklaces',
-            sortOrder: 2,
-          },
-          {
-            attribute: 'Stone',
-            type: 'select',
-            required: true,
-            options: ['Natural Diamond', 'Lab Diamond', 'Moissanite'],
-            priceAdjustment: 0,
-            category: 'necklaces',
-            sortOrder: 3,
-          },
-          {
-            attribute: 'Carat Size',
-            type: 'select',
-            required: false,
-            options: ['0.25', '0.5', '0.75', '1', '2', '3', '4', '5'],
-            priceAdjustment: 0,
-            category: 'necklaces',
-            sortOrder: 4,
-          },
-        ],
-      },
     },
-  });
+    {
+      name: 'Dummy Mangalsutra',
+      slug: 'dummy-mangalsutra',
+      description: 'Minimal mangalsutra for testing.',
+      shortDescription: 'Test mangalsutra',
+      price: 1800.0,
+      images: ['/placeholder-product.svg'],
+      category: 'mangalsutra',
+      tags: ['dummy', 'mangalsutra'],
+      isActive: true,
+    },
+    {
+      name: 'Dummy Other',
+      slug: 'dummy-other',
+      description: 'Minimal product for testing.',
+      shortDescription: 'Test other',
+      price: 500.0,
+      images: ['/placeholder-product.svg'],
+      category: 'other',
+      tags: ['dummy', 'other'],
+      isActive: true,
+    },
+  ];
 
-  // 5. Luxury Watch (Watches category)
-  await prisma.product.upsert({
-    where: { slug: 'luxury-watch' },
-    update: {},
-    create: {
-      name: 'Luxury Watch',
-      slug: 'luxury-watch',
-      description: 'Premium luxury watch with customizable case material and features',
-      shortDescription: 'Elegant timepiece for the discerning',
-      price: 2499.99,
-      compareAtPrice: 2999.99,
-      images: ['/images/watches/luxury-watch-1.jpg', '/images/watches/luxury-watch-2.jpg'],
-      category: 'watches',
-      tags: ['watch', 'luxury', 'timepiece'],
-      isActive: true,
-      isFeatured: true,
-      isOnSale: true,
-      salePercentage: 17,
-      variants: {
-        create: [
-          {
-            size: '42mm',
-            material: 'Stainless Steel',
-            price: 2499.99,
-            stockQuantity: 3,
-            sku: 'WATCH-LUX-001-42',
-            isActive: true,
-          },
-          {
-            size: '44mm',
-            material: 'Stainless Steel',
-            price: 2499.99,
-            stockQuantity: 2,
-            sku: 'WATCH-LUX-001-44',
-            isActive: true,
-          },
-        ],
+  for (const p of dummyProducts) {
+    await prisma.product.upsert({
+      where: { slug: p.slug },
+      update: {},
+      create: { 
+        ...p,
+        customizations: {
+          create: buildCustomizationsForCategory(p.category)
+        }
       },
-      customizations: {
-        create: [
-          {
-            attribute: 'Case Material',
-            type: 'select',
-            required: true,
-            options: ['Stainless Steel', 'Gold', 'Platinum'],
-            priceAdjustment: 0,
-            category: 'watches',
-            sortOrder: 1,
-          },
-          {
-            attribute: 'Strap Material',
-            type: 'select',
-            required: true,
-            options: ['Leather', 'Metal', 'Rubber'],
-            priceAdjustment: 0,
-            category: 'watches',
-            sortOrder: 2,
-          },
-          {
-            attribute: 'Dial Color',
-            type: 'select',
-            required: true,
-            options: ['Black', 'White', 'Blue', 'Silver'],
-            priceAdjustment: 0,
-            category: 'watches',
-            sortOrder: 3,
-          },
-        ],
-      },
-    },
-  });
+    });
+  }
 
   // Create deals
   console.log('Creating deals...');
@@ -495,13 +182,64 @@ async function main() {
   console.log('- 2 roles created');
   console.log('- 2 users created');
   console.log('- 2 categories created');
-  console.log('- 5 comprehensive test products created:');
-  console.log('  • Diamond Engagement Ring (rings) - 6 customizations');
-  console.log('  • Pearl Drop Earrings (earrings) - 4 customizations');
-  console.log('  • Gold Chain Bracelet (bracelets) - 4 customizations');
-  console.log('  • Diamond Pendant Necklace (necklaces) - 4 customizations');
-  console.log('  • Luxury Watch (watches) - 3 customizations');
+  console.log('- 6 minimal dummy products created: rings, earrings, bracelets, necklaces, mangalsutra, other');
   console.log('- 1 deal created');
+}
+
+function buildCustomizationsForCategory(category: string) {
+  const common = [
+    {
+      attribute: 'Metal Type',
+      type: 'select',
+      required: true,
+      options: ['Yellow Gold', 'White Gold', 'Rose Gold'],
+      category,
+      sortOrder: 1,
+    },
+    {
+      attribute: 'Purity',
+      type: 'select',
+      required: true,
+      options: ['22kt', '18kt', '14kt', '9kt'],
+      category,
+      sortOrder: 2,
+    },
+    {
+      attribute: 'Stone',
+      type: 'select',
+      required: true,
+      options: ['Natural Diamond', 'Lab Diamond', 'Moissanite'],
+      category,
+      sortOrder: 3,
+    },
+  ];
+
+  const lower = category.toLowerCase();
+
+  if (lower === 'rings') {
+    return [
+      ...common,
+      { attribute: 'Ring Size', type: 'number', required: true, minValue: 5, maxValue: 18, category, sortOrder: 4 },
+      { attribute: 'Carat Size', type: 'select', required: true, options: ['0.25','0.5','0.75','1','2','3','4','5'], category, sortOrder: 5 },
+      { attribute: 'Engraving', type: 'text', required: false, maxLength: 20, pattern: '^[A-Za-z0-9 ]{0,20}$', helpText: 'Up to 20 characters', category, sortOrder: 6 },
+    ];
+  }
+
+  if (lower === 'earrings') {
+    return [
+      ...common,
+      { attribute: 'Carat Size', type: 'select', required: true, options: ['0.25','0.5','0.75','1','2','3','4','5'], category, sortOrder: 4 },
+    ];
+  }
+
+  if (lower === 'bracelets' || lower === 'necklaces' || lower === 'mangalsutra') {
+    return [
+      ...common,
+      { attribute: 'Carat Size', type: 'select', required: false, options: ['0.25','0.5','0.75','1','2','3','4','5'], category, sortOrder: 4 },
+    ];
+  }
+
+  return common;
 }
 
 main()

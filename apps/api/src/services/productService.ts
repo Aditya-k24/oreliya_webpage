@@ -165,6 +165,15 @@ export class ProductService {
     return { success: true };
   }
 
+  async deleteProductBySlug(slug: string): Promise<{ success: boolean }> {
+    const existing = await this.productRepository.getProductBySlug(slug);
+    if (!existing) {
+      throw new CustomError('Product not found', 404);
+    }
+    await this.productRepository.deleteProduct(existing.id);
+    return { success: true };
+  }
+
   async getFeaturedProducts(): Promise<{
     success: boolean;
     data: { products: any[]; total: number; hasMore: boolean };

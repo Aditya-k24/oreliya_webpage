@@ -70,6 +70,19 @@ export const getProducts = createProductCache(
 
 export const getProductById = (id: string) =>
   createProductCache(async (): Promise<Product | null> => {
+    // Try internal Next.js API first (dev uses in-memory products)
+    try {
+      const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      const res = await fetch(`${base}/api/products?id=${encodeURIComponent(id)}`, {
+        cache: 'no-store',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.success && data?.data?.product) return data.data.product as Product;
+      }
+    } catch {}
+
+    // Fallback to external API (production)
     try {
       const response = await apiClient.get<{ success: boolean; data: { product: Product } }>(
         `/products/id/${id}`
@@ -77,7 +90,6 @@ export const getProductById = (id: string) =>
       return response.success ? response.data.product : null;
     } catch (error) {
       console.error('Error fetching product:', error);
-      // Return null for missing products instead of throwing
       return null;
     }
   }, `product-${id}`)();

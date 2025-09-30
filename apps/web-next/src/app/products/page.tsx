@@ -10,7 +10,8 @@ import type { Product } from '@/types/product';
 // Function to get products from the API
 async function getProducts(): Promise<Product[]> {
   try {
-    const response = await fetch('http://localhost:3001/api/products');
+    // Use internal API route so newly created products (mock in dev) are visible
+    const response = await fetch('/api/products', { cache: 'no-store' });
     const data = await response.json();
     return data.success ? data.data.products : [];
   } catch (error) {

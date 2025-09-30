@@ -22,7 +22,9 @@ export default function ProductCustomizationManager({
 
   useEffect(() => {
     onCustomizationsChange(customizations);
-  }, [customizations, onCustomizationsChange]);
+    // Intentionally omit onCustomizationsChange to avoid effect firing on every parent render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customizations]);
 
   const getTemplatesForCategory = (category: string) => {
     const normalizedCategory = category.toLowerCase();

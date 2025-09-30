@@ -42,4 +42,12 @@ router.delete(
   productController.deleteProduct
 );
 
+// Admin delete by slug (to support frontend calling with slugs)
+router.delete(
+  '/slug/:slug',
+  authenticateToken,
+  adminMiddleware,
+  productController.deleteProductBySlug
+);
+
 export default router;

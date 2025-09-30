@@ -120,6 +120,14 @@ export class ProductController {
     }
   );
 
+  deleteProductBySlug = asyncWrapper(
+    async (req: Request, res: Response): Promise<void> => {
+      const { slug } = req.params as { slug: string };
+      const result = await this.productService.deleteProductBySlug(slug);
+      res.json(result);
+    }
+  );
+
   getFeaturedProducts = asyncWrapper(
     async (req: Request, res: Response): Promise<void> => {
       const result = await this.productService.getFeaturedProducts();
