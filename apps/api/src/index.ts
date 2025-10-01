@@ -3,7 +3,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { prisma } from './lib/prisma';
 
 // Import routes
 import productRoutes from './routes/productRoutes';
@@ -26,24 +25,12 @@ app.use(cors());
 app.use(morgan('combined'));
 app.use(express.json());
 
-// Health check endpoint
-app.get('/health', async (req, res) => {
-  try {
-    // Test database connection
-    await prisma.$queryRaw`SELECT 1`;
-    res.status(200).json({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      database: 'connected',
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      timestamp: new Date().toISOString(),
-      database: 'disconnected',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
+// Health check endpoint (no DB access to avoid cold-start failures)
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // API routes
@@ -63,6 +50,7 @@ app.use('/api/webhooks', webhookRoutes);
 // Database test endpoint
 app.get('/api/db-test', async (req, res) => {
   try {
+    const { prisma } = await import('./lib/prisma');
     const userCount = await prisma.user.count();
     const productCount = await prisma.product.count();
     const orderCount = await prisma.order.count();
