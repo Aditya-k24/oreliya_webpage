@@ -1,17 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function ContactPage() {
+  const searchParams = useSearchParams();
+  const productParam = searchParams.get('product');
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     subject: '',
     message: '',
+    product: productParam || '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Update form data when product param changes
+  useEffect(() => {
+    if (productParam) {
+      setFormData(prev => ({ ...prev, product: productParam }));
+    }
+  }, [productParam]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -49,12 +62,14 @@ export default function ContactPage() {
         setFormData({
           name: '',
           email: '',
+          phone: '',
           subject: '',
           message: '',
+          product: '',
         });
       } else {
         setSubmitStatus('error');
-        setErrorMessage(data.error || 'Failed to send message. Please try again.');
+        setErrorMessage(data.message || 'Failed to send message. Please try again.');
       }
     } catch (error) {
       setSubmitStatus('error');
@@ -274,6 +289,13 @@ export default function ContactPage() {
             )}
 
             <form onSubmit={handleSubmit} className='space-y-6'>
+              {formData.product && (
+                <div className='p-4 bg-[#1E240A]/10 rounded-lg'>
+                  <p className='text-sm font-medium text-[#1E240A] mb-1'>Product Inquiry</p>
+                  <p className='text-gray-700'>{formData.product}</p>
+                </div>
+              )}
+              
               <div>
                 <label
                   htmlFor='name'
@@ -308,6 +330,23 @@ export default function ContactPage() {
                   required
                   className='w-full px-4 py-3 border-b border-gray-300 focus:border-[#1E240A] focus:outline-none bg-transparent text-gray-900 placeholder-gray-500 transition-colors duration-300'
                   placeholder='Enter your email address'
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor='phone'
+                  className='block text-sm font-medium text-[#1E240A] mb-2'
+                >
+                  Phone Number
+                </label>
+                <input
+                  type='tel'
+                  id='phone'
+                  name='phone'
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className='w-full px-4 py-3 border-b border-gray-300 focus:border-[#1E240A] focus:outline-none bg-transparent text-gray-900 placeholder-gray-500 transition-colors duration-300'
+                  placeholder='+91 XXXXX XXXXX'
                 />
               </div>
               <div>

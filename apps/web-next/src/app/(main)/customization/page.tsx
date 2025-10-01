@@ -79,24 +79,50 @@ export default function CustomizationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
     try {
-      await new Promise<void>(resolve => setTimeout(() => resolve(), 1500));
-      setSubmitSuccess(true);
-      setTimeout(() => {
-        setSubmitSuccess(false);
-        setFormData({
-          customerName: '',
-          email: '',
-          phone: '',
-          jewelryType: '',
-          description: '',
-          budget: '',
-          timeline: '',
-          referenceImage: null,
-          additionalNotes: '',
-        });
-        setImagePreview(null);
-      }, 2000);
+      // Send customization request
+      const response = await fetch('/api/customization', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.customerName,
+          email: formData.email,
+          phone: formData.phone,
+          productType: formData.jewelryType,
+          customizationDetails: formData.description,
+          budget: formData.budget,
+          deliveryDate: formData.timeline,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitSuccess(true);
+        setTimeout(() => {
+          setSubmitSuccess(false);
+          setFormData({
+            customerName: '',
+            email: '',
+            phone: '',
+            jewelryType: '',
+            description: '',
+            budget: '',
+            timeline: '',
+            referenceImage: null,
+            additionalNotes: '',
+          });
+          setImagePreview(null);
+        }, 3000);
+      } else {
+        alert(data.message || 'Failed to send customization request. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting customization:', error);
+      alert('Network error. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
