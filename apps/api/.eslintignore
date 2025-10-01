@@ -1,5 +1,6 @@
 node_modules
 dist
 .vercel
-index.js
+/index.js
+*.config.js
 
