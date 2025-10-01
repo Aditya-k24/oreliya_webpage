@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function ContactPage() {
+function ContactForm() {
   const searchParams = useSearchParams();
   const productParam = searchParams.get('product');
   
@@ -408,5 +408,20 @@ export default function ContactPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={
+      <div className='bg-white min-h-screen flex items-center justify-center'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E240A] mx-auto mb-4'></div>
+          <p className='text-gray-600'>Loading...</p>
+        </div>
+      </div>
+    }>
+      <ContactForm />
+    </Suspense>
   );
 }
