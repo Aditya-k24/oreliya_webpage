@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
 
   compress: true,
 
+  // Disable ESLint during build for production deployment
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],

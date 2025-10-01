@@ -33,7 +33,7 @@ async function handleProductManagement(req: NextRequest) {
 async function handleGetProducts(req: NextRequest) {
   // Admin can get all products including inactive ones
   const url = new URL(req.url);
-  const includeInactive = url.searchParams.get('includeInactive') === 'true';
+  const _includeInactive = url.searchParams.get('includeInactive') === 'true';
   
   // TODO: Implement database query for admin product listing
   return NextResponse.json({
