@@ -56,8 +56,13 @@ export function Header() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const isActive = (path: string) => pathname === path;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -174,6 +179,30 @@ export function Header() {
               ))}
             </nav>
           </div>
+
+          {/* Auth section in sidebar - only show if not logged in */}
+          {isMounted && !session && (
+            <div className='mt-8 pt-6 border-t border-[#1E240A]/10'>
+              <div className='flex flex-col space-y-3 px-4'>
+                <button
+                  onClick={() => {
+                    signIn('credentials', { callbackUrl: '/' });
+                    setShowSidebar(false);
+                  }}
+                  className='w-full px-4 py-2 text-sm font-medium text-[#1E240A] bg-transparent border border-[#1E240A] rounded-lg hover:bg-[#1E240A]/5 transition-colors duration-200'
+                >
+                  Sign In
+                </button>
+                <Link
+                  href='/register'
+                  onClick={() => setShowSidebar(false)}
+                  className='w-full px-4 py-2 text-sm font-medium bg-[#1E240A] text-white rounded-lg hover:bg-[#2A3A1A] transition-colors duration-200 text-center'
+                >
+                  Register
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -197,7 +226,7 @@ export function Header() {
             </button>
             
             {/* Centered logo */}
-            <div className='flex-1 flex items-center justify-center'>
+            <div className='absolute left-1/2 transform -translate-x-1/2 flex items-center'>
               <Link
                 href='/'
                 className='flex items-center group transition-transform duration-300 hover:scale-105'
@@ -228,9 +257,9 @@ export function Header() {
               </Link>
             </div>
             
-            {/* Auth section */}
-            <div className='flex items-center space-x-4'>
-              {session ? (
+            {/* Auth section - only show user menu if logged in */}
+            {isMounted && session && (
+              <div className='flex items-center space-x-4 ml-auto'>
                 <div className='relative'>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
@@ -279,23 +308,8 @@ export function Header() {
                     </div>
                   )}
                 </div>
-              ) : (
-                <div className='flex items-center space-x-3'>
-                  <button
-                    onClick={() => signIn('credentials', { callbackUrl: '/' })}
-                    className='px-4 py-2 text-sm font-medium text-[#1E240A] hover:text-[#2A3A1A] transition-colors duration-200 cursor-pointer'
-                  >
-                    Sign In
-                  </button>
-                  <Link
-                    href='/register'
-                    className='px-4 py-2 text-sm font-medium bg-[#1E240A] text-white rounded-md hover:bg-[#2A3A1A] transition-colors duration-200'
-                  >
-                    Register
-                  </Link>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -407,6 +421,30 @@ export function Header() {
                   ))}
                 </nav>
               </div>
+
+              {/* Auth section in mobile sidebar - only show if not logged in */}
+              {isMounted && !session && (
+                <div className='mt-8 pt-6 border-t border-[#1E240A]/10'>
+                  <div className='flex flex-col space-y-3 px-4'>
+                    <button
+                      onClick={() => {
+                        signIn('credentials', { callbackUrl: '/' });
+                        setShowMobileMenu(false);
+                      }}
+                      className='w-full px-4 py-2 text-sm font-medium text-[#1E240A] bg-transparent border border-[#1E240A] rounded-lg hover:bg-[#1E240A]/5 transition-colors duration-200'
+                    >
+                      Sign In
+                    </button>
+                    <Link
+                      href='/register'
+                      onClick={() => setShowMobileMenu(false)}
+                      className='w-full px-4 py-2 text-sm font-medium bg-[#1E240A] text-white rounded-lg hover:bg-[#2A3A1A] transition-colors duration-200 text-center'
+                    >
+                      Register
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </>
