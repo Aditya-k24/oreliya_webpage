@@ -14,7 +14,7 @@ export type DevProduct = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __DEV_PRODUCTS__: DevProduct[] | undefined;
 }
 
@@ -25,7 +25,13 @@ export function list(): DevProduct[] {
 }
 
 export function add(product: DevProduct): void {
-  devProducts.push(product);
+  // Avoid duplicates by checking if product with same ID or slug exists
+  const existingIndex = devProducts.findIndex(p => p.id === product.id || (product.slug && p.slug === product.slug));
+  if (existingIndex >= 0) {
+    devProducts[existingIndex] = product; // Update existing
+  } else {
+    devProducts.push(product);
+  }
 }
 
 export function removeById(id: string): boolean {
