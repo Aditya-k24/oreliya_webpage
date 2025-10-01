@@ -25,6 +25,13 @@ export interface Product {
   subcategory?: string;
   inStock: boolean;
   customizations?: ProductCustomization[];
+  compareAtPrice?: number;
+  isFeatured?: boolean;
+  isOnSale?: boolean;
+  salePercentage?: number;
+  variants?: Array<{ stockQuantity: number }>;
+  tags?: string[];
+  slug?: string;
   createdAt: string;
   updatedAt: string;
 }

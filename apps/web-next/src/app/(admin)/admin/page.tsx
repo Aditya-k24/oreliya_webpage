@@ -196,7 +196,7 @@ export default function AdminDashboard() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          ${product.price.toFixed(2)}
+                          ₹{product.price.toLocaleString('en-IN')}
                           {product.isOnSale && product.salePercentage && (
                             <span className="ml-2 text-green-600">
                               -{product.salePercentage}%

@@ -76,14 +76,14 @@ export function Header() {
   return (
     <>
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-50 transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${
         showSidebar ? 'translate-x-0' : '-translate-x-full'
       }`}>
         {/* Top accent line */}
         <div className='h-0.5 bg-[#1E240A]' />
         
         {/* Sidebar content */}
-        <div className='p-6 relative'>
+        <div className='p-6 relative pb-20'>
           {/* Close button */}
           <button
             onClick={() => setShowSidebar(false)}
@@ -322,12 +322,12 @@ export function Header() {
             className='lg:hidden fixed inset-0 bg-black/50 z-30'
             onClick={() => setShowMobileMenu(false)}
           />
-          <div className='lg:hidden fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-50 transform transition-transform duration-300 ease-in-out'>
+          <div className='lg:hidden fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto'>
             {/* Top accent line */}
             <div className='h-0.5 bg-[#1E240A]' />
             
             {/* Mobile sidebar content */}
-            <div className='p-6'>
+            <div className='p-6 pb-20'>
               {/* Navigation */}
               <nav className='space-y-4 mt-8' role='navigation' aria-label='Main navigation'>
                 {navigation.map(item => (

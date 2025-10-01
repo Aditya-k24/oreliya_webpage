@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { getProductById } from '@/features/products/lib/server';
 import ProductCustomization from '@/components/ProductCustomization';
+import ProductImageCarousel from '@/components/ProductImageCarousel';
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
@@ -16,32 +16,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  // Helper function to get a valid image URL
-  const getImageUrl = (imageUrl: string) => {
-    if (!imageUrl) return '/placeholder-product.svg';
-    
-    // If it's already a full URL, return as is
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      return imageUrl;
-    }
-    
-    // If it's a relative path, ensure it starts with /
-    return imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
-  };
-
-  // Get the main product image
-  const mainImage = product.images && product.images.length > 0 
-    ? getImageUrl(product.images[0]) 
-    : '/placeholder-product.svg';
-
-  // Get thumbnail images
-  const thumbnails = product.images && product.images.length > 1 
-    ? product.images.slice(1).map(getImageUrl)
-    : [];
-
   // Calculate total stock from variants
-  const totalStock = product.variants?.reduce((sum, variant) => sum + variant.stockQuantity, 0) || 0;
-  const isInStock = totalStock > 0;
+  // const totalStock = product.variants?.reduce((sum, variant) => sum + variant.stockQuantity, 0) || 0;
+  // const isInStock = totalStock > 0;
 
   // Format price
   const formatPrice = (price: number) => {
@@ -73,40 +50,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         {/* Main Product Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          {/* Product Images */}
-          <div className="space-y-6">
-            {/* Main Image */}
-            <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-white shadow-2xl">
-              <Image
-                src={mainImage}
-                alt={product.name}
-                fill
-                className="object-cover transition-transform duration-500 hover:scale-105"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
-            </div>
-
-            {/* Thumbnail Images */}
-            {thumbnails.length > 0 && (
-              <div className="grid grid-cols-4 gap-3">
-                {thumbnails.map((thumbnail, index) => (
-                  <div
-                    key={index}
-                    className="relative aspect-square rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow"
-                  >
-                    <Image
-                      src={thumbnail}
-                      alt={`${product.name} view ${index + 2}`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 25vw, 12.5vw"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Product Images Carousel */}
+          <ProductImageCarousel 
+            images={product.images || []} 
+            productName={product.name}
+          />
 
           {/* Product Details */}
           <div className="space-y-8">
@@ -155,18 +103,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </p>
             </div>
 
-            {/* Stock Status */}
-            <div className="flex items-center space-x-3">
-              <span className="text-sm font-medium text-gray-600">Availability:</span>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                isInStock 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
-              }`}>
-                {isInStock ? `In Stock (${totalStock} available)` : 'Out of Stock'}
-              </span>
-            </div>
-
             {/* Product Customizations */}
             {product.customizations && product.customizations.length > 0 && (
               <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
@@ -176,22 +112,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="space-y-4">
-              <button
-                className={`w-full py-4 px-8 rounded-2xl font-semibold text-lg transition-all duration-300 ${
-                  isInStock
-                    ? 'bg-[#1E240A] text-white hover:bg-[#1E240A]/90 shadow-lg hover:shadow-xl'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-                disabled={!isInStock}
+            {/* Action Button */}
+            <div>
+              <Link
+                href={`/contact?product=${encodeURIComponent(product.name)}`}
+                className="flex items-center justify-center space-x-2 w-full py-4 px-8 bg-[#1E240A] text-white rounded-2xl font-semibold text-lg hover:bg-[#1E240A]/90 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                {isInStock ? 'Add to Cart' : 'Out of Stock'}
-              </button>
-              
-              <button className="w-full py-4 px-8 border-2 border-[#1E240A] text-[#1E240A] rounded-2xl font-semibold text-lg hover:bg-[#1E240A] hover:text-white transition-all duration-300">
-                Add to Wishlist
-              </button>
+                <span>Inquire Now</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </Link>
             </div>
 
             {/* Product Features */}
