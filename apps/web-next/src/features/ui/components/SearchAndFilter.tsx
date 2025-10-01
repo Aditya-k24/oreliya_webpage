@@ -22,11 +22,12 @@ interface FilterState {
 
 const categories = [
   { value: '', label: 'All Categories' },
-  { value: 'Rings', label: 'Rings' },
-  { value: 'Necklace', label: 'Necklace' },
-  { value: 'Earrings', label: 'Earrings' },
-  { value: 'Bracelet', label: 'Bracelet' },
-  { value: 'Eira Collection', label: 'Eira Collection' },
+  { value: 'rings', label: 'Rings' },
+  { value: 'necklaces', label: 'Necklaces' },
+  { value: 'earrings', label: 'Earrings' },
+  { value: 'bracelets', label: 'Bracelets' },
+  { value: 'mangalsutra', label: 'Mangalsutra' },
+  { value: 'other', label: 'Other' },
 ];
 
 const sortOptions = [
@@ -41,14 +42,27 @@ export function SearchAndFilter({ products, onFilteredProducts, className = '' }
   const searchParams = useSearchParams();
   const [showSidebar, setShowSidebar] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
-    search: searchParams.get('search') || '',
-    category: searchParams.get('category') || '',
-    subcategory: searchParams.get('subcategory') || '',
-    minPrice: searchParams.get('minPrice') || '',
-    maxPrice: searchParams.get('maxPrice') || '',
-        inStock: searchParams.get('inStock') === 'true' ? true : (searchParams.get('inStock') === 'false' ? false : null),
-    sortBy: (searchParams.get('sortBy') as FilterState['sortBy']) || 'name',
+    search: '',
+    category: '',
+    subcategory: '',
+    minPrice: '',
+    maxPrice: '',
+    inStock: null,
+    sortBy: 'name',
   });
+
+  // Initialize filters from URL on mount
+  useEffect(() => {
+    setFilters({
+      search: searchParams.get('search') || '',
+      category: searchParams.get('category') || '',
+      subcategory: searchParams.get('subcategory') || '',
+      minPrice: searchParams.get('minPrice') || '',
+      maxPrice: searchParams.get('maxPrice') || '',
+      inStock: searchParams.get('inStock') === 'true' ? true : (searchParams.get('inStock') === 'false' ? false : null),
+      sortBy: (searchParams.get('sortBy') as FilterState['sortBy']) || 'name',
+    });
+  }, [searchParams]);
 
   // Get available subcategories based on selected category
   const availableSubcategories = filters.category
@@ -72,9 +86,11 @@ export function SearchAndFilter({ products, onFilteredProducts, className = '' }
       );
     }
 
-    // Category filter
+    // Category filter (case-insensitive)
     if (filters.category) {
-      filtered = filtered.filter(product => product.category === filters.category);
+      filtered = filtered.filter(product => 
+        product.category.toLowerCase() === filters.category.toLowerCase()
+      );
     }
 
     // Subcategory filter

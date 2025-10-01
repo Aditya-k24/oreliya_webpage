@@ -85,34 +85,24 @@ export default function ProductsPage() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
+  const [category, setCategory] = useState<string>('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setSearchParams(new URLSearchParams(window.location.search));
+      const params = new URLSearchParams(window.location.search);
+      setCategory(params.get('category') || '');
     }
   }, []);
-
-  const category = searchParams?.get('category');
-  const subcategory = searchParams?.get('subcategory');
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const products = await getProducts();
         setAllProducts(products);
-        
-        // Initial filter by category and subcategory if specified in URL
-        let initialProducts = products;
-        if (category) {
-          initialProducts = initialProducts.filter(product => product.category === category);
-        }
-        if (subcategory) {
-          initialProducts = initialProducts.filter(product => product.subcategory === subcategory);
-        }
-        
-        setFilteredProducts(initialProducts);
+        // Don't pre-filter here - let SearchAndFilter handle all filtering
+        setFilteredProducts(products);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error loading products:', error);
       } finally {
         setLoading(false);
@@ -120,7 +110,7 @@ export default function ProductsPage() {
     };
 
     fetchProducts();
-  }, [category, subcategory]);
+  }, []);
 
   if (loading) {
     return (
@@ -138,34 +128,22 @@ export default function ProductsPage() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-[#1E240A] mb-4">
-            {subcategory ? subcategory : category ? category : 'Our Products'}
+            {category ? category.charAt(0).toUpperCase() + category.slice(1) : 'Our Products'}
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {subcategory 
-              ? `Explore our collection of ${subcategory.toLowerCase()}`
-              : category 
-                ? `Explore our collection of ${category.toLowerCase()}`
-                : 'Discover our exquisite collection of handcrafted jewelry pieces'
+            {category 
+              ? `Explore our collection of ${category.toLowerCase()}`
+              : 'Discover our exquisite collection of handcrafted jewelry pieces'
             }
           </p>
-          {(category || subcategory) && (
-            <div className="mt-4 space-x-4">
-              {subcategory && category && (
-                <Link 
-                  href={`/products?category=${encodeURIComponent(category)}`}
-                  className="inline-flex items-center text-[#1E240A] hover:text-[#2A3A1A] transition-colors duration-200"
-                >
-                  ← View All {category}
-                </Link>
-              )}
-              {category && (
-                <Link 
-                  href="/products"
-                  className="inline-flex items-center text-[#1E240A] hover:text-[#2A3A1A] transition-colors duration-200"
-                >
-                  ← View All Products
-                </Link>
-              )}
+          {category && (
+            <div className="mt-4">
+              <Link 
+                href="/products"
+                className="inline-flex items-center text-[#1E240A] hover:text-[#2A3A1A] transition-colors duration-200"
+              >
+                ← View All Products
+              </Link>
             </div>
           )}
         </div>

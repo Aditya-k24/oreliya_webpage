@@ -20,35 +20,32 @@ const productCategories = [
   },
   {
     name: 'Rings',
-    href: '/products?category=Rings',
-    hasSubcategories: true,
-    subcategories: [
-      { name: 'Engagement Rings', href: '/products?category=Rings&subcategory=Engagement Rings' },
-      { name: 'Everyday Rings', href: '/products?category=Rings&subcategory=Everyday Rings' },
-    ],
+    href: '/products?category=rings',
+    hasSubcategories: false,
   },
   {
     name: 'Necklace',
-    href: '/products?category=Necklace',
-    hasSubcategories: true,
-    subcategories: [
-      { name: 'Mangalsutra', href: '/products?category=Necklace&subcategory=Mangalsutra' },
-      { name: 'Everyday Necklaces', href: '/products?category=Necklace&subcategory=Everyday Necklaces' },
-    ],
+    href: '/products?category=necklaces',
+    hasSubcategories: false,
   },
   {
     name: 'Earrings',
-    href: '/products?category=Earrings',
+    href: '/products?category=earrings',
     hasSubcategories: false,
   },
   {
     name: 'Bracelet',
-    href: '/products?category=Bracelet',
+    href: '/products?category=bracelets',
     hasSubcategories: false,
   },
   {
-    name: 'Eira Collection',
-    href: '/products?category=Eira Collection',
+    name: 'Mangalsutra',
+    href: '/products?category=mangalsutra',
+    hasSubcategories: false,
+  },
+  {
+    name: 'Other',
+    href: '/products?category=other',
     hasSubcategories: false,
   },
 ];
@@ -59,8 +56,6 @@ export function Header() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-  const [expandedMobileCategory, setExpandedMobileCategory] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const isActive = (path: string) => pathname === path;
 
@@ -168,48 +163,14 @@ export function Header() {
             </h3>
             <nav className='space-y-1' role='navigation' aria-label='Product categories'>
               {productCategories.map((category) => (
-                <div key={category.name}>
-                  {category.hasSubcategories ? (
-                    <div>
-                      <button
-                        onClick={() => setExpandedCategory(expandedCategory === category.name ? null : category.name)}
-                        className='w-full flex items-center justify-between px-4 py-2 text-sm text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
-                      >
-                        <span>{category.name}</span>
-                        <svg 
-                          className={`w-4 h-4 transition-transform duration-200 ${expandedCategory === category.name ? 'rotate-180' : ''}`} 
-                          fill='none' 
-                          stroke='currentColor' 
-                          viewBox='0 0 24 24'
-                        >
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
-                        </svg>
-                      </button>
-                      {expandedCategory === category.name && (
-                        <div className='ml-4 mt-1 space-y-1'>
-                          {category.subcategories?.map((subcategory) => (
-                            <Link
-                              key={subcategory.name}
-                              href={subcategory.href}
-                              onClick={() => setShowSidebar(false)}
-                              className='block px-4 py-2 text-sm text-[#1E240A]/60 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
-                            >
-                              {subcategory.name}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <Link
-                      href={category.href}
-                      onClick={() => setShowSidebar(false)}
-                      className='block px-4 py-2 text-sm text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
-                    >
-                      {category.name}
-                    </Link>
-                  )}
-                </div>
+                <Link
+                  key={category.name}
+                  href={category.href}
+                  onClick={() => setShowSidebar(false)}
+                  className='block px-4 py-2 text-sm text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
+                >
+                  {category.name}
+                </Link>
               ))}
             </nav>
           </div>
@@ -435,48 +396,14 @@ export function Header() {
                 </h3>
                 <nav className='space-y-1' role='navigation' aria-label='Product categories'>
                   {productCategories.map((category) => (
-                    <div key={category.name}>
-                      {category.hasSubcategories ? (
-                        <div>
-                          <button
-                            onClick={() => setExpandedMobileCategory(expandedMobileCategory === category.name ? null : category.name)}
-                            className='w-full flex items-center justify-between px-4 py-2 text-sm text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
-                          >
-                            <span>{category.name}</span>
-                            <svg 
-                              className={`w-4 h-4 transition-transform duration-200 ${expandedMobileCategory === category.name ? 'rotate-180' : ''}`} 
-                              fill='none' 
-                              stroke='currentColor' 
-                              viewBox='0 0 24 24'
-                            >
-                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
-                            </svg>
-                          </button>
-                          {expandedMobileCategory === category.name && (
-                            <div className='ml-4 mt-1 space-y-1'>
-                              {category.subcategories?.map((subcategory) => (
-                                <Link
-                                  key={subcategory.name}
-                                  href={subcategory.href}
-                                  onClick={() => setShowMobileMenu(false)}
-                                  className='block px-4 py-2 text-sm text-[#1E240A]/60 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
-                                >
-                                  {subcategory.name}
-                                </Link>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <Link
-                          href={category.href}
-                          onClick={() => setShowMobileMenu(false)}
-                          className='block px-4 py-2 text-sm text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
-                        >
-                          {category.name}
-                        </Link>
-                      )}
-                    </div>
+                    <Link
+                      key={category.name}
+                      href={category.href}
+                      onClick={() => setShowMobileMenu(false)}
+                      className='block px-4 py-2 text-sm text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5 rounded-lg transition-colors duration-200'
+                    >
+                      {category.name}
+                    </Link>
                   ))}
                 </nav>
               </div>
