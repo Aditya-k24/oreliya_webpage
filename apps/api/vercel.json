@@ -1,39 +1,15 @@
 {
   "version": 2,
-  "name": "oreliya-api",
-  "buildCommand": "pnpm install && pnpm prisma generate && pnpm build",
-  "outputDirectory": "dist",
-  "installCommand": "pnpm install",
   "builds": [
     {
-      "src": "dist/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["prisma/**", "dist/**"]
-      }
+      "src": "api/index.ts",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/health",
-      "dest": "dist/index.js"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "dist/index.js"
-    },
-    {
       "src": "/(.*)",
-      "dest": "dist/index.js"
+      "dest": "/api/index.ts"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "dist/index.js": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  }
+  ]
 }

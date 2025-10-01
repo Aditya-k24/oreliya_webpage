@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -17,7 +17,7 @@ import webhookRoutes from './routes/webhookRoutes';
 // Load environment variables
 dotenv.config();
 
-const app = express();
+const app: Express = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
@@ -102,13 +102,19 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`🚀 Oreliya API server running on port ${PORT}`);
-  // eslint-disable-next-line no-console
-  console.log(`📊 Health check available at http://localhost:${PORT}/health`);
-  // eslint-disable-next-line no-console
-  console.log(
-    `🗄️  Database test available at http://localhost:${PORT}/api/db-test`
-  );
-});
+// Export app for Vercel serverless
+export default app;
+
+// Only listen if not in serverless environment
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`🚀 Oreliya API server running on port ${PORT}`);
+    // eslint-disable-next-line no-console
+    console.log(`📊 Health check available at http://localhost:${PORT}/health`);
+    // eslint-disable-next-line no-console
+    console.log(
+      `🗄️  Database test available at http://localhost:${PORT}/api/db-test`
+    );
+  });
+}
