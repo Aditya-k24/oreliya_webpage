@@ -35,36 +35,37 @@ export default function ProductCustomization({
     }
   };
 
-  const validateInput = (customization: ProductCustomization, value: any): string => {
-    if (customization.required && (!value || value === '')) {
-      return `${customization.name} is required`;
-    }
+  // Validation function for future use
+  // const validateInput = (customization: ProductCustomization, value: any): string => {
+  //   if (customization.required && (!value || value === '')) {
+  //     return `${customization.name} is required`;
+  //   }
 
-    if (customization.type === 'text' && value) {
-      if (customization.maxLength && value.length > customization.maxLength) {
-        return `Maximum ${customization.maxLength} characters allowed`;
-      }
-      
-      if (customization.pattern) {
-        const regex = new RegExp(customization.pattern);
-        if (!regex.test(value)) {
-          return 'Invalid format';
-        }
-      }
-    }
+  //   if (customization.type === 'text' && value) {
+  //     if (customization.maxLength && value.length > customization.maxLength) {
+  //       return `Maximum ${customization.maxLength} characters allowed`;
+  //     }
+  //     
+  //     if (customization.pattern) {
+  //       const regex = new RegExp(customization.pattern);
+  //       if (!regex.test(value)) {
+  //         return 'Invalid format';
+  //       }
+  //     }
+  //   }
 
-    if (customization.type === 'number' && value) {
-      const numValue = Number(value);
-      if (customization.minValue !== undefined && numValue < customization.minValue) {
-        return `Minimum value is ${customization.minValue}`;
-      }
-      if (customization.maxValue !== undefined && numValue > customization.maxValue) {
-        return `Maximum value is ${customization.maxValue}`;
-      }
-    }
+  //   if (customization.type === 'number' && value) {
+  //     const numValue = Number(value);
+  //     if (customization.minValue !== undefined && numValue < customization.minValue) {
+  //       return `Minimum value is ${customization.minValue}`;
+  //     }
+  //     if (customization.maxValue !== undefined && numValue > customization.maxValue) {
+  //       return `Maximum value is ${customization.maxValue}`;
+  //     }
+  //   }
 
-    return '';
-  };
+  //   return '';
+  // };
 
   const renderCustomizationField = (customization: ProductCustomization) => {
     const value = values[customization.name] || '';
