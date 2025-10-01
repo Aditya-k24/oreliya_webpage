@@ -5,8 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc --noEmit && tsc",
+    "build": "prisma generate && tsc --noEmit && tsc",
     "build:skip-check": "tsc --noEmitOnError false",
+    "postinstall": "prisma generate",
     "start": "node dist/index.js",
     "test": "jest",
     "test:watch": "jest --watch",
