@@ -60,35 +60,30 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication first
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Check if user has admin role
+    const userRole = (session as any)?.user?.role;
+    if (userRole !== 'admin') {
+      return NextResponse.json(
+        { success: false, message: 'Admin access required' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     
     // Try to create in actual database first
     try {
-      const session = await getServerSession(authOptions);
       const accessToken = (session as any)?.accessToken;
-      
-      if (!accessToken) {
-        // No session - create in dev store only
-        const devProduct = {
-          id: `product-${Date.now()}`,
-          name: body.name || 'New Product',
-          description: body.description || 'Product description',
-          price: body.price || 0,
-          category: body.category || 'other',
-          images: body.images || [],
-          customizations: Array.isArray(body.customizations) ? body.customizations : [],
-          inStock: body.inStock !== undefined ? body.inStock : true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          slug: body.slug || `product-${Date.now()}`,
-        } as any;
-        store.add(devProduct);
-        return NextResponse.json({ 
-          success: true, 
-          data: devProduct,
-          message: 'Created in dev store. Sign in as admin to save to database.'
-        }, { status: 201 });
-      }
       
       // Create in actual database via Express API
       const response = await fetch(`${config.api.baseUrl}/products`, {
@@ -112,49 +107,17 @@ export async function POST(request: NextRequest) {
       const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
       console.error('API create failed:', response.status, errorData);
       
-      // Fall back to dev store
-      const devProduct = {
-        id: `product-${Date.now()}`,
-        name: body.name || 'New Product',
-        description: body.description || 'Product description',
-        price: body.price || 0,
-        category: body.category || 'other',
-        images: body.images || [],
-        customizations: Array.isArray(body.customizations) ? body.customizations : [],
-        inStock: body.inStock !== undefined ? body.inStock : true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        slug: body.slug || `product-${Date.now()}`,
-      } as any;
-      store.add(devProduct);
-      return NextResponse.json({ 
-        success: true, 
-        data: devProduct,
-        message: `Created in dev store. DB save failed: ${errorData.message}`
-      }, { status: 201 });
+      return NextResponse.json(
+        { success: false, message: `Failed to create product: ${errorData.message}` },
+        { status: response.status }
+      );
       
     } catch (apiError) {
       console.error('API create error:', apiError);
-      // Fall back to dev store
-      const devProduct = {
-        id: `product-${Date.now()}`,
-        name: body.name || 'New Product',
-        description: body.description || 'Product description',
-        price: body.price || 0,
-        category: body.category || 'other',
-        images: body.images || [],
-        customizations: Array.isArray(body.customizations) ? body.customizations : [],
-        inStock: body.inStock !== undefined ? body.inStock : true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        slug: body.slug || `product-${Date.now()}`,
-      } as any;
-      store.add(devProduct);
-      return NextResponse.json({ 
-        success: true, 
-        data: devProduct,
-        message: 'Created in dev store. DB connection failed.'
-      }, { status: 201 });
+      return NextResponse.json(
+        { success: false, message: 'Database connection failed' },
+        { status: 500 }
+      );
     }
     
   } catch (error) {

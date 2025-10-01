@@ -11,8 +11,7 @@ RUN npm install -g pnpm@8.15.0
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* ./
 
 # Copy workspace packages
-COPY apps/api/package.json ./apps/api/
-COPY packages/ui/package.json ./packages/ui/
+COPY apps/web-next/package.json ./apps/web-next/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
@@ -21,7 +20,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build the application
-RUN pnpm --filter api build
+RUN pnpm --filter web-next build
 
 # Expose port
 EXPOSE 3000
@@ -30,4 +29,4 @@ EXPOSE 3000
 ENV NODE_ENV=production
 
 # Start the application
-CMD ["pnpm", "--filter", "api", "start"] 
+CMD ["pnpm", "--filter", "web-next", "start"] 

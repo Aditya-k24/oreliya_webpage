@@ -32,11 +32,17 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (status === 'loading') return;
     
+    console.log('Admin page - Session status:', status);
+    console.log('Admin page - Session data:', session);
+    console.log('Admin page - User role:', (session?.user as any)?.role);
+    
     if (!session || (session.user as any)?.role !== 'admin') {
+      console.log('Admin page - Redirecting to login, user role:', (session?.user as any)?.role);
       router.push('/login');
       return;
     }
 
+    console.log('Admin page - User is admin, fetching products');
     fetchProducts();
   }, [session, status, router]);
 

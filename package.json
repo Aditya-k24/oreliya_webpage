@@ -4,9 +4,8 @@
   "description": "Oreliya - Full Stack Monorepo",
   "private": true,
   "scripts": {
-    "dev": "pnpm --parallel --recursive run dev",
-    "build": "pnpm --recursive run build",
-    "build:api": "cd apps/api && pnpm run build:skip-check",
+    "dev": "cd apps/web-next && pnpm run dev",
+    "build": "cd apps/web-next && pnpm run build",
     "vercel-build": "cd apps/web-next && pnpm install --ignore-scripts && pnpm run build",
     "test": "pnpm --recursive run test",
     "lint": "pnpm --recursive run lint",

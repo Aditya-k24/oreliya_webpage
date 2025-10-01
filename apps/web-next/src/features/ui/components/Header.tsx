@@ -288,6 +288,10 @@ export function Header() {
                             Admin Dashboard
                           </Link>
                         )}
+                        {/* Debug info - remove in production */}
+                        <div className='px-4 py-2 text-xs text-gray-500 border-t'>
+                          Role: {(session.user as any)?.role || 'none'}
+                        </div>
                         <Link
                           href='/account'
                           className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200'

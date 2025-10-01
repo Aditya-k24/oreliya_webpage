@@ -1,5 +1,0 @@
-apps/api
-packages
-node_modules
-.git
-*.log

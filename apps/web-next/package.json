@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "build:production": "NODE_ENV=production next build",
+    "build": "prisma generate && next build --turbopack",
+    "build:production": "prisma generate && NODE_ENV=production next build",
     "start": "next start",
     "start:production": "NODE_ENV=production next start",
     "lint": "eslint",
@@ -19,16 +19,31 @@
     "analyze": "ANALYZE=true next build",
     "preview": "next build && next start",
     "clean": "rm -rf .next out",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@prisma/client": "^6.11.1",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/stripe": "^8.0.417",
+    "axios": "^1.10.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.6.1",
+    "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
     "next": "15.5.3",
     "next-auth": "^4.24.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "resend": "^6.0.3"
+    "resend": "^6.0.3",
+    "stripe": "^18.5.0",
+    "winston": "^3.17.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -37,6 +52,7 @@
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.0.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -44,6 +60,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
     "jsdom": "^23.0.0",
+    "prisma": "^6.11.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^1.0.0"
