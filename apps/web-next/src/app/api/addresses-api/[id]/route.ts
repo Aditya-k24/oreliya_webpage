@@ -1,9 +1,13 @@
+import { NextRequest } from 'next/server';
 import { createNextRouteHandler } from '@/api-lib/adapters/nextjs';
 import { AddressController } from '@/api-lib/controllers/addressController';
 import { AddressService } from '@/api-lib/services/addressService';
 import { AddressRepository } from '@/api-lib/repositories/addressRepository';
 import { authenticateToken } from '@/api-lib/middlewares/authMiddleware';
-import { prisma } from '@/api-lib/prisma';
+import prisma from '@/api-lib/config/database';
+
+// Ensure Node.js runtime for Prisma compatibility
+export const runtime = 'nodejs';
 
 const addressRepository = new AddressRepository(prisma);
 const addressService = new AddressService(addressRepository);

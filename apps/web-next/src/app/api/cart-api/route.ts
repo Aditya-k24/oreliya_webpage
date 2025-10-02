@@ -3,7 +3,7 @@ import { CartController } from '@/api-lib/controllers/cartController';
 import { CartService } from '@/api-lib/services/cartService';
 import { CartRepository } from '@/api-lib/repositories/cartRepository';
 import { authenticateToken } from '@/api-lib/middlewares/authMiddleware';
-import { prisma } from '@/api-lib/prisma';
+import prisma from '@/api-lib/config/database';
 
 const cartRepository = new CartRepository(prisma);
 const cartService = new CartService(cartRepository);

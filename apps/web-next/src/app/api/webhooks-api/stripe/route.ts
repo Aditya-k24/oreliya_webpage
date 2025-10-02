@@ -3,7 +3,7 @@ import { WebhookController } from '@/api-lib/controllers/webhookController';
 import { OrderService } from '@/api-lib/services/orderService';
 import { OrderRepository } from '@/api-lib/repositories/orderRepository';
 import { CartRepository } from '@/api-lib/repositories/cartRepository';
-import { prisma } from '@/api-lib/prisma';
+import prisma from '@/api-lib/config/database';
 
 const orderRepository = new OrderRepository(prisma);
 const cartRepository = new CartRepository(prisma);

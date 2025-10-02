@@ -4,7 +4,7 @@ import { ProductService } from '@/api-lib/services/productService';
 import { ProductRepository } from '@/api-lib/repositories/productRepository';
 import { authenticateToken } from '@/api-lib/middlewares/authMiddleware';
 import { adminMiddleware } from '@/api-lib/middlewares/adminMiddleware';
-import { prisma } from '@/api-lib/prisma';
+import prisma from '@/api-lib/config/database';
 
 const productRepository = new ProductRepository(prisma);
 const productService = new ProductService(productRepository);
