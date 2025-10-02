@@ -22,9 +22,7 @@ export class ProductRepository {
         ...data,
         slug,
         category: data.category as any,
-        metadata: data.metadata
-          ? (data.metadata as Prisma.JsonValue)
-          : Prisma.JsonNull,
+        metadata: data.metadata as any,
         // Create customizations if provided
         customizations: data.customizations
           ? {
@@ -84,15 +82,6 @@ export class ProductRepository {
     limit = 20,
     offset = 0
   ) {
-    // Debug Prisma client in repository
-    if (!this.prisma) {
-      throw new Error('Prisma client is undefined in ProductRepository');
-    }
-    
-    if (!this.prisma.product) {
-      console.error('ProductRepository: prisma.product is undefined. Available models:', Object.keys(this.prisma).filter(key => !key.startsWith('$')));
-      throw new Error('Prisma product model is undefined in ProductRepository');
-    }
 
     const where: Prisma.ProductWhereInput = {
       isActive: filters.isActive ?? true,
@@ -137,9 +126,7 @@ export class ProductRepository {
       data: {
         ...data,
         category: data.category as any,
-        metadata: data.metadata
-          ? (data.metadata as Prisma.JsonValue)
-          : Prisma.JsonNull,
+        metadata: data.metadata as any,
         // Update customizations if provided
         customizations: data.customizations
           ? {

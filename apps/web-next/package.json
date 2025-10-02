@@ -30,6 +30,7 @@
     "supabase:migrate-images": "tsx scripts/migrate-images-to-supabase.ts",
     "supabase:setup": "tsx scripts/setup-supabase.ts",
     "create-users": "tsx scripts/create-users.ts",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "test:signed-urls": "curl -X POST http://localhost:3000/api/images/signed-url -H 'Content-Type: application/json' -d '{\"filePath\": \"products/1759378148947-10.png\", \"expiresIn\": 3600}' | jq ."
   },
   "dependencies": {

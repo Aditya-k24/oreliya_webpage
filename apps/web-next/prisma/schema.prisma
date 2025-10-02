@@ -1,5 +1,7 @@
 generator client {
   provider = "prisma-client-js"
+    output   = "./generated/client"
+
 }
 
 datasource db {
@@ -39,7 +41,7 @@ model cart_items {
   createdAt      DateTime @default(now())
   updatedAt      DateTime
   carts          carts    @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  products       products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product        Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model carts {
@@ -89,7 +91,7 @@ model order_items {
   customizations Json?
   createdAt      DateTime @default(now())
   orders         orders   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  products       products @relation(fields: [productId], references: [id])
+  product        Product @relation(fields: [productId], references: [id])
 }
 
 model orders {
@@ -136,7 +138,7 @@ model product_customizations {
   sortOrder       Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime
-  products        products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product         Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model product_variants {
@@ -150,10 +152,10 @@ model product_variants {
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime
-  products      products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
-model products {
+model Product {
   id                     String                   @id
   name                   String
   slug                   String                   @unique
@@ -239,7 +241,7 @@ model wishlists {
   userId    String
   productId String
   createdAt DateTime @default(now())
-  products  products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   users     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
