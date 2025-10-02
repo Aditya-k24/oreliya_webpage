@@ -40,17 +40,27 @@ export default function SignUpPage() {
     }
     
     try {
-      // Check if email already exists
-      const existingEmails = ['admin@oreliya.com', 'user@oreliya.com'];
-      if (existingEmails.includes(email)) {
-        setError('This email is already registered. Please use a different email or try signing in.');
-        setLoading(false);
-        return;
+      // Call actual registration API
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
       }
-      
-      // Mock signup - replace with actual API call when backend is ready
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      
+
+      // Auto sign in after successful registration
       const res = await signIn('credentials', {
         email,
         password,
@@ -60,7 +70,7 @@ export default function SignUpPage() {
       if (res?.error) throw new Error(res.error);
       router.push('/');
     } catch (err) {
-      setError('Signup failed. Please try again.');
+      setError(err instanceof Error ? err.message : 'Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }

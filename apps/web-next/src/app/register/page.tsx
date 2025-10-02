@@ -36,12 +36,28 @@ export default function RegisterPage() {
       return;
     }
 
-    // Mock registration for development - replace with actual API call when backend is ready
+    // Call actual registration API
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful registration
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone || undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
       setSuccess(true);
       
       // Auto sign in after successful registration
@@ -60,7 +76,7 @@ export default function RegisterPage() {
         }
       }, 2000);
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }

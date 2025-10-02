@@ -2,7 +2,13 @@
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { config } from '@/lib/config';
 import type { AppUser, AppToken, AppSession } from '../types/auth';
-import { findUserByEmail, addUser } from '@/lib/mock-users';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+// Create Prisma client instance with proper configuration for production
+const prisma = new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+});
 
 // Production-ready authentication options
 export const authOptions = {
@@ -27,68 +33,42 @@ export const authOptions = {
         }
 
         try {
-          // In production, attempt to authenticate with real API
-          if (process.env.NODE_ENV === 'production') {
-            const response = await fetch(`${config.api.baseUrl}/auth/login`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                email: credentials.email,
-                password: credentials.password,
-              }),
-            });
+          // Find user in database
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+            include: { role: true },
+          });
 
-            if (response.ok) {
-              const data = await response.json();
-              return {
-                id: data.user.id,
-                email: data.user.email,
-                name: data.user.name,
-                role: data.user.role,
-                accessToken: data.accessToken,
-                refreshToken: data.refreshToken,
-              } as AppUser & { accessToken: string; refreshToken: string };
-            }
+          if (!user) {
+            console.log('User not found:', credentials.email);
+            return null;
           }
 
-          // Development fallback with mock authentication using the mock user store
-          const user = findUserByEmail(credentials.email);
+          // Check if user is active
+          if (!user.isActive) {
+            console.log('User account is inactive:', credentials.email);
+            return null;
+          }
+
+          // Verify password
+          const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
           
-          if (user && user.password === credentials.password) {
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              role: user.role,
-              accessToken: `mock-${user.id}-token`,
-              refreshToken: `mock-${user.id}-refresh-token`,
-            } as AppUser & { accessToken: string; refreshToken: string };
+          if (!isPasswordValid) {
+            console.log('Invalid password for user:', credentials.email);
+            return null;
           }
 
-          // Allow any email/password combination for newly registered users (development only)
-          if (process.env.NODE_ENV === 'development' && 
-              credentials.email && credentials.password && 
-              !user) {
-            const newUser = addUser({
-              email: credentials.email,
-              name: credentials.email.split('@')[0],
-              role: 'user',
-              password: credentials.password,
-            });
-            
-            return {
-              id: newUser.id,
-              email: newUser.email,
-              name: newUser.name,
-              role: newUser.role,
-              accessToken: `mock-${newUser.id}-token`,
-              refreshToken: `mock-${newUser.id}-refresh-token`,
-            } as AppUser & { accessToken: string; refreshToken: string };
-          }
+          console.log('Authentication successful for user:', user.email, 'Role:', user.role.name);
 
-          return null;
+          return {
+            id: user.id,
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`,
+            role: user.role.name,
+            accessToken: `db-${user.id}-token`,
+            refreshToken: `db-${user.id}-refresh-token`,
+          } as AppUser & { accessToken: string; refreshToken: string };
+
         } catch (error) {
           console.error('Authentication error:', error);
           return null;

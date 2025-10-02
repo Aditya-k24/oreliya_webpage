@@ -1,110 +1,137 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 export default function AuthTestPage() {
   const { data: session, status } = useSession();
-  const [apiCheck, setApiCheck] = useState<any>(null);
+  const [testResults, setTestResults] = useState<any[]>([]);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/auth-check');
-        const data = await response.json();
-        setApiCheck(data);
-      } catch (error) {
-        setApiCheck({ error: 'Failed to check auth' });
-      }
-    };
+  const testCredentials = [
+    { email: 'admin@oreliya.com', password: 'admin123', role: 'admin' },
+    { email: 'user@oreliya.com', password: 'user123', role: 'user' },
+    { email: 'johndoe@example.com', password: 'password123', role: 'user' },
+  ];
 
-    if (status !== 'loading') {
-      checkAuth();
+  const runAuthTest = async (credentials: any) => {
+    try {
+      const result = await signIn('credentials', {
+        email: credentials.email,
+        password: credentials.password,
+        redirect: false,
+      });
+
+      setTestResults(prev => [...prev, {
+        email: credentials.email,
+        expectedRole: credentials.role,
+        result: result,
+        timestamp: new Date().toLocaleTimeString(),
+      }]);
+    } catch (error) {
+      setTestResults(prev => [...prev, {
+        email: credentials.email,
+        expectedRole: credentials.role,
+        result: { error: 'Test failed' },
+        timestamp: new Date().toLocaleTimeString(),
+      }]);
     }
-  }, [status]);
+  };
+
+  const runAllTests = async () => {
+    setTestResults([]);
+    for (const cred of testCredentials) {
+      await runAuthTest(cred);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second between tests
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Authentication Test</h1>
+    <div className="container mx-auto p-8">
+      <h1 className="text-3xl font-bold mb-6">Authentication Test Page</h1>
+      
+      <div className="mb-8 p-4 border rounded-md bg-gray-50">
+        <h2 className="text-xl font-semibold mb-4">Current Session Status</h2>
+        <p>Status: {status}</p>
+        <p>Authenticated: {session ? 'Yes' : 'No'}</p>
+        {session && (
+          <>
+            <p>User ID: {(session.user as any)?.id}</p>
+            <p>User Email: {(session.user as any)?.email}</p>
+            <p>User Name: {(session.user as any)?.name}</p>
+            <p>User Role: {(session.user as any)?.role}</p>
+          </>
+        )}
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Test Credentials</h2>
+        <div className="space-y-2">
+          {testCredentials.map((cred, index) => (
+            <div key={index} className="flex items-center space-x-4 p-2 border rounded">
+              <span className="font-mono text-sm">{cred.email}</span>
+              <span className="text-sm text-gray-600">({cred.role})</span>
+              <button
+                onClick={() => runAuthTest(cred)}
+                className="px-3 py-1 bg-blue-500 text-white rounded text-sm"
+              >
+                Test Login
+              </button>
+            </div>
+          ))}
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Client-side session */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Client-side Session</h2>
-            <div className="space-y-2">
-              <p><strong>Status:</strong> {status}</p>
-              <p><strong>Authenticated:</strong> {session ? 'Yes' : 'No'}</p>
-              {session && (
-                <>
-                  <p><strong>User ID:</strong> {(session.user as any)?.id}</p>
-                  <p><strong>Email:</strong> {(session.user as any)?.email}</p>
-                  <p><strong>Name:</strong> {(session.user as any)?.name}</p>
-                  <p><strong>Role:</strong> {(session.user as any)?.role}</p>
-                  <p><strong>Is Admin:</strong> {(session.user as any)?.role === 'admin' ? 'Yes' : 'No'}</p>
-                </>
-              )}
-            </div>
-          </div>
+        <button
+          onClick={runAllTests}
+          className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
+        >
+          Run All Tests
+        </button>
+      </div>
 
-          {/* Server-side check */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Server-side Check</h2>
-            <div className="space-y-2">
-              {apiCheck ? (
-                <>
-                  <p><strong>Success:</strong> {apiCheck.success ? 'Yes' : 'No'}</p>
-                  <p><strong>Message:</strong> {apiCheck.message}</p>
-                  {apiCheck.user && (
-                    <>
-                      <p><strong>User ID:</strong> {apiCheck.user.id}</p>
-                      <p><strong>Email:</strong> {apiCheck.user.email}</p>
-                      <p><strong>Role:</strong> {apiCheck.user.role}</p>
-                      <p><strong>Is Admin:</strong> {apiCheck.user.isAdmin ? 'Yes' : 'No'}</p>
-                    </>
-                  )}
-                </>
-              ) : (
-                <p>Loading...</p>
-              )}
-            </div>
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Test Results</h2>
+        {testResults.length === 0 ? (
+          <p className="text-gray-500">No tests run yet</p>
+        ) : (
+          <div className="space-y-2">
+            {testResults.map((result, index) => (
+              <div key={index} className="p-3 border rounded">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold">{result.email}</p>
+                    <p className="text-sm text-gray-600">Expected: {result.expectedRole}</p>
+                    <p className="text-sm text-gray-500">Time: {result.timestamp}</p>
+                  </div>
+                  <div className="text-right">
+                    {result.result?.error ? (
+                      <span className="text-red-600">❌ Failed</span>
+                    ) : result.result?.ok ? (
+                      <span className="text-green-600">✅ Success</span>
+                    ) : (
+                      <span className="text-yellow-600">⚠️ Unknown</span>
+                    )}
+                  </div>
+                </div>
+                <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto">
+                  {JSON.stringify(result.result, null, 2)}
+                </pre>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Test credentials */}
-        <div className="mt-8 bg-blue-50 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">Test Credentials</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h3 className="font-medium text-gray-900">Admin User</h3>
-              <p className="text-sm text-gray-600">Email: admin@oreliya.com</p>
-              <p className="text-sm text-gray-600">Password: admin123</p>
-              <p className="text-sm text-gray-600">Role: admin</p>
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-900">Regular User</h3>
-              <p className="text-sm text-gray-600">Email: user@oreliya.com</p>
-              <p className="text-sm text-gray-600">Password: user123</p>
-              <p className="text-sm text-gray-600">Role: user</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="mt-8 flex gap-4">
-          <a 
-            href="/login" 
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      <div className="flex space-x-4">
+        {session ? (
+          <button
+            onClick={() => signOut()}
+            className="px-4 py-2 bg-red-500 text-white rounded"
           >
-            Go to Login
-          </a>
-          <a 
-            href="/admin" 
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-          >
-            Try Admin Page
-          </a>
-        </div>
+            Sign Out
+          </button>
+        ) : (
+          <p className="text-gray-500">Not signed in</p>
+        )}
       </div>
     </div>
   );
