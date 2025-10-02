@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { randomUUID } from 'crypto';
 import { CreateAddressRequest, UpdateAddressRequest } from '../types/address';
 
 export class AddressRepository {
@@ -9,8 +10,10 @@ export class AddressRepository {
   }
 
   async createAddress(userId: string, data: CreateAddressRequest) {
-    return this.prisma.address.create({
+    return this.prisma.addresses.create({
       data: {
+        id: randomUUID(),
+        updatedAt: new Date(),
         userId,
         ...data,
       },
@@ -18,27 +21,27 @@ export class AddressRepository {
   }
 
   async getAddressesByUserId(userId: string) {
-    return this.prisma.address.findMany({
+    return this.prisma.addresses.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   async getAddressById(id: string, userId: string) {
-    return this.prisma.address.findFirst({
+    return this.prisma.addresses.findFirst({
       where: { id, userId },
     });
   }
 
   async updateAddress(id: string, userId: string, data: UpdateAddressRequest) {
-    return this.prisma.address.update({
+    return this.prisma.addresses.update({
       where: { id, userId },
       data,
     });
   }
 
   async deleteAddress(id: string, userId: string) {
-    return this.prisma.address.delete({
+    return this.prisma.addresses.delete({
       where: { id, userId },
     });
   }
