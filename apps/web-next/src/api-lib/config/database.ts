@@ -25,14 +25,14 @@ const prisma: PrismaClient = globalForPrisma.prisma ?? new PrismaClient({
       level: 'warn',
     },
   ] : ['error'],
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
 });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+// Ensure Prisma client is properly initialized
+if (typeof prisma === 'undefined') {
+  throw new Error('Prisma client is undefined. Check DATABASE_URL environment variable.');
+}
 
 // Test database connection
 export const testDatabaseConnection = async (): Promise<boolean> => {
