@@ -1,13 +1,8 @@
 // Remove the import - AuthOptions is not exported in newer versions
 import CredentialsProvider from 'next-auth/providers/credentials';
 import type { AppUser, AppToken, AppSession } from '../types/auth';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-
-// Create Prisma client instance with proper configuration for production
-const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-});
+import prisma from '@/api-lib/config/database';
 
 // Production-ready authentication options
 export const authOptions = {
