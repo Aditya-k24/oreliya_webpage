@@ -44,8 +44,26 @@ export async function GET(request: NextRequest) {
       const result = await productService.getProducts();
       
       if (result.success && result.data?.products) {
-        // Merge with dev store for immediate visibility
-        const merged = [...result.data.products, ...store.list()];
+        // Merge with dev store for immediate visibility, removing duplicates
+        const dbProducts = result.data.products;
+        const devProducts = store.list();
+        
+        // Create a map to deduplicate by ID
+        const productMap = new Map();
+        
+        // Add database products first
+        dbProducts.forEach(product => {
+          productMap.set(product.id, product);
+        });
+        
+        // Add dev store products, but only if they don't exist in database
+        devProducts.forEach(product => {
+          if (!productMap.has(product.id)) {
+            productMap.set(product.id, product);
+          }
+        });
+        
+        const merged = Array.from(productMap.values());
         return NextResponse.json({
           success: true,
           data: { products: merged, total: merged.length },
