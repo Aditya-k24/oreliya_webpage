@@ -1,49 +1,39 @@
 import { PrismaClient } from '@prisma/client';
 import logger from './logger';
 
-// Global Prisma client instance for production
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+let prismaInstance: PrismaClient | undefined;
 
-const prisma: PrismaClient = globalForPrisma.prisma ?? new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? [
-    {
-      emit: 'stdout',
-      level: 'query',
-    },
-    {
-      emit: 'stdout',
-      level: 'error',
-    },
-    {
-      emit: 'stdout',
-      level: 'info',
-    },
-    {
-      emit: 'stdout',
-      level: 'warn',
-    },
-  ] : ['error'],
+function createPrismaClient(): PrismaClient {
+  return new PrismaClient({
+    log: process.env.NODE_ENV === 'development'
+      ? [
+          { emit: 'stdout', level: 'query' },
+          { emit: 'stdout', level: 'error' },
+          { emit: 'stdout', level: 'info' },
+          { emit: 'stdout', level: 'warn' },
+        ]
+      : ['error'],
+  });
+}
+
+function getPrisma(): PrismaClient {
+  if (!prismaInstance) {
+    prismaInstance = createPrismaClient();
+  }
+  return prismaInstance;
+}
+
+// Export a proxy that lazily initializes Prisma on first property access
+const prisma = new Proxy({} as unknown as PrismaClient, {
+  get(_target, prop: string | symbol) {
+    const client = getPrisma() as any;
+    return client[prop];
+  },
 });
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
-
-// Ensure Prisma client is properly initialized
-if (typeof prisma === 'undefined') {
-  console.error('Prisma client is undefined. DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
-  throw new Error('Prisma client is undefined. Check DATABASE_URL environment variable.');
-}
-
-// Debug Prisma client in production
-if (process.env.NODE_ENV === 'production') {
-  console.log('Prisma client initialized. Available models:', Object.keys(prisma).filter(key => !key.startsWith('$')));
-}
-
-// Test database connection
 export const testDatabaseConnection = async (): Promise<boolean> => {
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await getPrisma().$queryRaw`SELECT 1`;
     logger.info('Database connection successful');
     return true;
   } catch (error) {
@@ -52,10 +42,9 @@ export const testDatabaseConnection = async (): Promise<boolean> => {
   }
 };
 
-// Connection management for production
 export const connectDatabase = async (): Promise<void> => {
   try {
-    await prisma.$connect();
+    await getPrisma().$connect();
     logger.info('Database connected successfully');
   } catch (error) {
     logger.error('Failed to connect to database:', error);
@@ -63,27 +52,15 @@ export const connectDatabase = async (): Promise<void> => {
   }
 };
 
-// Graceful shutdown
 export const disconnectDatabase = async (): Promise<void> => {
   try {
-    await prisma.$disconnect();
-    logger.info('Database disconnected successfully');
+    if (prismaInstance) {
+      await prismaInstance.$disconnect();
+      logger.info('Database disconnected successfully');
+    }
   } catch (error) {
     logger.error('Error disconnecting database:', error);
   }
 };
-
-// Handle process termination in production
-if (process.env.NODE_ENV === 'production') {
-  process.on('SIGINT', async () => {
-    await disconnectDatabase();
-    process.exit(0);
-  });
-  
-  process.on('SIGTERM', async () => {
-    await disconnectDatabase();
-    process.exit(0);
-  });
-}
 
 export default prisma;
