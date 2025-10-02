@@ -18,7 +18,8 @@
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
-    "prepare": "[ -z \"\" ] && husky install || echo 'Skipping husky install in CI'"
+    "prepare": "[ -z \"\" ] && husky install || echo 'Skipping husky install in CI'",
+    "postinstall": "cd apps/web-next && pnpm run db:generate"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
