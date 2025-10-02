@@ -115,10 +115,18 @@ export async function POST(request: NextRequest) {
     // Create product directly in database using ProductService
     try {
       // Verify Prisma client is available
-      if (!prisma || typeof prisma.product === 'undefined') {
-        console.error('Prisma client or product model is undefined');
+      if (!prisma) {
+        console.error('Prisma client is undefined');
         return NextResponse.json(
           { success: false, message: 'Database client not available' },
+          { status: 500 }
+        );
+      }
+      
+      if (typeof prisma.product === 'undefined') {
+        console.error('Prisma product model is undefined. Available models:', Object.keys(prisma));
+        return NextResponse.json(
+          { success: false, message: 'Database model not available' },
           { status: 500 }
         );
       }

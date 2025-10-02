@@ -31,7 +31,13 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 // Ensure Prisma client is properly initialized
 if (typeof prisma === 'undefined') {
+  console.error('Prisma client is undefined. DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
   throw new Error('Prisma client is undefined. Check DATABASE_URL environment variable.');
+}
+
+// Debug Prisma client in production
+if (process.env.NODE_ENV === 'production') {
+  console.log('Prisma client initialized. Available models:', Object.keys(prisma).filter(key => !key.startsWith('$')));
 }
 
 // Test database connection
