@@ -6,26 +6,40 @@ import { AddressRepository } from '@/api-lib/repositories/addressRepository';
 import { authenticateToken } from '@/api-lib/middlewares/authMiddleware';
 import prisma from '@/api-lib/config/database';
 
-// Ensure Node.js runtime for Prisma compatibility
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
-const addressRepository = new AddressRepository(prisma);
-const addressService = new AddressService(addressRepository);
-const addressController = new AddressController(addressService);
+function getAddressController(): AddressController {
+  const repo = new AddressRepository(prisma);
+  const service = new AddressService(repo);
+  return new AddressController(service);
+}
 
 export const GET = async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
   const params = await context.params;
-  return createNextRouteHandler(authenticateToken, addressController.getAddressById)(request, { params });
+  const controller = getAddressController();
+  return createNextRouteHandler(
+    authenticateToken,
+    controller.getAddressById.bind(controller)
+  )(request, { params });
 };
 
 export const PUT = async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
   const params = await context.params;
-  return createNextRouteHandler(authenticateToken, addressController.updateAddress)(request, { params });
+  const controller = getAddressController();
+  return createNextRouteHandler(
+    authenticateToken,
+    controller.updateAddress.bind(controller)
+  )(request, { params });
 };
 
 export const DELETE = async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
   const params = await context.params;
-  return createNextRouteHandler(authenticateToken, addressController.deleteAddress)(request, { params });
+  const controller = getAddressController();
+  return createNextRouteHandler(
+    authenticateToken,
+    controller.deleteAddress.bind(controller)
+  )(request, { params });
 };
 
 
