@@ -6,16 +6,16 @@ import { AddressController } from '@/api-lib/controllers/addressController';
 import { AddressService } from '@/api-lib/services/addressService';
 import { AddressRepository } from '@/api-lib/repositories/addressRepository';
 import { authenticateToken } from '@/api-lib/middlewares/authMiddleware';
-import prisma from '@/api-lib/config/database';
 
-function getAddressController(): AddressController {
+async function getAddressController(): Promise<AddressController> {
+  const { default: prisma } = await import('@/api-lib/config/database');
   const repo = new AddressRepository(prisma);
   const service = new AddressService(repo);
   return new AddressController(service);
 }
 
 export async function GET(request: NextRequest) {
-  const controller = getAddressController();
+  const controller = await getAddressController();
   return createNextRouteHandler(
     authenticateToken,
     controller.getAddresses.bind(controller)
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const controller = getAddressController();
+  const controller = await getAddressController();
   return createNextRouteHandler(
     authenticateToken,
     controller.createAddress.bind(controller)
