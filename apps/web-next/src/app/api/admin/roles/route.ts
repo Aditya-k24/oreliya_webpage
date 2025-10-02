@@ -4,20 +4,27 @@ import { createNextRouteHandler } from '@/api-lib/adapters/nextjs';
 import { AdminController } from '@/api-lib/controllers/adminController';
 import { authenticateToken } from '@/api-lib/middlewares/authMiddleware';
 import { adminMiddleware } from '@/api-lib/middlewares/adminMiddleware';
-import prisma from '@/api-lib/config/database';
+async function getAdminController(): Promise<AdminController> {
+  const { default: prisma } = await import('@/api-lib/config/database');
+  return new AdminController(prisma);
+}
 
-const adminController = new AdminController(prisma);
+export const GET = async (request: Request) => {
+  const controller = await getAdminController();
+  return createNextRouteHandler(
+    authenticateToken,
+    adminMiddleware,
+    controller.listRoles.bind(controller)
+  )(request as any);
+};
 
-export const GET = createNextRouteHandler(
-  authenticateToken,
-  adminMiddleware,
-  adminController.listRoles.bind(adminController)
-);
-
-export const POST = createNextRouteHandler(
-  authenticateToken,
-  adminMiddleware,
-  adminController.createRole.bind(adminController)
-);
+export const POST = async (request: Request) => {
+  const controller = await getAdminController();
+  return createNextRouteHandler(
+    authenticateToken,
+    adminMiddleware,
+    controller.createRole.bind(controller)
+  )(request as any);
+};
 
 
