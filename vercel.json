@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd apps/web-next && pnpm install --ignore-scripts --frozen-lockfile && pnpm run build",
+  "buildCommand": "cd apps/web-next && pnpm install --ignore-scripts --frozen-lockfile && pnpm run vercel-build",
   "installCommand": "pnpm install --ignore-scripts --frozen-lockfile",
   "framework": "nextjs",
   "outputDirectory": "apps/web-next/.next",
