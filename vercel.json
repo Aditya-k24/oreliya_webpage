@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "buildCommand": "cd apps/web-next && pnpm install --ignore-scripts --frozen-lockfile && pnpm run vercel-build",
+  "buildCommand": "pnpm install --ignore-scripts --frozen-lockfile && pnpm run vercel-build",
   "installCommand": "pnpm install --ignore-scripts --frozen-lockfile",
   "framework": "nextjs",
-  "outputDirectory": "apps/web-next/.next",
+  "outputDirectory": ".next",
   "functions": {
-    "apps/web-next/src/app/api/**/*.ts": {
+    "src/app/api/**/*.ts": {
       "runtime": "nodejs18.x"
     }
   }
