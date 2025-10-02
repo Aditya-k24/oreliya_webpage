@@ -65,6 +65,7 @@ const nextConfig: NextConfig = {
   // Experimental features for performance
   experimental: {
     optimizePackageImports: ['@heroicons/react', 'lucide-react'],
+    serverComponentsExternalPackages: ['@prisma/client'],
   },
 
   // Bundle analysis

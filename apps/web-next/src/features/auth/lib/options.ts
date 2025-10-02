@@ -1,6 +1,5 @@
 // Remove the import - AuthOptions is not exported in newer versions
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { config } from '@/lib/config';
 import type { AppUser, AppToken, AppSession } from '../types/auth';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -114,6 +113,6 @@ export const authOptions = {
       return `${baseUrl}/`;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || config.auth.secret,
+  secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development',
 };

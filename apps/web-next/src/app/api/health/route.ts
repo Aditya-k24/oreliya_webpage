@@ -1,32 +1,36 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
-export async function GET() {
+const prisma = new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+});
+
+export async function GET(_request: NextRequest) {
   try {
-    const healthCheck = {
+    // Test database connection
+    await prisma.$connect();
+    
+    // Test basic query
+    const userCount = await prisma.user.count();
+    
+    return NextResponse.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
+      database: 'connected',
+      userCount,
       environment: process.env.NODE_ENV,
-      version: process.env.npm_package_version || '1.0.0',
-      services: {
-        database: 'connected', // Update this when you have a real database
-        auth: 'operational',
-        fileUpload: 'operational',
-        email: process.env.RESEND_API_KEY ? 'configured' : 'not-configured',
-      },
-    };
-
-    return NextResponse.json(healthCheck, { status: 200 });
-  } catch (error) {
-    console.error('Health check failed:', error);
+    }, { status: 200 });
     
-    return NextResponse.json(
-      {
-        status: 'unhealthy',
-        timestamp: new Date().toISOString(),
-        error: process.env.NODE_ENV === 'development' ? (error as Error).message : 'Internal server error',
-      },
-      { status: 500 }
-    );
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Health check failed:', error);
+    return NextResponse.json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error',
+      environment: process.env.NODE_ENV,
+    }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
