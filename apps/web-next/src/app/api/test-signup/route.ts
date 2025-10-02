@@ -1,14 +1,9 @@
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/api-lib/config/database';
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
-
-// Create Prisma client with proper configuration for production
-const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-});
 
 export async function POST(request: NextRequest) {
   try {
@@ -88,7 +83,5 @@ export async function POST(request: NextRequest) {
       success: false,
       message: 'Internal server error',
     }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
