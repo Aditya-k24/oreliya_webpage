@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model addresses {
+  id                                         String   @id
+  userId                                     String
+  type                                       String
+  firstName                                  String
+  lastName                                   String
+  company                                    String?
+  addressLine1                               String
+  addressLine2                               String?
+  city                                       String
+  state                                      String
+  postalCode                                 String
+  country                                    String
+  phone                                      String?
+  isDefault                                  Boolean  @default(false)
+  createdAt                                  DateTime @default(now())
+  updatedAt                                  DateTime
+  users                                      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders_orders_billingAddressIdToaddresses  orders[] @relation("orders_billingAddressIdToaddresses")
+  orders_orders_shippingAddressIdToaddresses orders[] @relation("orders_shippingAddressIdToaddresses")
+}
+
+model cart_items {
+  id             String   @id
+  cartId         String
+  productId      String
+  quantity       Int
+  price          Decimal  @db.Decimal(10, 2)
+  customizations Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime
+  carts          carts    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  products       products @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model carts {
+  id         String       @id
+  userId     String       @unique
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  cart_items cart_items[]
+  users      users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model categories {
+  id               String       @id
+  name             String       @unique
+  description      String?
+  slug             String       @unique
+  parentId         String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime
+  categories       categories?  @relation("categoriesTocategories", fields: [parentId], references: [id])
+  other_categories categories[] @relation("categoriesTocategories")
+}
+
+model deals {
+  id          String   @id
+  name        String
+  description String?
+  type        String
+  value       Decimal  @db.Decimal(10, 2)
+  minAmount   Decimal? @db.Decimal(10, 2)
+  maxDiscount Decimal? @db.Decimal(10, 2)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  usageLimit  Int?
+  usedCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+}
+
+model order_items {
+  id             String   @id
+  orderId        String
+  productId      String
+  quantity       Int
+  price          Decimal  @db.Decimal(10, 2)
+  customizations Json?
+  createdAt      DateTime @default(now())
+  orders         orders   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  products       products @relation(fields: [productId], references: [id])
+}
+
+model orders {
+  id                                            String        @id
+  orderNumber                                   String        @unique
+  userId                                        String
+  status                                        String        @default("pending")
+  subtotal                                      Decimal       @db.Decimal(10, 2)
+  taxAmount                                     Decimal       @db.Decimal(10, 2)
+  shippingAmount                                Decimal       @db.Decimal(10, 2)
+  discountAmount                                Decimal       @default(0) @db.Decimal(10, 2)
+  totalAmount                                   Decimal       @db.Decimal(10, 2)
+  billingAddressId                              String
+  shippingAddressId                             String
+  notes                                         String?
+  trackingNumber                                String?
+  shippedAt                                     DateTime?
+  deliveredAt                                   DateTime?
+  createdAt                                     DateTime      @default(now())
+  updatedAt                                     DateTime
+  stripeSessionId                               String?
+  paymentStatus                                 String?
+  order_items                                   order_items[]
+  addresses_orders_billingAddressIdToaddresses  addresses     @relation("orders_billingAddressIdToaddresses", fields: [billingAddressId], references: [id])
+  addresses_orders_shippingAddressIdToaddresses addresses     @relation("orders_shippingAddressIdToaddresses", fields: [shippingAddressId], references: [id])
+  users                                         users         @relation(fields: [userId], references: [id])
+}
+
+model product_customizations {
+  id              String   @id
+  productId       String
+  attribute       String
+  type            String
+  required        Boolean  @default(false)
+  options         String[]
+  priceAdjustment Decimal? @db.Decimal(10, 2)
+  minValue        Int?
+  maxValue        Int?
+  maxLength       Int?
+  pattern         String?
+  helpText        String?
+  category        String?
+  isEnabled       Boolean  @default(true)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime
+  products        products @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model product_variants {
+  id            String   @id
+  productId     String
+  size          String?
+  material      String?
+  price         Decimal  @db.Decimal(10, 2)
+  stockQuantity Int      @default(0)
+  sku           String   @unique
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+  products      products @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model products {
+  id                     String                   @id
+  name                   String
+  slug                   String                   @unique
+  description            String
+  shortDescription       String?
+  price                  Decimal                  @db.Decimal(10, 2)
+  compareAtPrice         Decimal?                 @db.Decimal(10, 2)
+  images                 String[]
+  category               String
+  tags                   String[]
+  isActive               Boolean                  @default(true)
+  isFeatured             Boolean                  @default(false)
+  isOnSale               Boolean                  @default(false)
+  salePercentage         Int?
+  metadata               Json?
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime
+  cart_items             cart_items[]
+  order_items            order_items[]
+  product_customizations product_customizations[]
+  product_variants       product_variants[]
+  reviews                reviews[]
+  wishlists              wishlists[]
+}
+
+model refresh_tokens {
+  id        String   @id
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  users     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model reviews {
+  id         String   @id
+  userId     String
+  productId  String
+  rating     Int
+  title      String?
+  comment    String?
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  products   products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model roles {
+  id          String   @id
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  users       users[]
+}
+
+model users {
+  id             String           @id
+  email          String           @unique
+  password       String
+  firstName      String
+  lastName       String
+  phone          String?
+  isActive       Boolean          @default(true)
+  emailVerified  Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  roleId         String
+  addresses      addresses[]
+  carts          carts?
+  orders         orders[]
+  refresh_tokens refresh_tokens[]
+  reviews        reviews[]
+  roles          roles            @relation(fields: [roleId], references: [id])
+  wishlists      wishlists[]
+}
+
+model wishlists {
+  id        String   @id
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  products  products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  users     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}

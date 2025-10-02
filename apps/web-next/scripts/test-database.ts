@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -10,21 +11,21 @@ async function testDatabaseConnection() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
     
-    // Test role query
-    const roles = await prisma.role.findMany();
+    // Test roles query
+    const roles = await prisma.roles.findMany();
     console.log('📋 Available roles:', roles.map(r => r.name));
     
-    // Test user query
-    const users = await prisma.user.findMany({
-      include: { role: true },
+    // Test users query
+    const users = await prisma.users.findMany({
+      include: { roles: true },
       take: 5,
     });
-    console.log('👥 Existing users:', users.map(u => ({ email: u.email, role: u.role.name })));
+    console.log('👥 Existing users:', users.map(u => ({ email: u.email, role: u.roles.name })));
     
     // Test creating a user
     console.log('🧪 Testing user creation...');
     
-    const userRole = await prisma.role.findUnique({
+    const userRole = await prisma.roles.findUnique({
       where: { name: 'user' },
     });
     
@@ -33,26 +34,28 @@ async function testDatabaseConnection() {
       return;
     }
     
-    const testUser = await prisma.user.create({
+    const testUser = await prisma.users.create({
       data: {
+        id: randomUUID(),
         email: 'testuser2@example.com',
         password: 'hashedpassword123',
         firstName: 'Test',
         lastName: 'User2',
         phone: '+1234567890',
         roleId: userRole.id,
+        updatedAt: new Date(),
       },
-      include: { role: true },
+      include: { roles: true },
     });
     
     console.log('✅ Test user created:', {
       id: testUser.id,
       email: testUser.email,
-      role: testUser.role.name,
+      role: testUser.roles.name,
     });
     
     // Clean up
-    await prisma.user.delete({
+    await prisma.users.delete({
       where: { id: testUser.id },
     });
     console.log('🧹 Test user cleaned up');

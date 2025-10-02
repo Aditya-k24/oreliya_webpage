@@ -3,6 +3,7 @@
 import { PrismaClient } from '@prisma/client'
 import { config } from 'dotenv'
 import bcrypt from 'bcryptjs'
+import { randomUUID } from 'crypto'
 
 // Load environment variables
 config({ path: '.env.local' })
@@ -16,21 +17,25 @@ async function createUsers() {
     // First, create roles if they don't exist
     console.log('📋 Creating roles...')
     
-    const adminRole = await prisma.role.upsert({
+    const adminRole = await prisma.roles.upsert({
       where: { name: 'admin' },
       update: {},
       create: {
+        id: randomUUID(),
         name: 'admin',
-        description: 'Administrator with full access'
+        description: 'Administrator with full access',
+        updatedAt: new Date()
       }
     })
     
-    const userRole = await prisma.role.upsert({
+    const userRole = await prisma.roles.upsert({
       where: { name: 'user' },
       update: {},
       create: {
+        id: randomUUID(),
         name: 'user',
-        description: 'Regular user with limited access'
+        description: 'Regular user with limited access',
+        updatedAt: new Date()
       }
     })
     
@@ -40,10 +45,11 @@ async function createUsers() {
     console.log('👑 Creating admin user...')
     const adminPassword = await bcrypt.hash('admin123', 10)
     
-    const adminUser = await prisma.user.upsert({
+    const adminUser = await prisma.users.upsert({
       where: { email: 'admin@oreliya.com' },
       update: {},
       create: {
+        id: randomUUID(),
         email: 'admin@oreliya.com',
         password: adminPassword,
         firstName: 'Admin',
@@ -51,7 +57,8 @@ async function createUsers() {
         phone: '+1234567890',
         isActive: true,
         emailVerified: true,
-        roleId: adminRole.id
+        roleId: adminRole.id,
+        updatedAt: new Date()
       }
     })
     
@@ -65,10 +72,11 @@ async function createUsers() {
     console.log('👤 Creating dummy user...')
     const userPassword = await bcrypt.hash('user123', 10)
     
-    const dummyUser = await prisma.user.upsert({
+    const dummyUser = await prisma.users.upsert({
       where: { email: 'user@example.com' },
       update: {},
       create: {
+        id: randomUUID(),
         email: 'user@example.com',
         password: userPassword,
         firstName: 'John',
@@ -76,7 +84,8 @@ async function createUsers() {
         phone: '+1234567891',
         isActive: true,
         emailVerified: true,
-        roleId: userRole.id
+        roleId: userRole.id,
+        updatedAt: new Date()
       }
     })
     
@@ -89,9 +98,10 @@ async function createUsers() {
     // Create addresses for the dummy user
     console.log('🏠 Creating addresses for dummy user...')
     
-    await prisma.address.createMany({
+    await prisma.addresses.createMany({
       data: [
         {
+          id: randomUUID(),
           userId: dummyUser.id,
           type: 'billing',
           firstName: 'John',
@@ -102,9 +112,11 @@ async function createUsers() {
           postalCode: '10001',
           country: 'USA',
           phone: '+1234567891',
-          isDefault: true
+          isDefault: true,
+          updatedAt: new Date()
         },
         {
+          id: randomUUID(),
           userId: dummyUser.id,
           type: 'shipping',
           firstName: 'John',
@@ -115,7 +127,8 @@ async function createUsers() {
           postalCode: '10001',
           country: 'USA',
           phone: '+1234567891',
-          isDefault: true
+          isDefault: true,
+          updatedAt: new Date()
         }
       ],
       skipDuplicates: true
@@ -126,11 +139,13 @@ async function createUsers() {
     // Create a cart for the dummy user
     console.log('🛒 Creating cart for dummy user...')
     
-    await prisma.cart.upsert({
+    await prisma.carts.upsert({
       where: { userId: dummyUser.id },
       update: {},
       create: {
-        userId: dummyUser.id
+        id: randomUUID(),
+        userId: dummyUser.id,
+        updatedAt: new Date()
       }
     })
     

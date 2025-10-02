@@ -28,9 +28,9 @@ export const authOptions = {
 
         try {
           // Find user in database
-          const user = await prisma.user.findUnique({
+          const user = await prisma.users.findUnique({
             where: { email: credentials.email },
-            include: { role: true },
+            include: { roles: true },
           });
 
           if (!user) {
@@ -52,13 +52,13 @@ export const authOptions = {
             return null;
           }
 
-          console.log('Authentication successful for user:', user.email, 'Role:', user.role.name);
+          console.log('Authentication successful for user:', user.email, 'Role:', user.roles.name);
 
           return {
             id: user.id,
             email: user.email,
             name: `${user.firstName} ${user.lastName}`,
-            role: user.role.name,
+            role: user.roles.name,
             accessToken: `db-${user.id}-token`,
             refreshToken: `db-${user.id}-refresh-token`,
           } as AppUser & { accessToken: string; refreshToken: string };

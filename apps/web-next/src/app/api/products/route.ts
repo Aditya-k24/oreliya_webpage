@@ -123,8 +123,8 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      if (typeof prisma.product === 'undefined') {
-        console.error('Prisma product model is undefined. Available models:', Object.keys(prisma));
+      if (typeof prisma.products === 'undefined') {
+        console.error('Prisma products model is undefined. Available models:', Object.keys(prisma));
         return NextResponse.json(
           { success: false, message: 'Database model not available' },
           { status: 500 }
