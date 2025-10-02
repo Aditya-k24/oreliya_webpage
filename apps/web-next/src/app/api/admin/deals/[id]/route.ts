@@ -4,20 +4,27 @@ import { createNextRouteHandler } from '@/api-lib/adapters/nextjs';
 import { AdminController } from '@/api-lib/controllers/adminController';
 import { authenticateToken } from '@/api-lib/middlewares/authMiddleware';
 import { adminMiddleware } from '@/api-lib/middlewares/adminMiddleware';
-import prisma from '@/api-lib/config/database';
+async function getAdminController(): Promise<AdminController> {
+  const { default: prisma } = await import('@/api-lib/config/database');
+  return new AdminController(prisma);
+}
 
-const adminController = new AdminController(prisma);
+export const PUT = async (request: Request) => {
+  const controller = await getAdminController();
+  return createNextRouteHandler(
+    authenticateToken,
+    adminMiddleware,
+    controller.updateDeal.bind(controller)
+  )(request as any);
+};
 
-export const PUT = createNextRouteHandler(
-  authenticateToken,
-  adminMiddleware,
-  adminController.updateDeal.bind(adminController)
-);
-
-export const DELETE = createNextRouteHandler(
-  authenticateToken,
-  adminMiddleware,
-  adminController.deleteDeal.bind(adminController)
-);
+export const DELETE = async (request: Request) => {
+  const controller = await getAdminController();
+  return createNextRouteHandler(
+    authenticateToken,
+    adminMiddleware,
+    controller.deleteDeal.bind(controller)
+  )(request as any);
+};
 
 
