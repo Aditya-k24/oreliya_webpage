@@ -9,8 +9,19 @@ const addressRepository = new AddressRepository(prisma);
 const addressService = new AddressService(addressRepository);
 const addressController = new AddressController(addressService);
 
-export const GET = createNextRouteHandler(authenticateToken, addressController.getAddressById);
-export const PUT = createNextRouteHandler(authenticateToken, addressController.updateAddress);
-export const DELETE = createNextRouteHandler(authenticateToken, addressController.deleteAddress);
+export const GET = async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
+  const params = await context.params;
+  return createNextRouteHandler(authenticateToken, addressController.getAddressById)(request, { params });
+};
+
+export const PUT = async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
+  const params = await context.params;
+  return createNextRouteHandler(authenticateToken, addressController.updateAddress)(request, { params });
+};
+
+export const DELETE = async (request: NextRequest, context: { params: Promise<{ id: string }> }) => {
+  const params = await context.params;
+  return createNextRouteHandler(authenticateToken, addressController.deleteAddress)(request, { params });
+};
 
 
