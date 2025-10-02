@@ -68,31 +68,32 @@ export const getProducts = createProductCache(
   'products'
 );
 
-export const getProductById = (id: string) =>
-  createProductCache(async (): Promise<Product | null> => {
-    // Try internal Next.js API first (dev uses in-memory products)
-    try {
-      const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-      const res = await fetch(`${base}/api/products?id=${encodeURIComponent(id)}`, {
-        cache: 'no-store',
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.success && data?.data?.product) return data.data.product as Product;
-      }
-    } catch {}
-
-    // Fallback to external API (production)
-    try {
-      const response = await apiClient.get<{ success: boolean; data: { product: Product } }>(
-        `/products/id/${id}`
-      );
-      return response.success ? response.data.product : null;
-    } catch (error) {
-      console.error('Error fetching product:', error);
-      return null;
+export const getProductById = async (id: string): Promise<Product | null> => {
+  // Try internal Next.js API first (dev uses in-memory products)
+  try {
+    const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const res = await fetch(`${base}/api/products?id=${encodeURIComponent(id)}`, {
+      cache: 'no-store', // Disable caching to avoid 2MB limit issues
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.success && data?.data?.product) return data.data.product as Product;
     }
-  }, `product-${id}`)();
+    } catch (error) {
+      console.error('Error fetching product from API:', error);
+    }
+
+  // Fallback to external API (production)
+  try {
+    const response = await apiClient.get<{ success: boolean; data: { product: Product } }>(
+      `/products/id/${id}`
+    );
+    return response.success ? response.data.product : null;
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return null;
+  }
+};
 
 export const getCategories = createCategoryCache(
   async (): Promise<Category[]> => {

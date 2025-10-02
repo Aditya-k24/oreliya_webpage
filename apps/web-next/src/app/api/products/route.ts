@@ -4,6 +4,9 @@ import { authOptions } from '@/features/auth/lib/options';
 import * as store from '@/lib/dev-products-store';
 import { config } from '@/lib/config';
 import { createErrorResponse, AppError } from '@/lib/error-handler';
+import { ProductService } from '@/api-lib/services/productService';
+import { ProductRepository } from '@/api-lib/repositories/productRepository';
+import prisma from '@/api-lib/config/database';
 
 export async function GET(request: NextRequest) {
   try {
@@ -51,10 +54,11 @@ export async function GET(request: NextRequest) {
       data: { products: merged, total: merged.length },
     }, { status: 200 });
   } catch (error) {
-    const errorResponse = createErrorResponse(error);
-    return NextResponse.json(errorResponse, { 
-      status: error instanceof AppError ? error.statusCode : 500 
-    });
+    console.error('Error in products GET:', error);
+    return NextResponse.json(
+      { success: false, message: 'Failed to fetch products' },
+      { status: 500 }
+    );
   }
 }
 
@@ -81,41 +85,24 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     
-    // Try to create in actual database first
+    // Create product directly in database using ProductService
     try {
-      const accessToken = (session as any)?.accessToken;
+      const productRepository = new ProductRepository(prisma);
+      const productService = new ProductService(productRepository);
       
-      // Create in actual database via Express API
-      const response = await fetch(`${config.api.baseUrl}/products`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(body),
-      });
+      const result = await productService.createProduct(body);
       
-      if (response.ok) {
-        const data = await response.json();
-        // Also add to dev store for immediate visibility
-        if (data.data) {
-          store.add(data.data);
-        }
-        return NextResponse.json(data, { status: 201 });
+      // Also add to dev store for immediate visibility
+      if (result.data?.product) {
+        store.add(result.data.product);
       }
       
-      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-      console.error('API create failed:', response.status, errorData);
+      return NextResponse.json(result, { status: 201 });
       
+    } catch (dbError) {
+      console.error('Database create error:', dbError);
       return NextResponse.json(
-        { success: false, message: `Failed to create product: ${errorData.message}` },
-        { status: response.status }
-      );
-      
-    } catch (apiError) {
-      console.error('API create error:', apiError);
-      return NextResponse.json(
-        { success: false, message: 'Database connection failed' },
+        { success: false, message: 'Failed to create product in database' },
         { status: 500 }
       );
     }

@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/features/auth/lib/options';
 import * as store from '@/lib/dev-products-store';
-import { config } from '@/lib/config';
+import { ProductService } from '@/api-lib/services/productService';
+import { ProductRepository } from '@/api-lib/repositories/productRepository';
+import prisma from '@/api-lib/config/database';
 
 export async function DELETE(
   request: NextRequest,
@@ -11,49 +13,45 @@ export async function DELETE(
   try {
     const { id } = await params;
     
+    // Check authentication first
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Check if user has admin role
+    const userRole = (session as any)?.user?.role;
+    if (userRole !== 'admin') {
+      return NextResponse.json(
+        { success: false, message: 'Admin access required' },
+        { status: 403 }
+      );
+    }
+    
     // Remove from dev store immediately for instant UI update
     store.removeById(id);
     
-    // Try to delete from actual database via Express API
+    // Delete from database using ProductService
     try {
-      const session = await getServerSession(authOptions);
-      const accessToken = (session as any)?.accessToken;
+      const productRepository = new ProductRepository(prisma);
+      const productService = new ProductService(productRepository);
       
-      if (!accessToken) {
-        return NextResponse.json({
-          success: true,
-          message: 'Deleted from dev store. Sign in as admin for permanent deletion.'
-        }, { status: 200 });
-      }
-      
-      const response = await fetch(`${config.api.baseUrl}/products/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
-      
-      if (response.ok || response.status === 404) {
-        return NextResponse.json({
-          success: true,
-          message: 'Product deleted successfully from database'
-        }, { status: 200 });
-      }
-      
-      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-      console.error('API delete failed:', response.status, errorData);
+      await productService.deleteProduct(id);
       
       return NextResponse.json({
         success: true,
-        message: `Deleted from dev store. DB deletion failed: ${errorData.message}`
+        message: 'Product deleted successfully from database'
       }, { status: 200 });
       
-    } catch (apiError) {
-      console.error('API delete error:', apiError);
+    } catch (dbError) {
+      console.error('Database delete error:', dbError);
       return NextResponse.json({
         success: true,
-        message: 'Deleted from dev store. DB connection failed.'
+        message: 'Deleted from dev store. Database deletion failed.'
       }, { status: 200 });
     }
     
