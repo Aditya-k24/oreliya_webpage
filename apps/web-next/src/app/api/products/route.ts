@@ -6,6 +6,9 @@ import { ProductService } from '@/api-lib/services/productService';
 import { ProductRepository } from '@/api-lib/repositories/productRepository';
 import prisma from '@/api-lib/config/database';
 
+// Ensure Node.js runtime for Prisma compatibility
+export const runtime = 'nodejs';
+
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);

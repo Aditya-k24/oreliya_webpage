@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/api-lib/config/database';
 
+// Ensure Node.js runtime for Prisma compatibility
+export const runtime = 'nodejs';
+
 export async function GET(_request: NextRequest) {
   try {
     // Test database connection
