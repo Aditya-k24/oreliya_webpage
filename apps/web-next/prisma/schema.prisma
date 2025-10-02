@@ -6,7 +6,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:Kulkarni@24042002@db.zsexkmraqccjxtwsksao.supabase.co:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require"
 }
 
 model addresses {
