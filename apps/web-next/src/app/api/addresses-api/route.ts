@@ -8,9 +8,6 @@ import { AddressRepository } from '@/api-lib/repositories/addressRepository';
 import { authenticateToken } from '@/api-lib/middlewares/authMiddleware';
 import prisma from '@/api-lib/config/database';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-
 function getAddressController(): AddressController {
   const repo = new AddressRepository(prisma);
   const service = new AddressService(repo);
