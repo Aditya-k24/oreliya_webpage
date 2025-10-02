@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: 'localhost',
       },
+      {
+        protocol: 'https',
+        hostname: 'zsexkmraqccjxtwsksao.supabase.co',
+      },
     ],
     unoptimized: false,
   },
@@ -62,10 +66,12 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  // External packages for server components
+  serverExternalPackages: ['@prisma/client'],
+
   // Experimental features for performance
   experimental: {
     optimizePackageImports: ['@heroicons/react', 'lucide-react'],
-    serverComponentsExternalPackages: ['@prisma/client'],
   },
 
   // Bundle analysis

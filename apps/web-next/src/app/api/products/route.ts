@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/features/auth/lib/options';
 import * as store from '@/lib/dev-products-store';
-import { config } from '@/lib/config';
-import { createErrorResponse, AppError } from '@/lib/error-handler';
 import { ProductService } from '@/api-lib/services/productService';
 import { ProductRepository } from '@/api-lib/repositories/productRepository';
 import prisma from '@/api-lib/config/database';
@@ -21,38 +19,49 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ success: true, data: { product: dev } }, { status: 200 });
       }
 
-      // 2) Fallback to API
-      const response = await fetch(`${config.api.baseUrl}/products/id/${productId}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }).catch(() => null);
-
-      if (!response) {
-        return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
+      // 2) Fetch from database
+      try {
+        const productRepository = new ProductRepository(prisma);
+        const productService = new ProductService(productRepository);
+        
+        const result = await productService.getProductById(productId);
+        
+        if (result.success && result.data?.product) {
+          return NextResponse.json({ success: true, data: { product: result.data.product } }, { status: 200 });
+        }
+      } catch (dbError) {
+        console.error('Database fetch error:', dbError);
       }
 
-      const data = await response.json();
-      return NextResponse.json(data, { status: response.status });
+      return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
     }
 
-    // List all: merge API results with dev store so newly added items appear immediately
-    let apiProducts: any[] = [];
+    // List all products from database
     try {
-      const response = await fetch(`${config.api.baseUrl}/products`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        apiProducts = data?.data?.products ?? [];
+      const productRepository = new ProductRepository(prisma);
+      const productService = new ProductService(productRepository);
+      
+      const result = await productService.getProducts();
+      
+      if (result.success && result.data?.products) {
+        // Merge with dev store for immediate visibility
+        const merged = [...result.data.products, ...store.list()];
+        return NextResponse.json({
+          success: true,
+          data: { products: merged, total: merged.length },
+        }, { status: 200 });
       }
-    } catch {}
+    } catch (dbError) {
+      console.error('Database fetch error:', dbError);
+    }
 
-    const merged = [...apiProducts, ...store.list()];
+    // Fallback to dev store only
+    const devProducts = store.list();
     return NextResponse.json({
       success: true,
-      data: { products: merged, total: merged.length },
+      data: { products: devProducts, total: devProducts.length },
     }, { status: 200 });
+    
   } catch (error) {
     console.error('Error in products GET:', error);
     return NextResponse.json(
@@ -75,7 +84,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has admin role
-    const userRole = (session as any)?.user?.role;
+    const userRole = (session as { user?: { role?: string } })?.user?.role;
     if (userRole !== 'admin') {
       return NextResponse.json(
         { success: false, message: 'Admin access required' },
@@ -94,7 +103,12 @@ export async function POST(request: NextRequest) {
       
       // Also add to dev store for immediate visibility
       if (result.data?.product) {
-        store.add(result.data.product);
+        const devProduct = {
+          ...result.data.product,
+          createdAt: result.data.product.createdAt.toISOString(),
+          updatedAt: result.data.product.updatedAt.toISOString(),
+        };
+        store.add(devProduct);
       }
       
       return NextResponse.json(result, { status: 201 });

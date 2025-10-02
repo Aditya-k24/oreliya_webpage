@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { SignedImage } from '@/components/SignedImage';
 // import { useSearchParams } from 'next/navigation';
 import { SearchAndFilter } from '@/features/ui/components/SearchAndFilter';
 import type { Product } from '@/types/product';
@@ -25,40 +26,28 @@ interface ProductCardProps {
 }
 
 function ProductCard({ product }: ProductCardProps) {
-  // Helper function to get a valid image URL
-  const getImageUrl = (imageUrl: string) => {
-    if (!imageUrl) return '/placeholder-product.svg';
-    
-    // If it's already a full URL, return as is
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      return imageUrl;
-    }
-    
-    // If it's a relative path, ensure it starts with slash and encode spaces
-    if (imageUrl.startsWith('/')) {
-      // Encode spaces and special characters in the URL
-      const pathParts = imageUrl.split('/');
-      const encodedParts = pathParts.map(part => 
-        part.includes(' ') ? encodeURIComponent(part) : part
-      );
-      return encodedParts.join('/');
-    }
-    
-    // If it's a relative path without leading slash, add one and encode
-    return `/${encodeURIComponent(imageUrl)}`;
-  };
 
   return (
     <Link href={`/products/${product.id}`} className="group">
       <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-xl">
         {/* Background Image */}
-        <Image
-          src={product.images[0] ? getImageUrl(product.images[0]) : '/placeholder-product.svg'}
-          alt={product.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
+        {product.images[0] ? (
+          <SignedImage
+            filePath={product.images[0]}
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        ) : (
+          <Image
+            src="/placeholder-product.svg"
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        )}
         
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
