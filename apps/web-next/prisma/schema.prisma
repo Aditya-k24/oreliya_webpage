@@ -41,7 +41,7 @@ model cart_items {
   createdAt      DateTime @default(now())
   updatedAt      DateTime
   carts          carts    @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product        Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  products       products @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model carts {
@@ -91,7 +91,7 @@ model order_items {
   customizations Json?
   createdAt      DateTime @default(now())
   orders         orders   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product        Product @relation(fields: [productId], references: [id])
+  products       products @relation(fields: [productId], references: [id])
 }
 
 model orders {
@@ -155,7 +155,7 @@ model product_variants {
   product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
-model Product {
+model products {
   id                     String                   @id
   name                   String
   slug                   String                   @unique
