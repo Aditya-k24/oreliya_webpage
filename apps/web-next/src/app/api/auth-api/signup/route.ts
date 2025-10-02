@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 import { createNextRouteHandler } from '@/api-lib/adapters/nextjs';
 import { AuthController } from '@/api-lib/controllers/authController';
 import { AuthService } from '@/api-lib/services/authService';

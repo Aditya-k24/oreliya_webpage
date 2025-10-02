@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 import { createNextRouteHandler } from '@/api-lib/adapters/nextjs';
 import { AddressController } from '@/api-lib/controllers/addressController';
 import { AddressService } from '@/api-lib/services/addressService';

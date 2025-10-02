@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateFileUpload } from '@/lib/validation';
 import { uploadToSupabaseStorage } from '@/lib/storage';

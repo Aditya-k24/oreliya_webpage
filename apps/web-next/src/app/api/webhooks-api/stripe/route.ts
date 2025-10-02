@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 import { createNextRouteHandler } from '@/api-lib/adapters/nextjs';
 import { WebhookController } from '@/api-lib/controllers/webhookController';
 import { OrderService } from '@/api-lib/services/orderService';
