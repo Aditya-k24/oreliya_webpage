@@ -7,7 +7,7 @@ export async function GET(_request: NextRequest) {
     await prisma.$connect();
     
     // Test basic query
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.users.count();
     
     return NextResponse.json({
       status: 'healthy',

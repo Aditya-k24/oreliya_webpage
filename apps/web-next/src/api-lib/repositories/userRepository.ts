@@ -1,6 +1,7 @@
-import { PrismaClient, User, Role } from '@prisma/client';
+import { PrismaClient, users, roles } from '@prisma/client';
 import { UserWithoutPassword } from '../types/auth';
 import logger from '../config/logger';
+import { randomUUID } from 'crypto';
 
 export class UserRepository {
   private prisma: PrismaClient;
@@ -16,12 +17,16 @@ export class UserRepository {
     lastName: string;
     phone?: string;
     roleId: string;
-  }): Promise<User & { role: Role }> {
+  }): Promise<users & { roles: roles }> {
     try {
-      const user = await this.prisma.user.create({
-        data: userData,
+      const user = await this.prisma.users.create({
+        data: {
+          ...userData,
+          id: randomUUID(),
+          updatedAt: new Date(),
+        },
         include: {
-          role: true,
+          roles: true,
         },
       });
       logger.info(`User created: ${user.email}`);
@@ -32,12 +37,12 @@ export class UserRepository {
     }
   }
 
-  async findUserById(id: string): Promise<(User & { role: Role }) | null> {
+  async findUserById(id: string): Promise<(users & { roles: roles }) | null> {
     try {
-      return await this.prisma.user.findUnique({
+      return await this.prisma.users.findUnique({
         where: { id },
         include: {
-          role: true,
+          roles: true,
         },
       });
     } catch (error) {
@@ -48,12 +53,12 @@ export class UserRepository {
 
   async findUserByEmail(
     email: string
-  ): Promise<(User & { role: Role }) | null> {
+  ): Promise<(users & { roles: roles }) | null> {
     try {
-      return await this.prisma.user.findUnique({
+      return await this.prisma.users.findUnique({
         where: { email },
         include: {
-          role: true,
+          roles: true,
         },
       });
     } catch (error) {
@@ -66,7 +71,7 @@ export class UserRepository {
     id: string
   ): Promise<UserWithoutPassword | null> {
     try {
-      const user = await this.prisma.user.findUnique({
+      const user = await this.prisma.users.findUnique({
         where: { id },
         select: {
           id: true,
@@ -76,7 +81,7 @@ export class UserRepository {
           phone: true,
           isActive: true,
           emailVerified: true,
-          role: {
+          roles: {
             select: {
               id: true,
               name: true,
@@ -94,13 +99,13 @@ export class UserRepository {
     }
   }
 
-  async updateUser(id: string, data: Partial<User>): Promise<User> {
+  async updateUser(id: string, data: Partial<users>): Promise<users> {
     try {
-      const user = await this.prisma.user.update({
+      const user = await this.prisma.users.update({
         where: { id },
         data,
         include: {
-          role: true,
+          roles: true,
         },
       });
       logger.info(`User updated: ${user.email}`);
@@ -113,7 +118,7 @@ export class UserRepository {
 
   async deleteUser(id: string): Promise<boolean> {
     try {
-      await this.prisma.user.delete({
+      await this.prisma.users.delete({
         where: { id },
       });
       logger.info(`User deleted: ${id}`);
@@ -124,9 +129,9 @@ export class UserRepository {
     }
   }
 
-  async findRoleByName(name: string): Promise<Role | null> {
+  async findRoleByName(name: string): Promise<roles | null> {
     try {
-      return await this.prisma.role.findUnique({
+      return await this.prisma.roles.findUnique({
         where: { name },
       });
     } catch (error) {
@@ -135,9 +140,9 @@ export class UserRepository {
     }
   }
 
-  async findRoleById(id: string): Promise<Role | null> {
+  async findRoleById(id: string): Promise<roles | null> {
     try {
-      return await this.prisma.role.findUnique({
+      return await this.prisma.roles.findUnique({
         where: { id },
       });
     } catch (error) {
@@ -146,9 +151,9 @@ export class UserRepository {
     }
   }
 
-  async getAllRoles(): Promise<Role[]> {
+  async getAllRoles(): Promise<roles[]> {
     try {
-      return await this.prisma.role.findMany();
+      return await this.prisma.roles.findMany();
     } catch (error) {
       logger.error('Error getting all roles:', error);
       throw error;
@@ -158,10 +163,14 @@ export class UserRepository {
   async createRole(roleData: {
     name: string;
     description?: string;
-  }): Promise<Role> {
+  }): Promise<roles> {
     try {
-      const role = await this.prisma.role.create({
-        data: roleData,
+      const role = await this.prisma.roles.create({
+        data: {
+          ...roleData,
+          id: randomUUID(),
+          updatedAt: new Date(),
+        },
       });
       logger.info(`Role created: ${role.name}`);
       return role;
@@ -173,7 +182,7 @@ export class UserRepository {
 
   async userExists(email: string): Promise<boolean> {
     try {
-      const count = await this.prisma.user.count({
+      const count = await this.prisma.users.count({
         where: { email },
       });
       return count > 0;

@@ -3,9 +3,9 @@ import { prisma } from '@/api-lib/prisma';
 
 export async function GET() {
   try {
-    const userCount = await prisma.user.count();
-    const productCount = await prisma.product.count();
-    const orderCount = await prisma.order.count();
+    const userCount = await prisma.users.count();
+    const productCount = await prisma.products.count();
+    const orderCount = await prisma.orders.count();
 
     return NextResponse.json({
       message: 'Database connection successful',

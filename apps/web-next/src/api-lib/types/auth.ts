@@ -3,7 +3,7 @@ import { Request } from 'express';
 export interface AuthenticatedUser {
   id: string;
   email: string;
-  role: string;
+  roles: string;
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -38,7 +38,7 @@ export interface AuthResponse {
       email: string;
       firstName: string;
       lastName: string;
-      role: string;
+      roles: string;
     };
     tokens: {
       accessToken: string;
@@ -61,7 +61,7 @@ export interface UserWithoutPassword {
   phone: string | null;
   isActive: boolean;
   emailVerified: boolean;
-  role: {
+  roles: {
     id: string;
     name: string;
     description: string | null;

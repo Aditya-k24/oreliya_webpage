@@ -113,17 +113,17 @@ export class AdminController {
 
   // Role Management CRUD
   async listRoles(req: Request, res: Response) {
-    const roles = await this.prisma.role.findMany();
+    const roles = await this.prisma.roles.findMany();
     res.json({ success: true, data: { roles } });
   }
 
   async createRole(req: Request, res: Response) {
-    const role = await this.prisma.role.create({ data: req.body });
+    const role = await this.prisma.roles.create({ data: req.body });
     res.status(201).json({ success: true, data: { role } });
   }
 
   async updateRole(req: Request, res: Response) {
-    const role = await this.prisma.role.update({
+    const role = await this.prisma.roles.update({
       where: { id: req.params.id },
       data: req.body,
     });
@@ -131,7 +131,7 @@ export class AdminController {
   }
 
   async deleteRole(req: Request, res: Response) {
-    await this.prisma.role.delete({ where: { id: req.params.id } });
+    await this.prisma.roles.delete({ where: { id: req.params.id } });
     res.json({ success: true });
   }
 }

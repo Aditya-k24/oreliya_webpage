@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { randomUUID } from 'crypto';
 
 // Create Prisma client with proper configuration for production
 const prisma = new PrismaClient({
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.users.findUnique({
       where: { email: body.email },
     });
     
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Get user role
-    const userRole = await prisma.role.findUnique({
+    const userRole = await prisma.roles.findUnique({
       where: { name: 'user' },
     });
     
@@ -49,16 +50,18 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(body.password, 10);
     
     // Create user
-    const user = await prisma.user.create({
+    const user = await prisma.users.create({
       data: {
+        id: randomUUID(),
         email: body.email,
         password: hashedPassword,
         firstName: body.firstName,
         lastName: body.lastName,
         phone: body.phone || null,
         roleId: userRole.id,
+        updatedAt: new Date(),
       },
-      include: { role: true },
+      include: { roles: true },
     });
     
     console.log('✅ User created:', user.email);
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
-          role: user.role.name,
+          role: user.roles.name,
         },
       },
     }, { status: 201 });
