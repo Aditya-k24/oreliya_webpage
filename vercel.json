@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "cd apps/web-next && pnpm install && pnpm run build",
-  "installCommand": "pnpm install",
+  "buildCommand": "cd apps/web-next && pnpm install --ignore-scripts --frozen-lockfile && pnpm run build",
+  "installCommand": "pnpm install --ignore-scripts --frozen-lockfile",
   "framework": "nextjs",
   "outputDirectory": "apps/web-next/.next",
   "functions": {
