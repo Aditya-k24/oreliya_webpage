@@ -1,14 +1,8 @@
 #!/usr/bin/env tsx
 
-import { PrismaClient } from '@prisma/client'
-import { config } from 'dotenv'
+import prisma from '../src/api-lib/config/database'
 import bcrypt from 'bcryptjs'
 import { randomUUID } from 'crypto'
-
-// Load environment variables
-config({ path: '.env.local' })
-
-const prisma = new PrismaClient()
 
 async function createUsers() {
   console.log('🚀 Creating admin and dummy users...')
