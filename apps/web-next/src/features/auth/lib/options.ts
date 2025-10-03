@@ -2,7 +2,7 @@
 import CredentialsProvider from 'next-auth/providers/credentials';
 import type { AppUser, AppToken, AppSession } from '../types/auth';
 import bcrypt from 'bcryptjs';
-// Prisma is lazy-imported inside authorize to avoid build-time initialization issues
+import prisma from '@/api-lib/config/database';
 
 // Production-ready authentication options
 export const authOptions = {
@@ -21,8 +21,7 @@ export const authOptions = {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
-        const { default: prisma } = await import('@/api-lib/config/database');
+      async authorize(credentials: Record<"email" | "password", string> | undefined) {
         if (!credentials?.email || !credentials.password) {
           return null;
         }

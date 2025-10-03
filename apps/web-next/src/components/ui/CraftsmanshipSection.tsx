@@ -16,7 +16,7 @@ export function CraftsmanshipSection({
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           className='w-full h-full object-cover'
         />
         <div className='absolute inset-0 bg-black/40' />

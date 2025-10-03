@@ -1,167 +1,82 @@
-'use client';
-
-import Link from 'next/link';
-import Image from 'next/image';
-import { useState, useEffect } from 'react';
-import { SignedImage } from '@/components/SignedImage';
-// import { useSearchParams } from 'next/navigation';
-import { SearchAndFilter } from '@/features/ui/components/SearchAndFilter';
+import ProductsPageClient from './ProductsPageClient';
 import type { Product } from '@/types/product';
+import { ProductService } from '@/api-lib/services/productService';
+import { ProductRepository } from '@/api-lib/repositories/productRepository';
+import prisma from '@/api-lib/config/database';
+import { getSignedUrls } from '@/lib/storage';
+import * as store from '@/lib/dev-products-store';
 
-// Function to get products from the API
-async function getProducts(): Promise<Product[]> {
+async function getServerProducts(category?: string): Promise<Product[]> {
   try {
-    // Use internal API route so newly created products (mock in dev) are visible
-    const response = await fetch('/api/products', { cache: 'no-store' });
-    const data = await response.json();
-    return data.success ? data.data.products : [];
+    
+    const productRepository = new ProductRepository(prisma);
+    const productService = new ProductService(productRepository);
+    
+    const result = await productService.getProducts();
+    
+    if (result.success && result.data?.products) {
+      const dbProducts = result.data.products;
+      const devProducts = store.list();
+      
+      const productMap = new Map<string, any>();
+      
+      dbProducts.forEach((product: any) => {
+        productMap.set(product.id, product);
+      });
+      
+      devProducts.forEach((product: any) => {
+        if (!productMap.has(product.id)) {
+          productMap.set(product.id, product);
+        }
+      });
+      
+      let merged = Array.from(productMap.values());
+      
+      // Filter by category at server level for better performance
+      if (category) {
+        merged = merged.filter((product: any) => 
+          product.category.toLowerCase() === category.toLowerCase()
+        );
+      }
+      
+      const allImagePaths = merged.flatMap((p: any) => p.images || []);
+      
+      // Only get signed URLs if there are images to process
+      let urlMap = new Map();
+      if (allImagePaths.length > 0) {
+        urlMap = await getSignedUrls('production', allImagePaths, 7200);
+      }
+      
+      const productsWithSignedUrls = merged.map((product: any) => ({
+        ...product,
+        images: product.images && product.images.length > 0
+          ? product.images.map((path: string) => urlMap.get(path) || path)
+          : [],
+        inStock: product.isActive,
+        createdAt: product.createdAt.toISOString(),
+        updatedAt: product.updatedAt.toISOString(),
+      }));
+      
+      return productsWithSignedUrls;
+    }
+    
+    const devProducts = store.list();
+    const filteredDevProducts = category 
+      ? devProducts.filter((product: any) => product.category.toLowerCase() === category.toLowerCase())
+      : devProducts;
+    
+    return filteredDevProducts as Product[];
   } catch (error) {
     console.error('Error fetching products:', error);
     return [];
   }
 }
 
-interface ProductCardProps {
-  product: Product;
-}
-
-function ProductCard({ product }: ProductCardProps) {
-
-  return (
-    <Link href={`/products/${product.id}`} className="group">
-      <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-xl">
-        {/* Background Image */}
-        {product.images[0] ? (
-          <SignedImage
-            filePath={product.images[0]}
-            alt={product.name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <Image
-            src="/placeholder-product.svg"
-            alt={product.name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        )}
-        
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-        
-        {/* Content overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-          <h3 className="font-semibold text-lg mb-2 line-clamp-2 drop-shadow-lg">
-            {product.name}
-          </h3>
-          
-          <div className="flex flex-col">
-            <span className="text-xs text-white/80 font-medium drop-shadow">Starting from</span>
-            <span className="text-lg font-bold text-white drop-shadow-lg">
-              ₹{product.price.toLocaleString('en-IN')}
-            </span>
-          </div>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-export default function ProductsPage() {
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState<string>('');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      setCategory(params.get('category') || '');
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const products = await getProducts();
-        setAllProducts(products);
-        // Don't pre-filter here - let SearchAndFilter handle all filtering
-        setFilteredProducts(products);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error loading products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F6EEDF] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E240A] mx-auto mb-4"></div>
-          <p className="text-[#1E240A]/70">Loading products...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-[#F6EEDF]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-[#1E240A] mb-4">
-            {category ? category.charAt(0).toUpperCase() + category.slice(1) : 'Our Products'}
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {category 
-              ? `Explore our collection of ${category.toLowerCase()}`
-              : 'Discover our exquisite collection of handcrafted jewelry pieces'
-            }
-          </p>
-          {category && (
-            <div className="mt-4">
-              <Link 
-                href="/products"
-                className="inline-flex items-center text-[#1E240A] hover:text-[#2A3A1A] transition-colors duration-200"
-              >
-                ← View All Products
-              </Link>
-            </div>
-          )}
-        </div>
-
-            {/* Search and Filter Component */}
-            <div className="mb-8">
-              <SearchAndFilter 
-                products={allProducts} 
-                onFilteredProducts={setFilteredProducts}
-              />
-            </div>
-
-        {/* Products Grid */}
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">No products match your search criteria.</p>
-            <p className="text-gray-500 mt-2">Try adjusting your filters or search terms.</p>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+  const params = await searchParams;
+  const category = params.category || '';
+  const products = await getServerProducts(category);
+  
+  return <ProductsPageClient initialProducts={products} initialCategory={category} />;
 }
 

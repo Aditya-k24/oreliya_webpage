@@ -4,15 +4,10 @@ import logger from './logger';
 let prismaInstance: PrismaClient | undefined;
 
 function createPrismaClient(): PrismaClient {
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+  
   return new PrismaClient({
-    log: process.env.NODE_ENV === 'development'
-      ? [
-          { emit: 'stdout', level: 'query' },
-          { emit: 'stdout', level: 'error' },
-          { emit: 'stdout', level: 'info' },
-          { emit: 'stdout', level: 'warn' },
-        ]
-      : ['error'],
+    log: isProduction ? [] : ['error', 'warn'],
   });
 }
 

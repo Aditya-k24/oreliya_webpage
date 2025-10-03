@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
 
   compress: true,
 
+  // Fix workspace root detection for Vercel
+  outputFileTracingRoot: process.env.VERCEL ? undefined : '/Users/apple/Desktop/Oreliya/oreliya_webpage',
+
   // Disable ESLint and TypeScript during build for production deployment
   eslint: {
     ignoreDuringBuilds: true,
@@ -55,11 +58,12 @@ const nextConfig: NextConfig = {
   },
 
   // External packages for server components
-  // serverExternalPackages: ['@prisma/client'], // Commented out due to transpilePackages conflict
+  serverExternalPackages: ['@prisma/client'],
 
   // Performance optimizations
   experimental: {
-    optimizePackageImports: ['@prisma/client', 'next-auth'],
+    optimizePackageImports: ['next-auth'],
+    webpackBuildWorker: true,
   },
 
   // Production environment variables are handled by Next.js automatically
@@ -79,6 +83,20 @@ const nextConfig: NextConfig = {
         },
       };
     }
+
+    // Fix for Next.js 15.5.3 chunk loading issues
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+    };
+
+    // Fix for source-map module issue on Vercel
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'source-map': require.resolve('source-map'),
+    };
 
     return config;
   },

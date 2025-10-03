@@ -114,3 +114,33 @@ export async function getSignedUrl(
     }
   }
 }
+
+// Batch signed URL generation for multiple files
+export async function getSignedUrls(
+  bucket: 'production',
+  filePaths: string[],
+  expiresIn: number = 3600
+): Promise<Map<string, string>> {
+  try {
+    const { data, error } = await supabaseAdmin.storage
+      .from(bucket)
+      .createSignedUrls(filePaths, expiresIn)
+    
+    if (error || !data) {
+      console.error('Supabase batch signed URLs error:', error)
+      return new Map()
+    }
+    
+    const urlMap = new Map<string, string>()
+    data.forEach((item) => {
+      if (item.signedUrl && item.path) {
+        urlMap.set(item.path, item.signedUrl)
+      }
+    })
+    
+    return urlMap
+  } catch (error) {
+    console.error('Batch signed URLs error:', error)
+    return new Map()
+  }
+}

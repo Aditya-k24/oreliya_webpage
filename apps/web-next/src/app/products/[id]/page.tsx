@@ -153,9 +153,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div className="space-y-3">
                 <h3 className="text-lg font-semibold text-[#1E240A]">Tags</h3>
                 <div className="flex flex-wrap gap-2">
-                  {product.tags.map((tag, index) => (
+                  {product.tags.map((tag) => (
                     <span
-                      key={index}
+                      key={tag}
                       className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full"
                     >
                       {tag}

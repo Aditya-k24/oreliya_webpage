@@ -1,16 +1,15 @@
-'use client'
-
-import { SignedImage } from '@/components/SignedImage'
+import { ServerSignedImage } from '@/components/ServerSignedImage'
 
 interface ProductImageProps {
   filePath: string
   alt: string
   className?: string
+  signedUrl?: string
 }
 
-export function ProductImage({ filePath, alt, className }: ProductImageProps) {
+export function ProductImage({ filePath, alt, className, signedUrl }: ProductImageProps) {
   return (
-    <SignedImage
+    <ServerSignedImage
       filePath={filePath}
       alt={alt}
       width={300}
@@ -18,6 +17,7 @@ export function ProductImage({ filePath, alt, className }: ProductImageProps) {
       className={`object-cover rounded-lg ${className}`}
       placeholder="blur"
       quality={85}
+      signedUrl={signedUrl}
     />
   )
 }

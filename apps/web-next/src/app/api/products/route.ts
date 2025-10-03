@@ -5,6 +5,7 @@ import * as store from '@/lib/dev-products-store';
 import { ProductService } from '@/api-lib/services/productService';
 import { ProductRepository } from '@/api-lib/repositories/productRepository';
 import prisma from '@/api-lib/config/database';
+import { getSignedUrls } from '@/lib/storage';
 
 // Ensure Node.js runtime for Prisma compatibility
 export const runtime = 'nodejs';
@@ -67,9 +68,22 @@ export async function GET(request: NextRequest) {
         });
         
         const merged = Array.from(productMap.values());
+        
+        // Batch generate signed URLs for all product images in one API call
+        const allImagePaths = merged.flatMap(p => p.images || []);
+        const urlMap = await getSignedUrls('production', allImagePaths, 7200);
+        
+        const productsWithSignedUrls = merged.map(product => {
+          if (product.images && product.images.length > 0) {
+            const signedImages = product.images.map((path: string) => urlMap.get(path) || path);
+            return { ...product, images: signedImages };
+          }
+          return product;
+        });
+        
         return NextResponse.json({
           success: true,
-          data: { products: merged, total: merged.length },
+          data: { products: productsWithSignedUrls, total: productsWithSignedUrls.length },
         }, { status: 200 });
       }
     } catch (dbError) {

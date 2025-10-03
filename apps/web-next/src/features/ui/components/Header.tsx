@@ -263,7 +263,7 @@ export function Header() {
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className='flex items-center space-x-2 p-2 rounded-md text-[#1E240A] hover:bg-[#1E240A]/10 transition-colors duration-200'
                   >
-                    <span className='text-sm font-medium'>{session.user?.name || session.user?.email}</span>
+                    <span className='text-sm font-medium hidden md:inline'>{session.user?.name || session.user?.email}</span>
                     <svg 
                       className={`w-4 h-4 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} 
                       fill='none' 
@@ -277,6 +277,9 @@ export function Header() {
                   {showUserMenu && (
                     <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50'>
                       <div className='py-1'>
+                        <div className='md:hidden px-4 py-2 text-sm font-medium text-gray-900 border-b border-gray-100'>
+                          {session.user?.name || session.user?.email}
+                        </div>
                         {(session.user as any)?.role === 'admin' && (
                           <Link
                             href='/admin'

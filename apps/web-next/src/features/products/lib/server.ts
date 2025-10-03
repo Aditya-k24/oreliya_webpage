@@ -1,6 +1,10 @@
 import { apiClient } from '@/lib/api/client';
 import { createProductCache, createCategoryCache } from '@/lib/cache';
 import type { Product, Category, ProductFilters } from '@/types/product';
+import { ProductService } from '@/api-lib/services/productService';
+import { ProductRepository } from '@/api-lib/repositories/productRepository';
+import prisma from '@/api-lib/config/database';
+import { getSignedUrls } from '@/lib/storage';
 
 // Local fallback categories using public assets to ensure UI renders even if API is unavailable
 const FALLBACK_CATEGORIES: Category[] = [
@@ -69,18 +73,29 @@ export const getProducts = createProductCache(
 );
 
 export const getProductById = async (id: string): Promise<Product | null> => {
-  // Use internal Next.js API (now works with database)
   try {
-    const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
-    const res = await fetch(`${base}/api/products?id=${encodeURIComponent(id)}`, {
-      cache: 'no-store', // Disable caching to avoid 2MB limit issues
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data?.success && data?.data?.product) return data.data.product as Product;
+    const productRepository = new ProductRepository(prisma);
+    const productService = new ProductService(productRepository);
+    
+    const result = await productService.getProductById(id);
+    
+    if (result.success && result.data?.product) {
+      const p = result.data.product;
+      
+      // Batch generate signed URLs for all images in one API call
+      const urlMap = await getSignedUrls('production', p.images || [], 7200);
+      const signedImages = (p.images || []).map(path => urlMap.get(path) || path);
+      
+      return {
+        ...p,
+        images: signedImages,
+        inStock: p.isActive,
+        createdAt: p.createdAt.toISOString(),
+        updatedAt: p.updatedAt.toISOString(),
+      } as Product;
     }
   } catch (error) {
-    console.error('Error fetching product from API:', error);
+    console.error('Error fetching product:', error);
   }
 
   return null;
