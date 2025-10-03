@@ -29,9 +29,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         },
@@ -55,9 +55,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         },
@@ -81,9 +81,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         },
@@ -104,15 +104,15 @@ export class ProductService {
     return {
       success: true,
       data: {
-        products: products.map(product => ({
+        products: products.map((product: any) => ({
           ...product,
           price: Number(product.price),
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -143,9 +143,9 @@ export class ProductService {
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         },
@@ -183,15 +183,15 @@ export class ProductService {
     return {
       success: true,
       data: {
-        products: products.map(product => ({
+        products: products.map((product: any) => ({
           ...product,
           price: Number(product.price),
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -210,15 +210,15 @@ export class ProductService {
     return {
       success: true,
       data: {
-        products: products.map(product => ({
+        products: products.map((product: any) => ({
           ...product,
           price: Number(product.price),
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -240,27 +240,27 @@ export class ProductService {
     return {
       success: true,
       data: {
-        featured: featuredProducts.map(product => ({
+        featured: featuredProducts.map((product: any) => ({
           ...product,
           price: Number(product.price),
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
-        deals: onSaleProducts.map(product => ({
+        deals: onSaleProducts.map((product: any) => ({
           ...product,
           price: Number(product.price),
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -277,15 +277,15 @@ export class ProductService {
     return {
       success: true,
       data: {
-        products: products.map(product => ({
+        products: products.map((product: any) => ({
           ...product,
           price: Number(product.price),
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),
@@ -304,15 +304,15 @@ export class ProductService {
     return {
       success: true,
       data: {
-        products: products.map(product => ({
+        products: products.map((product: any) => ({
           ...product,
           price: Number(product.price),
           compareAtPrice: product.compareAtPrice
             ? Number(product.compareAtPrice)
             : undefined,
-          variants: ProductService.mapVariants((product as any).variants || []),
+          variants: ProductService.mapVariants((product as any).product_variants || []),
           customizations: ProductService.mapCustomizations(
-            (product as any).customizations || []
+            (product as any).product_customizations || []
           ),
           metadata: (product.metadata as Record<string, unknown>) || {},
         })),

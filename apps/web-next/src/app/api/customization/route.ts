@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     // Send email to admin
     const { data, error } = await resend.emails.send({
       from: 'Oreliya Customization <onboarding@resend.dev>',
-      to: 'kulkarni24aditya@gmail.com',
+      to: 'palak.oreliya@gmail.com',
       subject: `New Customization Request: ${productType}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

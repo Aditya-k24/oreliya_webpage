@@ -71,7 +71,7 @@ export const getProducts = createProductCache(
 export const getProductById = async (id: string): Promise<Product | null> => {
   // Use internal Next.js API (now works with database)
   try {
-    const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
     const res = await fetch(`${base}/api/products?id=${encodeURIComponent(id)}`, {
       cache: 'no-store', // Disable caching to avoid 2MB limit issues
     });

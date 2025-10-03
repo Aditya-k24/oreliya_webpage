@@ -13,7 +13,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = await getProductById(id);
 
   if (!product) {
-    notFound();
+    return notFound();
   }
 
   // Calculate total stock from variants

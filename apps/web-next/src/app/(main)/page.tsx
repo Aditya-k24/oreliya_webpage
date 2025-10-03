@@ -52,7 +52,7 @@ export default function Page() {
                 href={category.href}
                 className="group"
               >
-                <div className="relative w-full h-96 rounded-lg overflow-hidden transition-transform duration-300 group-hover:scale-105">
+                <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden transition-transform duration-300 group-hover:scale-105">
                   <Image
                     src={category.image}
                     alt={category.name}

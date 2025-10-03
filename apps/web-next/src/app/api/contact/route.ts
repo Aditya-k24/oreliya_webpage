@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     // Send email to admin
     const { data, error } = await resend.emails.send({
       from: 'Oreliya Contact <onboarding@resend.dev>',
-      to: 'kulkarni24aditya@gmail.com',
+      to: 'palak.oreliya@gmail.com',
       subject: product ? `Product Inquiry: ${product}` : 'New Contact Form Submission',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useState, useEffect, useRef } from 'react';
 
 const navigation = [
@@ -184,15 +184,13 @@ export function Header() {
           {isMounted && !session && (
             <div className='mt-8 pt-6 border-t border-[#1E240A]/10'>
               <div className='flex flex-col space-y-3 px-4'>
-                <button
-                  onClick={() => {
-                    signIn('credentials', { callbackUrl: '/' });
-                    setShowSidebar(false);
-                  }}
-                  className='w-full px-4 py-2 text-sm font-medium text-[#1E240A] bg-transparent border border-[#1E240A] rounded-lg hover:bg-[#1E240A]/5 transition-colors duration-200'
+                <Link
+                  href='/login'
+                  onClick={() => setShowSidebar(false)}
+                  className='w-full px-4 py-2 text-sm font-medium text-[#1E240A] bg-transparent border border-[#1E240A] rounded-lg hover:bg-[#1E240A]/5 transition-colors duration-200 text-center'
                 >
                   Sign In
-                </button>
+                </Link>
                 <Link
                   href='/register'
                   onClick={() => setShowSidebar(false)}
@@ -426,15 +424,13 @@ export function Header() {
               {isMounted && !session && (
                 <div className='mt-8 pt-6 border-t border-[#1E240A]/10'>
                   <div className='flex flex-col space-y-3 px-4'>
-                    <button
-                      onClick={() => {
-                        signIn('credentials', { callbackUrl: '/' });
-                        setShowMobileMenu(false);
-                      }}
-                      className='w-full px-4 py-2 text-sm font-medium text-[#1E240A] bg-transparent border border-[#1E240A] rounded-lg hover:bg-[#1E240A]/5 transition-colors duration-200'
+                    <Link
+                      href='/login'
+                      onClick={() => setShowMobileMenu(false)}
+                      className='w-full px-4 py-2 text-sm font-medium text-[#1E240A] bg-transparent border border-[#1E240A] rounded-lg hover:bg-[#1E240A]/5 transition-colors duration-200 text-center'
                     >
                       Sign In
-                    </button>
+                    </Link>
                     <Link
                       href='/register'
                       onClick={() => setShowMobileMenu(false)}
