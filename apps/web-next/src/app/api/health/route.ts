@@ -1,33 +1,51 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/api-lib/config/database';
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
-// Ensure Node.js runtime for Prisma compatibility
-export const runtime = 'nodejs';
-
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     // Test database connection
-    await prisma.$connect();
+    await prisma.$queryRaw`SELECT 1`;
     
-    // Test basic query
-    const userCount = await prisma.users.count();
-    
-    return NextResponse.json({
+    const health = {
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      database: 'connected',
-      userCount,
+      uptime: process.uptime(),
       environment: process.env.NODE_ENV,
-    }, { status: 200 });
-    
+      version: process.env.npm_package_version || '1.0.0',
+      database: 'connected',
+      services: {
+        database: 'operational',
+        api: 'operational',
+      },
+    };
+
+    return NextResponse.json(health, { 
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Health check failed:', error);
-    return NextResponse.json({
+    
+    const health = {
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error',
       environment: process.env.NODE_ENV,
-    }, { status: 500 });
+      error: 'Database connection failed',
+      services: {
+        database: 'down',
+        api: 'operational',
+      },
+    };
+
+    return NextResponse.json(health, { 
+      status: 503,
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
+        'Content-Type': 'application/json',
+      },
+    });
   }
 }
