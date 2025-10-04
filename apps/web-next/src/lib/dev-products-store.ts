@@ -52,4 +52,17 @@ export function removeBySlug(slug: string): boolean {
   return false;
 }
 
+export function getById(id: string): DevProduct | null {
+  return devProducts.find(p => p.id === id) || null;
+}
+
+export function updateById(id: string, updates: Partial<DevProduct>): DevProduct | null {
+  const index = devProducts.findIndex(p => p.id === id);
+  if (index >= 0) {
+    devProducts[index] = { ...devProducts[index], ...updates };
+    return devProducts[index];
+  }
+  return null;
+}
+
 

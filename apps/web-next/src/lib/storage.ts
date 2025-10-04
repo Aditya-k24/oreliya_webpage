@@ -44,10 +44,20 @@ export async function uploadToSupabaseStorage(
       }
     }
     
-    // Return file path for signed URL generation instead of public URL
+    // Generate signed URL for immediate display
+    const signedUrlResult = await getSignedUrl(bucket, filePath, 7200) // 2 hours
+    
+    if (!signedUrlResult.success) {
+      console.error('Failed to generate signed URL:', signedUrlResult.message)
+      return {
+        success: false,
+        message: 'Upload successful but failed to generate display URL'
+      }
+    }
+    
     return {
       success: true,
-      url: filePath, // Return file path instead of public URL
+      url: signedUrlResult.signedUrl!, // Return signed URL for immediate display
       filename: file.name,
       size: file.size,
       type: file.type
