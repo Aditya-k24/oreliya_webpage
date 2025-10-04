@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
+import { SignedImage } from '@/components/SignedImage';
 import ProductCustomizationManager from '@/components/admin/ProductCustomizationManager';
 import { ImageUpload } from '@/components/ImageUpload';
 import { useImageUpload } from '@/hooks/useImageUpload';
@@ -657,8 +657,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                               className="w-full h-full object-cover"
                             />
                           ) : (isValidUrl(image) || isPresignedUrl(image)) ? (
-                            <Image
-                              src={image}
+                            <SignedImage
+                              filePath={image}
                               alt={`Product image ${index + 1}`}
                               width={200}
                               height={200}

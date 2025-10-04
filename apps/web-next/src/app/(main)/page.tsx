@@ -14,7 +14,7 @@ const categories = [
   },
   {
     name: 'Necklaces',
-    image: '/images/categories/Mangalsutra.png',
+    image: '/images/categories/everyday.png',
     href: '/products?category=necklaces',
   },
   {
@@ -24,7 +24,7 @@ const categories = [
   },
   {
     name: 'Mangalsutra',
-    image: '/images/categories/everyday.png',
+    image: '/images/categories/Mangalsutra.png',
     href: '/products?category=mangalsutra',
   },
 ];

@@ -8,6 +8,7 @@ interface SearchAndFilterProps {
   products: Product[];
   onFilteredProducts: (filteredProducts: Product[]) => void;
   className?: string;
+  initialCategory?: string;
 }
 
 interface FilterState {
@@ -37,7 +38,7 @@ const sortOptions = [
   { value: 'newest', label: 'Newest First' },
 ];
 
-export function SearchAndFilter({ products, onFilteredProducts, className = '' }: SearchAndFilterProps) {
+export function SearchAndFilter({ products, onFilteredProducts, className = '', initialCategory = '' }: SearchAndFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showSidebar, setShowSidebar] = useState(false);
@@ -51,18 +52,18 @@ export function SearchAndFilter({ products, onFilteredProducts, className = '' }
     sortBy: 'name',
   });
 
-  // Initialize filters from URL on mount
+  // Initialize filters from URL on mount, prioritizing initialCategory prop
   useEffect(() => {
     setFilters({
       search: searchParams.get('search') || '',
-      category: searchParams.get('category') || '',
+      category: initialCategory || searchParams.get('category') || '',
       subcategory: searchParams.get('subcategory') || '',
       minPrice: searchParams.get('minPrice') || '',
       maxPrice: searchParams.get('maxPrice') || '',
       inStock: searchParams.get('inStock') === 'true' ? true : (searchParams.get('inStock') === 'false' ? false : null),
       sortBy: (searchParams.get('sortBy') as FilterState['sortBy']) || 'name',
     });
-  }, [searchParams]);
+  }, [searchParams, initialCategory]);
 
   // Get available subcategories based on selected category
   const availableSubcategories = filters.category
@@ -147,11 +148,11 @@ export function SearchAndFilter({ products, onFilteredProducts, className = '' }
     const queryString = params.toString();
     const newUrl = queryString ? `?${queryString}` : '';
     
-    // Only update URL if it's different from current
-    if (window.location.search !== newUrl) {
+    // Only update URL if it's different from current and not the initial load
+    if (window.location.search !== newUrl && !initialCategory) {
       router.replace(`${window.location.pathname}${newUrl}`, { scroll: false });
     }
-  }, [filters, router]);
+  }, [filters, router, initialCategory]);
 
   const handleFilterChange = (key: keyof FilterState, value: string | boolean | null) => {
     setFilters(prev => {

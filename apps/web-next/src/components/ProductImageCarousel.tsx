@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import { useState } from 'react';
+import { SignedImage } from './SignedImage';
 
 interface ProductImageCarouselProps {
   images: string[];
@@ -32,8 +32,8 @@ export default function ProductImageCarousel({ images, productName }: ProductIma
     <div className="space-y-6">
       {/* Main Image */}
       <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-white shadow-2xl">
-        <Image
-          src={validImages[selectedImageIndex]}
+        <SignedImage
+          filePath={validImages[selectedImageIndex]}
           alt={`${productName} - Main Image`}
           fill
           className="object-cover transition-opacity duration-300"
@@ -62,8 +62,8 @@ export default function ProductImageCarousel({ images, productName }: ProductIma
                   : 'ring-2 ring-gray-200 shadow-md hover:ring-[#1E240A]/50'
               }`}
             >
-              <Image
-                src={image}
+              <SignedImage
+                filePath={image}
                 alt={`${productName} thumbnail ${index + 1}`}
                 fill
                 className="object-cover"

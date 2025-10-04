@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ProductCustomizationManager from '@/components/admin/ProductCustomizationManager';
-import Image from 'next/image';
+import { SignedImage } from '@/components/SignedImage';
 // import type { ProductCustomization } from '@/types/product';
 
 // Cache key for form data
@@ -578,8 +578,8 @@ export default function NewProductPage() {
                             {image && !image.startsWith('blob:') && (
                               <div className="flex justify-center">
                                 <div className="relative">
-                                  <Image
-                                    src={image}
+                                  <SignedImage
+                                    filePath={image}
                                     alt={`Preview ${index + 1}`}
                                     width={192}
                                     height={192}

@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from '../../../prisma/generated/client';
 import { randomUUID } from 'crypto';
 import {
   CreateProductRequest,
@@ -85,7 +85,7 @@ export class ProductRepository {
   async getProducts(
     filters: ProductFilters = {},
     sort: ProductSortOptions = { field: 'createdAt', order: 'desc' },
-    limit = 20,
+    limit = 10000,
     offset = 0
   ) {
 
@@ -257,14 +257,14 @@ export class ProductRepository {
       distinct: ['category'],
       orderBy: { category: 'asc' },
     });
-    return products.map(p => p.category);
+    return products.map((p: { category: string }) => p.category);
   }
 
   async findTags(): Promise<string[]> {
     const products = await this.prisma.products.findMany({
       select: { tags: true },
     });
-    const allTags = products.flatMap(p => p.tags);
+    const allTags = products.flatMap((p: { tags: unknown }) => p.tags as string[]) as string[];
     return [...new Set(allTags)].sort();
   }
 

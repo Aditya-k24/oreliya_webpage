@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
+import { SignedImage } from '@/components/SignedImage';
 
 interface Product {
   id: string;
@@ -185,8 +185,8 @@ export default function AdminDashboard() {
                           <div className="flex items-center">
                             {product.images.length > 0 && (
                               <div className="flex-shrink-0 h-10 w-10">
-                                <Image
-                                  src={product.images[0]}
+                                <SignedImage
+                                  filePath={product.images[0]}
                                   alt={product.name}
                                   width={40}
                                   height={40}

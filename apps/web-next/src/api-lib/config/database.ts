@@ -6,8 +6,24 @@ let prismaInstance: PrismaClient | undefined;
 function createPrismaClient(): PrismaClient {
   const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
   
+  // Configure database URL for Transaction Pooler compatibility
+  let databaseUrl = process.env.DATABASE_URL;
+  if (databaseUrl && databaseUrl.includes('pooler.supabase.com')) {
+    // Add parameters to disable prepared statements for pooler
+    const url = new URL(databaseUrl);
+    url.searchParams.set('pgbouncer', 'true');
+    url.searchParams.set('prepared_statements', 'false');
+    url.searchParams.set('connection_limit', '10');
+    databaseUrl = url.toString();
+  }
+  
   return new PrismaClient({
     log: isProduction ? [] : ['error', 'warn'],
+    datasources: {
+      db: {
+        url: databaseUrl,
+      },
+    },
   });
 }
 

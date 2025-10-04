@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import type { Product } from '@/types/product';
+import { SignedImage } from '@/components/SignedImage';
 import { SearchAndFilter } from '@/features/ui/components/SearchAndFilter';
 import { useState } from 'react';
 
@@ -15,8 +15,8 @@ function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.id}`} className="group">
       <div className="relative w-full h-96 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-xl">
         {product.images[0] ? (
-          <Image
-            src={product.images[0]}
+          <SignedImage
+            filePath={product.images[0]}
             alt={product.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -24,8 +24,8 @@ function ProductCard({ product }: ProductCardProps) {
             priority={false}
           />
         ) : (
-          <Image
-            src="/placeholder-product.svg"
+          <SignedImage
+            filePath="/placeholder-product.svg"
             alt={product.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -106,6 +106,7 @@ export default function ProductsPageClient({ initialProducts, initialCategory = 
           <SearchAndFilter 
             products={initialProducts} 
             onFilteredProducts={setFilteredProducts}
+            initialCategory={initialCategory}
           />
         </div>
 

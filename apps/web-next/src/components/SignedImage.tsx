@@ -45,7 +45,19 @@ export function SignedImage({
     if (!filePath) return
 
     const fetchSignedUrl = async () => {
-      const result = await getSignedUrl(filePath)
+      // Extract file path from full URL if needed
+      let pathToUse = filePath
+      
+      // If it's a full Supabase URL, extract just the file path
+      if (filePath.includes('/storage/v1/object/sign/production/')) {
+        const urlParts = filePath.split('/storage/v1/object/sign/production/')
+        if (urlParts.length > 1) {
+          // Remove query parameters and get just the path
+          pathToUse = urlParts[1].split('?')[0]
+        }
+      }
+      
+      const result = await getSignedUrl(pathToUse)
       if (result.success && result.signedUrl) {
         setImageUrl(result.signedUrl)
         setImageError(false)
