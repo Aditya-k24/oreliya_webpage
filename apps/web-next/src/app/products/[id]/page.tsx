@@ -83,7 +83,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </h1>
 
               {/* Price */}
-              <div className="flex items-center space-x-3">
+              {/* <div className="flex items-center space-x-3">
                 <span className="text-sm text-gray-600">Starting from</span>
                 <span className="text-3xl lg:text-4xl font-bold text-[#1E240A]">
                   {formatPrice(Number(product.price))}
@@ -93,7 +93,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     {formatPrice(Number(product.compareAtPrice))}
                   </span>
                 )}
-              </div>
+              </div> */}
             </div>
 
             {/* Product Description */}

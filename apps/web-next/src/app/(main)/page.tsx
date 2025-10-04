@@ -10,22 +10,22 @@ const categories = [
   {
     name: 'Rings',
     image: '/images/categories/engagement_rings.png',
-    href: '/products?category=Rings',
+    href: '/products?category=rings',
   },
   {
-    name: 'Necklace',
+    name: 'Necklaces',
     image: '/images/categories/Mangalsutra.png',
-    href: '/products?category=Necklace',
+    href: '/products?category=necklaces',
   },
   {
     name: 'Earrings',
     image: '/images/categories/Earrings.png',
-    href: '/products?category=Earrings',
+    href: '/products?category=earrings',
   },
   {
-    name: 'Everyday Rings',
+    name: 'Mangalsutra',
     image: '/images/categories/everyday.png',
-    href: '/products?category=Rings&subcategory=Everyday Rings',
+    href: '/products?category=mangalsutra',
   },
 ];
 
@@ -116,7 +116,7 @@ export default function Page() {
                   />
                 </div>
                 <h3 className='text-xl font-medium text-[#1E240A] mb-4'>
-                  IGI Certified Diamonds
+                  Certified Diamonds
                 </h3>
               </div>
               <div className='text-center p-8 group'>

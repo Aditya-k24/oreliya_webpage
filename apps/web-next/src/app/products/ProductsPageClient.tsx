@@ -36,16 +36,17 @@ function ProductCard({ product }: ProductCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
         
         <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-          <h3 className="font-semibold text-lg mb-2 line-clamp-2 drop-shadow-lg">
+          <h3 className="font-semibold text-lg mb-2 line-clamp-2 drop-shadow-lg text-center">
             {product.name}
           </h3>
           
-          <div className="flex flex-col">
+          {/* Price section commented out */}
+          {/* <div className="flex flex-col">
             <span className="text-xs text-white/80 font-medium drop-shadow">Starting from</span>
             <span className="text-lg font-bold text-white drop-shadow-lg">
               ₹{product.price.toLocaleString('en-IN')}
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
     </Link>
