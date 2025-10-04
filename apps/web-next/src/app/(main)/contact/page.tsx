@@ -140,7 +140,7 @@ function ContactForm() {
                     Visit Our Studio
                   </h3>
                   <p className='text-gray-600 leading-relaxed'>
-                    Borivali & Bhayandar
+                    Bhayandar
                     <br />
                     Mumbai, India
                   </p>

@@ -41,12 +41,12 @@ export default function CustomizationPage() {
     'Other',
   ];
   const budgetRanges = [
-    'Under $500',
-    '$500 - $1,000',
-    '$1,000 - $2,500',
-    '$2,500 - $5,000',
-    '$5,000 - $10,000',
-    'Over $10,000',
+    'Under ₹50,000',
+    '₹50,000 - ₹1,00,000',
+    '₹1,00,000 - ₹2,50,000',
+    '₹2,50,000 - ₹5,00,000',
+    '₹5,00,000 - ₹10,00,000',
+    'Over ₹10,00,000',
   ];
   const timelineOptions = [
     '1-2 weeks',
