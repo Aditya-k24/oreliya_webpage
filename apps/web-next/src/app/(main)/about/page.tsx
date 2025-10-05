@@ -59,13 +59,17 @@ export default function AboutPage() {
             </p>
           </div>
           <div className='relative'>
-            <div className='aspect-square bg-gradient-to-br from-[#1E240A] to-[#2A3A1A] rounded-2xl p-12 flex items-center justify-center'>
-              <div className='text-white text-center'>
-                <div className='w-16 h-16 mx-auto mb-6'>
-                  <span className='text-4xl'>💎</span>
+            <div className='aspect-square rounded-2xl overflow-hidden'>
+              <img 
+                src='/uploads/carftsmen.jpeg' 
+                alt='Artisan crafting jewelry with precision and attention to detail'
+                className='w-full h-full object-cover'
+              />
+              <div className='absolute inset-0 bg-black/40 flex items-center justify-center'>
+                <div className='text-white text-center'>
+                  {/* <h3 className='text-2xl font-medium mb-2'>Craftsmanship</h3>
+                  <p className='text-[#F6EEDF]'>Excellence in every detail</p> */}
                 </div>
-                <h3 className='text-2xl font-medium mb-2'>Craftsmanship</h3>
-                <p className='text-[#F6EEDF]'>Excellence in every detail</p>
               </div>
             </div>
           </div>
