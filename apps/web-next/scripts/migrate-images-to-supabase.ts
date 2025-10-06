@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
+/* eslint-disable no-console */
 
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '../prisma/generated/client'
 import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
 import { supabaseAdmin } from '../src/lib/supabase'
@@ -26,11 +27,11 @@ async function migrateImagesToSupabase() {
           const fileBuffer = readFileSync(filePath)
           
           // Upload to products folder in production bucket
-          const { data, error } = await supabaseAdmin.storage
+          const { error } = await supabaseAdmin.storage
             .from('production')
             .upload(`products/migrated/${file}`, fileBuffer, {
               contentType: getContentType(file),
-              cacheControl: '3600',
+              cacheControl: '31536000',
               upsert: true
             })
           
@@ -55,16 +56,14 @@ async function migrateImagesToSupabase() {
     
     // Update product images in database
     console.log('🔄 Updating product images in database...')
-    const products = await prisma.product.findMany({
+    const products = await prisma.products.findMany({
       where: {
-        images: {
-          not: []
-        }
+        images: { isEmpty: false }
       }
     })
     
     for (const product of products) {
-      const updatedImages = product.images.map(imageUrl => {
+      const updatedImages = product.images.map((imageUrl: string) => {
         // Convert local URLs to Supabase URLs
         if (imageUrl.startsWith('/uploads/')) {
           const filename = imageUrl.replace('/uploads/', '')
@@ -73,7 +72,7 @@ async function migrateImagesToSupabase() {
         return imageUrl
       })
       
-      await prisma.product.update({
+      await prisma.products.update({
         where: { id: product.id },
         data: { images: updatedImages }
       })

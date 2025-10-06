@@ -8,12 +8,12 @@ interface SignedUrlResult {
 }
 
 interface UseSignedUrlOptions {
-  expiresIn?: number // Default 1 hour
-  cacheTime?: number // How long to cache the signed URL (default 30 minutes)
+  expiresIn?: number // Default 24 hours
+  cacheTime?: number // How long to cache the signed URL (default 12 hours)
 }
 
 export const useSignedUrl = (options: UseSignedUrlOptions = {}) => {
-  const { expiresIn = 3600, cacheTime = 1800 } = options // Default 1 hour expiry, 30 min cache
+  const { expiresIn = 86400, cacheTime = 43200 } = options // 24h expiry, 12h cache
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   

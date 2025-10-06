@@ -32,7 +32,7 @@ export async function uploadToSupabaseStorage(
       .from(bucket)
       .upload(filePath, buffer, {
         contentType: file.type,
-        cacheControl: '3600',
+        cacheControl: '31536000',
         upsert: false
       })
     
@@ -45,7 +45,7 @@ export async function uploadToSupabaseStorage(
     }
     
     // Generate signed URL for immediate display
-    const signedUrlResult = await getSignedUrl(bucket, filePath, 7200) // 2 hours
+    const signedUrlResult = await getSignedUrl(bucket, filePath, 86400) // 24 hours
     
     if (!signedUrlResult.success) {
       console.error('Failed to generate signed URL:', signedUrlResult.message)
