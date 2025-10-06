@@ -32,7 +32,7 @@ export async function uploadToSupabaseStorage(
       .from(bucket)
       .upload(filePath, buffer, {
         contentType: file.type,
-        cacheControl: '31536000',
+        cacheControl: 'public, max-age=31536000, immutable',
         upsert: false
       })
     

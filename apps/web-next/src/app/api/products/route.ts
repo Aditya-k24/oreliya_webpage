@@ -20,7 +20,9 @@ export async function GET(request: NextRequest) {
       // 1) Check dev store first
       const dev = store.list().find(p => p.id === productId);
       if (dev) {
-        return NextResponse.json({ success: true, data: { product: dev } }, { status: 200 });
+        const res = NextResponse.json({ success: true, data: { product: dev } }, { status: 200 });
+        res.headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=30');
+        return res;
       }
 
       // 2) Fetch from database
@@ -31,7 +33,9 @@ export async function GET(request: NextRequest) {
         const result = await productService.getProductById(productId);
         
         if (result.success && result.data?.product) {
-          return NextResponse.json({ success: true, data: { product: result.data.product } }, { status: 200 });
+          const res = NextResponse.json({ success: true, data: { product: result.data.product } }, { status: 200 });
+          res.headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=30');
+          return res;
         }
       } catch (dbError) {
         console.error('Database fetch error:', dbError);
@@ -81,10 +85,12 @@ export async function GET(request: NextRequest) {
           return product;
         });
         
-        return NextResponse.json({
+        const res = NextResponse.json({
           success: true,
           data: { products: productsWithSignedUrls, total: productsWithSignedUrls.length },
         }, { status: 200 });
+        res.headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=30');
+        return res;
       }
     } catch (dbError) {
       console.error('Database fetch error:', dbError);
@@ -92,10 +98,12 @@ export async function GET(request: NextRequest) {
 
     // Fallback to dev store only
     const devProducts = store.list();
-    return NextResponse.json({
+    const res = NextResponse.json({
       success: true,
       data: { products: devProducts, total: devProducts.length },
     }, { status: 200 });
+    res.headers.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=30');
+    return res;
     
   } catch (error) {
     console.error('Error in products GET:', error);
