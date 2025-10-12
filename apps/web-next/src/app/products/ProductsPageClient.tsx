@@ -67,6 +67,7 @@ export default function ProductsPageClient({ initialProducts, initialCategory = 
     
     const categoryMap: { [key: string]: string } = {
       'rings': 'Our Rings',
+      'special-offer-rings': 'Special Offer',
       'necklaces': 'Our Necklaces', 
       'earrings': 'Our Earrings',
       'bracelets': 'Our Bracelets',
@@ -85,9 +86,11 @@ export default function ProductsPageClient({ initialProducts, initialCategory = 
             {getHeading()}
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {initialCategory 
-              ? `Discover our exquisite collection of ${initialCategory.toLowerCase()}`
-              : 'Discover our exquisite collection of handcrafted jewelry pieces'
+            {initialCategory === 'special-offer-rings'
+              ? 'Discover our exclusive collection of rings at a special price of ₹5,999'
+              : initialCategory 
+                ? `Discover our exquisite collection of ${initialCategory.toLowerCase()}`
+                : 'Discover our exquisite collection of handcrafted jewelry pieces'
             }
           </p>
           {initialCategory && (
@@ -104,6 +107,7 @@ export default function ProductsPageClient({ initialProducts, initialCategory = 
 
         <div className="mb-8">
           <SearchAndFilter 
+            key={initialCategory || 'all-products'}
             products={initialProducts} 
             onFilteredProducts={setFilteredProducts}
             initialCategory={initialCategory}

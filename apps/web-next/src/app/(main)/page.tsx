@@ -5,6 +5,7 @@ import {
   CraftsmanshipSection,
   AnnouncementBar,
 } from '@/components/ui';
+import { SpecialOfferBanner } from '@/components/SpecialOfferBanner';
 
 const categories = [
   {
@@ -32,6 +33,7 @@ const categories = [
 export default function Page() {
   return (
     <>
+      <SpecialOfferBanner />
       <AnnouncementBar />
       <div className='bg-[#F6EEDF]'>
         <HeroVideo linkComponent={Link} />

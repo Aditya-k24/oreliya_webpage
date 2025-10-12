@@ -34,9 +34,17 @@ async function getServerProducts(category?: string): Promise<Product[]> {
       
       // Filter by category at server level for better performance
       if (category) {
-        merged = merged.filter((product: any) => 
-          product.category.toLowerCase() === category.toLowerCase()
-        );
+        if (category === 'special-offer-rings') {
+          // Filter for rings with price exactly 5999
+          merged = merged.filter((product: any) => 
+            product.category.toLowerCase() === 'rings' && 
+            parseFloat(product.price) === 5999
+          );
+        } else {
+          merged = merged.filter((product: any) => 
+            product.category.toLowerCase() === category.toLowerCase()
+          );
+        }
       }
       
       const allImagePaths = merged.flatMap((p: any) => p.images || []);

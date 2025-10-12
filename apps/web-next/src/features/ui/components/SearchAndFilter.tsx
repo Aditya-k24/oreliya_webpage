@@ -24,6 +24,7 @@ interface FilterState {
 const categories = [
   { value: '', label: 'All Categories' },
   { value: 'rings', label: 'Rings' },
+  { value: 'special-offer-rings', label: 'Special Offer Rings' },
   { value: 'necklaces', label: 'Necklaces' },
   { value: 'earrings', label: 'Earrings' },
   { value: 'bracelets', label: 'Bracelets' },
@@ -54,9 +55,14 @@ export function SearchAndFilter({ products, onFilteredProducts, className = '', 
 
   // Initialize filters from URL on mount, prioritizing initialCategory prop
   useEffect(() => {
+    // If initialCategory is provided, use it; otherwise use URL params
+    // If we're on /products with no category in URL, clear the category
+    const categoryParam = searchParams.get('category');
+    const finalCategory = initialCategory || (categoryParam && window.location.pathname === '/products' ? categoryParam : '');
+    
     setFilters({
       search: searchParams.get('search') || '',
-      category: initialCategory || searchParams.get('category') || '',
+      category: finalCategory,
       subcategory: searchParams.get('subcategory') || '',
       minPrice: searchParams.get('minPrice') || '',
       maxPrice: searchParams.get('maxPrice') || '',
@@ -64,6 +70,7 @@ export function SearchAndFilter({ products, onFilteredProducts, className = '', 
       sortBy: (searchParams.get('sortBy') as FilterState['sortBy']) || 'name',
     });
   }, [searchParams, initialCategory]);
+
 
   // Get available subcategories based on selected category
   const availableSubcategories = filters.category
@@ -89,9 +96,17 @@ export function SearchAndFilter({ products, onFilteredProducts, className = '', 
 
     // Category filter (case-insensitive)
     if (filters.category) {
-      filtered = filtered.filter(product => 
-        product.category.toLowerCase() === filters.category.toLowerCase()
-      );
+      if (filters.category === 'special-offer-rings') {
+        // Filter for rings with price exactly 5999
+        filtered = filtered.filter(product => 
+          product.category.toLowerCase() === 'rings' && 
+          parseFloat(product.price.toString()) === 5999
+        );
+      } else {
+        filtered = filtered.filter(product => 
+          product.category.toLowerCase() === filters.category.toLowerCase()
+        );
+      }
     }
 
     // Subcategory filter
@@ -148,9 +163,14 @@ export function SearchAndFilter({ products, onFilteredProducts, className = '', 
     const queryString = params.toString();
     const newUrl = queryString ? `?${queryString}` : '';
     
-    // Only update URL if it's different from current and not the initial load
-    if (window.location.search !== newUrl && !initialCategory) {
-      router.replace(`${window.location.pathname}${newUrl}`, { scroll: false });
+    // Only update URL if it's different from current and we're on the main products page
+    // This prevents automatic redirects when navigating between category pages
+    if (window.location.search !== newUrl && !initialCategory && window.location.pathname === '/products') {
+      // Only update URL if the category filter was manually changed (not from URL params)
+      const urlCategory = searchParams.get('category');
+      if (filters.category !== urlCategory) {
+        router.replace(`${window.location.pathname}${newUrl}`, { scroll: false });
+      }
     }
   }, [filters, router, initialCategory]);
 
