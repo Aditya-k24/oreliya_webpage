@@ -67,7 +67,7 @@ export default function ProductsPageClient({ initialProducts, initialCategory = 
     
     const categoryMap: { [key: string]: string } = {
       'rings': 'Our Rings',
-      'special-offer-rings': 'Special Offer',
+      'special-offer-rings': 'Special Offers',
       'necklaces': 'Our Necklaces', 
       'earrings': 'Our Earrings',
       'bracelets': 'Our Bracelets',

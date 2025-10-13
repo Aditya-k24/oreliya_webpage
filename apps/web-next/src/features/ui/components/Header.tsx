@@ -14,7 +14,7 @@ const navigation = [
 
 const productCategories = [
   {
-    name: 'Special Offer Rings',
+    name: 'Special Offers',
     href: '/products?category=special-offer-rings',
     hasSubcategories: false,
   },

@@ -24,7 +24,7 @@ interface FilterState {
 const categories = [
   { value: '', label: 'All Categories' },
   { value: 'rings', label: 'Rings' },
-  { value: 'special-offer-rings', label: 'Special Offer Rings' },
+  { value: 'special-offer-rings', label: 'Special Offers' },
   { value: 'necklaces', label: 'Necklaces' },
   { value: 'earrings', label: 'Earrings' },
   { value: 'bracelets', label: 'Bracelets' },
