@@ -59,20 +59,7 @@ export function SpecialOfferBanner() {
 
   // Don't render if banner shouldn't be shown
   if (!showBanner) {
-    // Debug button to force show banner (remove this in production)
-    return (
-      <div className="fixed top-4 right-4 z-50">
-        <button
-          onClick={() => {
-            localStorage.removeItem(SPECIAL_OFFER_BANNER_KEY);
-            window.location.reload();
-          }}
-          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
-        >
-          Show Banner (Debug)
-        </button>
-      </div>
-    );
+    return null;
   }
 
   return (
