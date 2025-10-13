@@ -107,7 +107,7 @@ export default function ProductsDemoPage() {
                   <h3 className="font-semibold text-lg text-[#1E240A] mb-2 line-clamp-2">
                     {product.name}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  <p className="text-gray-600 text-sm mb-3 line-clamp-2 whitespace-pre-wrap">
                     {product.description}
                   </p>
                   <div className="flex justify-between items-center">

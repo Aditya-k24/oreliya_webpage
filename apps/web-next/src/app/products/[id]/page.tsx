@@ -98,7 +98,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             {/* Product Description */}
             <div className="prose prose-lg max-w-none">
-              <p className="text-gray-700 leading-relaxed text-lg">
+              <p className="text-gray-700 leading-relaxed text-lg whitespace-pre-wrap">
                 {product.description}
               </p>
             </div>

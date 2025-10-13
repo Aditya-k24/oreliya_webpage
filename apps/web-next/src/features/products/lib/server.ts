@@ -83,8 +83,11 @@ export const getProductById = async (id: string): Promise<Product | null> => {
       const p = result.data.product;
       
       // Batch generate signed URLs for all images in one API call
-      const urlMap = await getSignedUrls('production', p.images || [], 7200);
-      const signedImages = (p.images || []).map(path => urlMap.get(path) || path);
+      const productImages = p.images || [];
+      const urlMap = productImages.length > 0 
+        ? await getSignedUrls('production', productImages, 7200)
+        : new Map();
+      const signedImages = productImages.map(path => urlMap.get(path) || path);
       
       return {
         ...p,

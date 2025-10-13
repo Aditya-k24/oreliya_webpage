@@ -132,9 +132,22 @@ export async function getSignedUrls(
   expiresIn: number = 3600
 ): Promise<Map<string, string>> {
   try {
+    // Validate that we have at least one file path
+    if (!filePaths || filePaths.length === 0) {
+      console.warn('getSignedUrls called with empty filePaths array')
+      return new Map()
+    }
+
+    // Filter out any empty or invalid paths
+    const validPaths = filePaths.filter(path => path && path.trim().length > 0)
+    if (validPaths.length === 0) {
+      console.warn('getSignedUrls called with no valid file paths')
+      return new Map()
+    }
+
     const { data, error } = await supabaseAdmin.storage
       .from(bucket)
-      .createSignedUrls(filePaths, expiresIn)
+      .createSignedUrls(validPaths, expiresIn)
     
     if (error || !data) {
       console.error('Supabase batch signed URLs error:', error)

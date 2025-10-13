@@ -9,9 +9,13 @@ const SPECIAL_OFFER_BANNER_KEY = 'oreliya-special-offer-banner-shown';
 export function SpecialOfferBanner() {
   const [showBanner, setShowBanner] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    // Set client-side flag
+    setIsClient(true);
+    
     // Check if banner has been shown before
     const hasSeenBanner = localStorage.getItem(SPECIAL_OFFER_BANNER_KEY);
     
@@ -51,6 +55,11 @@ export function SpecialOfferBanner() {
     // Close banner
     setShowBanner(false);
   };
+
+  // Don't render anything until we're on the client side
+  if (!isClient) {
+    return null;
+  }
 
   // Don't render anything until component is loaded
   if (!isLoaded) {

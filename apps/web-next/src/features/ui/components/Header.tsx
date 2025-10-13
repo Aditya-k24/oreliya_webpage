@@ -14,7 +14,7 @@ const navigation = [
 
 const productCategories = [
   {
-    name: 'Special Offers',
+    name: 'Diwali Sale',
     href: '/products?category=special-offer-rings',
     hasSubcategories: false,
   },

@@ -75,7 +75,9 @@ export async function GET(request: NextRequest) {
         
         // Batch generate signed URLs for all product images in one API call
         const allImagePaths = merged.flatMap(p => p.images || []);
-        const urlMap = await getSignedUrls('production', allImagePaths, 7200);
+        const urlMap = allImagePaths.length > 0 
+          ? await getSignedUrls('production', allImagePaths, 7200)
+          : new Map();
         
         const productsWithSignedUrls = merged.map(product => {
           if (product.images && product.images.length > 0) {

@@ -87,7 +87,7 @@ export default function ProductsPageClient({ initialProducts, initialCategory = 
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             {initialCategory === 'special-offer-rings'
-              ? 'Discover our exclusive collection of rings at a special price of ₹5,999'
+              ? 'Exclusive collection of silver rings & lab grown diamonds at a special price of ₹5,999'
               : initialCategory 
                 ? `Discover our exquisite collection of ${initialCategory.toLowerCase()}`
                 : 'Discover our exquisite collection of handcrafted jewelry pieces'
