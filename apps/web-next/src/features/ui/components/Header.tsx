@@ -14,7 +14,7 @@ const navigation = [
 
 const productCategories = [
   {
-    name: 'Diwali Sale',
+    name: 'Special offer',
     href: '/products?category=special-offer-rings',
     hasSubcategories: false,
   },
@@ -96,6 +96,7 @@ export function Header() {
         <div className='p-6 relative pb-20'>
           {/* Close button */}
           <button
+            type="button"
             onClick={() => setShowSidebar(false)}
             className='absolute top-4 right-4 p-2 rounded-md text-[#1E240A] hover:bg-[#1E240A]/10 transition-colors duration-200'
             aria-label='Close sidebar'
@@ -106,13 +107,13 @@ export function Header() {
           </button>
           
           {/* Navigation */}
-          <nav className='space-y-4 mt-12' role='navigation' aria-label='Main navigation'>
+          <nav className='space-y-1 mt-12' role='navigation' aria-label='Main navigation'>
             {navigation.map(item => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setShowSidebar(false)}
-                className={`block px-4 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${
+                className={`block px-4 py-2 text-sm rounded-lg transition-colors duration-200 ${
                   isActive(item.href)
                     ? 'text-[#1E240A] bg-[#1E240A]/10 border-l-4 border-[#1E240A]'
                     : 'text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5'
@@ -219,6 +220,7 @@ export function Header() {
           <div className='flex items-center justify-between h-16'>
             {/* Menu button */}
             <button
+              type="button"
               onClick={() => setShowSidebar(!showSidebar)}
               className='p-2 rounded-md text-[#1E240A] hover:bg-[#1E240A]/10 transition-colors duration-200'
               aria-label='Toggle sidebar menu'
@@ -265,6 +267,7 @@ export function Header() {
               <div className='flex items-center space-x-4 ml-auto'>
                 <div className='relative'>
                   <button
+                    type="button"
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className='flex items-center space-x-2 p-2 rounded-md text-[#1E240A] hover:bg-[#1E240A]/10 transition-colors duration-200'
                   >
@@ -302,6 +305,7 @@ export function Header() {
                           My Account
                         </Link>
                         <button
+                          type="button"
                           onClick={() => {
                             signOut();
                             setShowUserMenu(false);
@@ -322,6 +326,7 @@ export function Header() {
 
       {/* Mobile menu button - only visible on mobile */}
       <button
+        type="button"
         onClick={() => setShowMobileMenu(!showMobileMenu)}
         className='lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md text-[#1E240A] bg-[#F6EEDF]/90 backdrop-blur-sm border border-[#1E240A]/10 hover:bg-[#1E240A]/10 transition-colors duration-200'
         aria-label='Toggle mobile menu'
@@ -341,6 +346,14 @@ export function Header() {
           <div 
             className='lg:hidden fixed inset-0 bg-black/50 z-30'
             onClick={() => setShowMobileMenu(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                setShowMobileMenu(false);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Close mobile menu"
           />
           <div className='lg:hidden fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto'>
             {/* Top accent line */}
@@ -349,12 +362,12 @@ export function Header() {
             {/* Mobile sidebar content */}
             <div className='p-6 pb-20'>
               {/* Navigation */}
-              <nav className='space-y-4 mt-8' role='navigation' aria-label='Main navigation'>
+              <nav className='space-y-1 mt-8' role='navigation' aria-label='Main navigation'>
                 {navigation.map(item => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`block px-4 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${
+                    className={`block px-4 py-2 text-sm rounded-lg transition-colors duration-200 ${
                       isActive(item.href)
                         ? 'text-[#1E240A] bg-[#1E240A]/10 border-l-4 border-[#1E240A]'
                         : 'text-[#1E240A]/80 hover:text-[#1E240A] hover:bg-[#1E240A]/5'
