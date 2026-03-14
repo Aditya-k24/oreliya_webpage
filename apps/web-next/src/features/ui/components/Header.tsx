@@ -86,28 +86,44 @@ export function Header() {
   return (
     <>
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${
-        showSidebar ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <div
+        className={`fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${
+          showSidebar ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         {/* Top accent line */}
         <div className='h-0.5 bg-[#1E240A]' />
-        
+
         {/* Sidebar content */}
         <div className='p-6 relative pb-20'>
           {/* Close button */}
           <button
-            type="button"
+            type='button'
             onClick={() => setShowSidebar(false)}
             className='absolute top-4 right-4 p-2 rounded-md text-[#1E240A] hover:bg-[#1E240A]/10 transition-colors duration-200'
             aria-label='Close sidebar'
           >
-            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+            <svg
+              className='w-5 h-5'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M6 18L18 6M6 6l12 12'
+              />
             </svg>
           </button>
-          
+
           {/* Navigation */}
-          <nav className='space-y-1 mt-12' role='navigation' aria-label='Main navigation'>
+          <nav
+            className='space-y-1 mt-12'
+            role='navigation'
+            aria-label='Main navigation'
+          >
             {navigation.map(item => (
               <Link
                 key={item.href}
@@ -130,7 +146,11 @@ export function Header() {
               <h3 className='text-sm font-medium text-[#1E240A]/60 uppercase tracking-wide mb-4 px-4'>
                 Admin Panel
               </h3>
-              <nav className='space-y-2' role='navigation' aria-label='Admin navigation'>
+              <nav
+                className='space-y-2'
+                role='navigation'
+                aria-label='Admin navigation'
+              >
                 <Link
                   href='/admin'
                   onClick={() => setShowSidebar(false)}
@@ -172,8 +192,12 @@ export function Header() {
             <h3 className='text-sm font-medium text-[#1E240A]/60 uppercase tracking-wide mb-4 px-4'>
               Product Categories
             </h3>
-            <nav className='space-y-1' role='navigation' aria-label='Product categories'>
-              {productCategories.map((category) => (
+            <nav
+              className='space-y-1'
+              role='navigation'
+              aria-label='Product categories'
+            >
+              {productCategories.map(category => (
                 <Link
                   key={category.name}
                   href={category.href}
@@ -215,21 +239,31 @@ export function Header() {
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           {/* Top accent line */}
           <div className='h-0.5 bg-[#1E240A]' />
-          
+
           {/* Header content */}
           <div className='flex items-center justify-between h-16'>
             {/* Menu button */}
             <button
-              type="button"
+              type='button'
               onClick={() => setShowSidebar(!showSidebar)}
               className='p-2 rounded-md text-[#1E240A] hover:bg-[#1E240A]/10 transition-colors duration-200'
               aria-label='Toggle sidebar menu'
             >
-              <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16M4 18h16' />
+              <svg
+                className='w-6 h-6'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M4 6h16M4 12h16M4 18h16'
+                />
               </svg>
             </button>
-            
+
             {/* Centered logo */}
             <div className='absolute left-1/2 transform -translate-x-1/2 flex items-center'>
               <Link
@@ -254,34 +288,42 @@ export function Header() {
                       alt='Oreliya'
                       height={32}
                       width={120}
-                      className='h-full w-auto object-contain'
+                      className='h-full object-contain'
+                      style={{ width: 'auto' }}
                       priority
                     />
                   </div>
                 </div>
               </Link>
             </div>
-            
+
             {/* Auth section - only show user menu if logged in */}
             {isMounted && session && (
               <div className='flex items-center space-x-4 ml-auto'>
                 <div className='relative'>
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className='flex items-center space-x-2 p-2 rounded-md text-[#1E240A] hover:bg-[#1E240A]/10 transition-colors duration-200'
                   >
-                    <span className='text-sm font-medium hidden md:inline'>{session.user?.name || session.user?.email}</span>
-                    <svg 
-                      className={`w-4 h-4 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} 
-                      fill='none' 
-                      stroke='currentColor' 
+                    <span className='text-sm font-medium hidden md:inline'>
+                      {session.user?.name || session.user?.email}
+                    </span>
+                    <svg
+                      className={`w-4 h-4 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`}
+                      fill='none'
+                      stroke='currentColor'
                       viewBox='0 0 24 24'
                     >
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M19 9l-7 7-7-7'
+                      />
                     </svg>
                   </button>
-                  
+
                   {showUserMenu && (
                     <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50'>
                       <div className='py-1'>
@@ -305,7 +347,7 @@ export function Header() {
                           My Account
                         </Link>
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => {
                             signOut();
                             setShowUserMenu(false);
@@ -326,16 +368,31 @@ export function Header() {
 
       {/* Mobile menu button - only visible on mobile */}
       <button
-        type="button"
+        type='button'
         onClick={() => setShowMobileMenu(!showMobileMenu)}
         className='lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md text-[#1E240A] bg-[#F6EEDF]/90 backdrop-blur-sm border border-[#1E240A]/10 hover:bg-[#1E240A]/10 transition-colors duration-200'
         aria-label='Toggle mobile menu'
       >
-        <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+        <svg
+          className='w-6 h-6'
+          fill='none'
+          stroke='currentColor'
+          viewBox='0 0 24 24'
+        >
           {showMobileMenu ? (
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M6 18L18 6M6 6l12 12'
+            />
           ) : (
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16M4 18h16' />
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M4 6h16M4 12h16M4 18h16'
+            />
           )}
         </svg>
       </button>
@@ -343,26 +400,30 @@ export function Header() {
       {/* Mobile sidebar overlay */}
       {showMobileMenu && (
         <>
-          <div 
+          <div
             className='lg:hidden fixed inset-0 bg-black/50 z-30'
             onClick={() => setShowMobileMenu(false)}
-            onKeyDown={(e) => {
+            onKeyDown={e => {
               if (e.key === 'Enter' || e.key === ' ') {
                 setShowMobileMenu(false);
               }
             }}
-            role="button"
+            role='button'
             tabIndex={0}
-            aria-label="Close mobile menu"
+            aria-label='Close mobile menu'
           />
           <div className='lg:hidden fixed left-0 top-0 h-full w-64 bg-[#F6EEDF]/95 backdrop-blur-sm border-r border-[#1E240A]/10 z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto'>
             {/* Top accent line */}
             <div className='h-0.5 bg-[#1E240A]' />
-            
+
             {/* Mobile sidebar content */}
             <div className='p-6 pb-20'>
               {/* Navigation */}
-              <nav className='space-y-1 mt-8' role='navigation' aria-label='Main navigation'>
+              <nav
+                className='space-y-1 mt-8'
+                role='navigation'
+                aria-label='Main navigation'
+              >
                 {navigation.map(item => (
                   <Link
                     key={item.href}
@@ -385,7 +446,11 @@ export function Header() {
                   <h3 className='text-sm font-medium text-[#1E240A]/60 uppercase tracking-wide mb-4 px-4'>
                     Admin Panel
                   </h3>
-                  <nav className='space-y-2' role='navigation' aria-label='Admin navigation'>
+                  <nav
+                    className='space-y-2'
+                    role='navigation'
+                    aria-label='Admin navigation'
+                  >
                     <Link
                       href='/admin'
                       onClick={() => setShowMobileMenu(false)}
@@ -427,8 +492,12 @@ export function Header() {
                 <h3 className='text-sm font-medium text-[#1E240A]/60 uppercase tracking-wide mb-4 px-4'>
                   Product Categories
                 </h3>
-                <nav className='space-y-1' role='navigation' aria-label='Product categories'>
-                  {productCategories.map((category) => (
+                <nav
+                  className='space-y-1'
+                  role='navigation'
+                  aria-label='Product categories'
+                >
+                  {productCategories.map(category => (
                     <Link
                       key={category.name}
                       href={category.href}

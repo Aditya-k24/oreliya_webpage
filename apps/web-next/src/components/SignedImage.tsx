@@ -1,24 +1,24 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import { useSignedUrl } from '@/hooks/useSignedUrl'
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { useSignedUrl } from '@/hooks/useSignedUrl';
 
 interface SignedImageProps {
-  filePath: string
-  alt: string
-  width?: number
-  height?: number
-  className?: string
-  placeholder?: 'blur' | 'empty'
-  blurDataURL?: string
-  priority?: boolean
-  quality?: number
-  sizes?: string
-  fill?: boolean
-  style?: React.CSSProperties
-  onLoad?: () => void
-  onError?: () => void
+  filePath: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  className?: string;
+  placeholder?: 'blur' | 'empty';
+  blurDataURL?: string;
+  priority?: boolean;
+  quality?: number;
+  sizes?: string;
+  fill?: boolean;
+  style?: React.CSSProperties;
+  onLoad?: () => void;
+  onError?: () => void;
 }
 
 export function SignedImage({
@@ -35,68 +35,80 @@ export function SignedImage({
   fill = false,
   style,
   onLoad,
-  onError
+  onError,
 }: SignedImageProps) {
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
-  const [imageError, setImageError] = useState(false)
-  const { getSignedUrl, isLoading, error } = useSignedUrl()
+  const isPreResolved =
+    filePath.startsWith('http://') || filePath.startsWith('https://');
+  const [imageUrl, setImageUrl] = useState<string | null>(
+    isPreResolved ? filePath : null
+  );
+  const [imageError, setImageError] = useState(false);
+  const { getSignedUrl, isLoading, error } = useSignedUrl();
 
   useEffect(() => {
-    if (!filePath) return
+    if (!filePath) return;
 
     const fetchSignedUrl = async () => {
+      // If already a full URL, use it directly — no need to re-fetch
+      if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+        setImageUrl(filePath);
+        return;
+      }
+
       // Extract file path from full URL if needed
-      let pathToUse = filePath
-      
+      let pathToUse = filePath;
+
       // If it's a full Supabase URL, extract just the file path
       if (filePath.includes('/storage/v1/object/sign/production/')) {
-        const urlParts = filePath.split('/storage/v1/object/sign/production/')
-        if (urlParts.length > 1) {
-          // Remove query parameters and get just the path
-          pathToUse = urlParts[1].split('?')[0]
+        const [, signedPathWithQuery] = filePath.split(
+          '/storage/v1/object/sign/production/'
+        );
+        if (signedPathWithQuery) {
+          const [cleanPath] = signedPathWithQuery.split('?');
+          pathToUse = cleanPath;
         }
       }
-      
-      const result = await getSignedUrl(pathToUse)
+
+      const result = await getSignedUrl(pathToUse);
       if (result.success && result.signedUrl) {
-        setImageUrl(result.signedUrl)
-        setImageError(false)
+        setImageUrl(result.signedUrl);
+        setImageError(false);
       } else {
-        setImageError(true)
-        onError?.()
+        setImageError(true);
+        onError?.();
       }
-    }
+    };
 
-    fetchSignedUrl()
-  }, [filePath, getSignedUrl, onError])
+    fetchSignedUrl();
+  }, [filePath, getSignedUrl, onError]);
 
-  // Show loading state
-  if (isLoading || (!imageUrl && !imageError)) {
+  // Show loading state (skip for pre-resolved URLs — they render immediately)
+  if (!isPreResolved && (isLoading || (!imageUrl && !imageError))) {
     return (
-      <div 
+      <div
         className={`bg-gray-200 animate-pulse ${className}`}
         style={{ width, height, ...style }}
       >
-        <div className="flex items-center justify-center h-full">
-          <div className="text-gray-400 text-sm">Loading...</div>
+        <div className='flex items-center justify-center h-full'>
+          <div className='text-gray-400 text-sm'>Loading...</div>
         </div>
       </div>
-    )
+    );
   }
 
   // Show error state
   if (imageError || error) {
     return (
-      <div 
+      <div
         className={`bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center ${className}`}
         style={{ width, height, ...style }}
       >
-        <div className="text-gray-500 text-sm text-center">
+        <div className='text-gray-500 text-sm text-center'>
           <div>Failed to load image</div>
-          {error && <div className="text-xs mt-1">{error}</div>}
+          {error && <div className='text-xs mt-1'>{error}</div>}
         </div>
       </div>
-    )
+    );
   }
 
   // Show image
@@ -115,14 +127,15 @@ export function SignedImage({
         sizes={sizes}
         fill={fill}
         style={style}
+        unoptimized={isPreResolved}
         onLoad={onLoad}
         onError={() => {
-          setImageError(true)
-          onError?.()
+          setImageError(true);
+          onError?.();
         }}
       />
-    )
+    );
   }
 
-  return null
+  return null;
 }

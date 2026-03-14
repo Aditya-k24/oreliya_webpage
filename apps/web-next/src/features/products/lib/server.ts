@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { apiClient } from '@/lib/api/client';
 import { createProductCache, createCategoryCache } from '@/lib/cache';
 import type { Product, Category, ProductFilters } from '@/types/product';
@@ -5,6 +6,13 @@ import { ProductService } from '@/api-lib/services/productService';
 import { ProductRepository } from '@/api-lib/repositories/productRepository';
 import prisma from '@/api-lib/config/database';
 import { getSignedUrls } from '@/lib/storage';
+
+const normalizeToPath = (img: string): string => {
+  if (img.includes('/storage/v1/object/sign/production/')) {
+    return img.split('/storage/v1/object/sign/production/')[1].split('?')[0];
+  }
+  return img;
+};
 
 // Local fallback categories using public assets to ensure UI renders even if API is unavailable
 const FALLBACK_CATEGORIES: Category[] = [
@@ -72,23 +80,27 @@ export const getProducts = createProductCache(
   'products'
 );
 
-export const getProductById = async (id: string): Promise<Product | null> => {
+const fetchProductById = async (id: string): Promise<Product | null> => {
   try {
     const productRepository = new ProductRepository(prisma);
     const productService = new ProductService(productRepository);
-    
+
     const result = await productService.getProductById(id);
-    
+
     if (result.success && result.data?.product) {
       const p = result.data.product;
-      
-      // Batch generate signed URLs for all images in one API call
+
       const productImages = p.images || [];
-      const urlMap = productImages.length > 0 
-        ? await getSignedUrls('production', productImages, 7200)
-        : new Map();
-      const signedImages = productImages.map(path => urlMap.get(path) || path);
-      
+      const rawPaths = productImages.map(normalizeToPath);
+      const urlMap =
+        rawPaths.length > 0
+          ? await getSignedUrls('production', [...new Set(rawPaths)], 7200)
+          : new Map<string, string>();
+      const signedImages = productImages.map((img: string) => {
+        const raw = normalizeToPath(img);
+        return urlMap.get(raw) || img;
+      });
+
       return {
         ...p,
         images: signedImages,
@@ -103,6 +115,12 @@ export const getProductById = async (id: string): Promise<Product | null> => {
 
   return null;
 };
+
+export const getProductById = unstable_cache(
+  fetchProductById,
+  ['product-by-id'],
+  { revalidate: 600, tags: ['products'] }
+);
 
 export const getCategories = createCategoryCache(
   async (): Promise<Category[]> => {
