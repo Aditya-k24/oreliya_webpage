@@ -37,8 +37,10 @@ export function SignedImage({
   onLoad,
   onError,
 }: SignedImageProps) {
+  const isSupabaseSigned = filePath.includes('/storage/v1/object/sign/');
   const isPreResolved =
-    filePath.startsWith('http://') || filePath.startsWith('https://');
+    (filePath.startsWith('http://') || filePath.startsWith('https://')) &&
+    !isSupabaseSigned;
   const [imageUrl, setImageUrl] = useState<string | null>(
     isPreResolved ? filePath : null
   );
@@ -49,8 +51,11 @@ export function SignedImage({
     if (!filePath) return;
 
     const fetchSignedUrl = async () => {
-      // If already a full URL, use it directly — no need to re-fetch
-      if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      // If already a non-Supabase full URL, use it directly
+      if (
+        (filePath.startsWith('http://') || filePath.startsWith('https://')) &&
+        !filePath.includes('/storage/v1/object/sign/')
+      ) {
         setImageUrl(filePath);
         return;
       }
