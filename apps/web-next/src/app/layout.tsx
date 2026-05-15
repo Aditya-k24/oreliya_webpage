@@ -94,13 +94,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en' className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
+    <html
+      lang='en'
+      className={`${inter.variable} ${playfair.variable}`}
+      suppressHydrationWarning
+    >
       <body className='font-sans antialiased'>
         <SessionProvider>
           <ErrorBoundary>
             <div className='min-h-screen flex flex-col'>
               <Header />
-              <main className='flex-1'>{children}</main>
+              <main className='flex-1 pt-[65px]'>{children}</main>
               <Footer />
             </div>
           </ErrorBoundary>

@@ -2,54 +2,63 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import type { Product } from '@/types/product';
 import { SignedImage } from '@/components/SignedImage';
 import { SearchAndFilter } from '@/features/ui/components/SearchAndFilter';
 
 interface ProductCardProps {
   product: Product;
+  index: number;
 }
 
-function ProductCard({ product }: ProductCardProps) {
+function ProductCard({ product, index }: ProductCardProps) {
   return (
-    <Link href={`/products/${product.id}`} prefetch className='group'>
-      <div className='relative w-full h-96 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-xl'>
-        {product.images[0] ? (
-          <SignedImage
-            filePath={product.images[0]}
-            alt={product.name}
-            fill
-            className='object-cover transition-transform duration-500 group-hover:scale-105'
-            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-            priority={false}
-          />
-        ) : (
-          <SignedImage
-            filePath='/placeholder-product.svg'
-            alt={product.name}
-            fill
-            className='object-cover transition-transform duration-500 group-hover:scale-105'
-            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-          />
-        )}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.5,
+        delay: Math.min(index * 0.04, 0.4),
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
+      <Link href={`/products/${product.id}`} prefetch className='group block'>
+        <div className='relative w-full aspect-[3/4] overflow-hidden bg-[#1E240A]/5'>
+          {product.images[0] ? (
+            <SignedImage
+              filePath={product.images[0]}
+              alt={product.name}
+              fill
+              className='object-cover transition-transform duration-700 group-hover:scale-105'
+              sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+              priority={false}
+            />
+          ) : (
+            <div className='w-full h-full flex items-center justify-center'>
+              <span className='text-[#1E240A]/20 text-[10px] uppercase tracking-widest'>
+                No image
+              </span>
+            </div>
+          )}
+        </div>
 
-        <div className='absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent' />
-
-        <div className='absolute bottom-0 left-0 right-0 p-4 text-white'>
-          <h3 className='font-semibold text-lg mb-2 line-clamp-2 drop-shadow-lg text-center'>
+        <div className='pt-4'>
+          <p className='text-[#1E240A]/40 text-[10px] uppercase tracking-[0.25em] mb-1.5'>
+            {product.category}
+          </p>
+          <h3
+            className='text-[#1E240A] text-base leading-snug group-hover:text-[#1E240A]/70 transition-colors duration-300'
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 400,
+            }}
+          >
             {product.name}
           </h3>
-
-          {/* Price section commented out */}
-          {/* <div className="flex flex-col">
-            <span className="text-xs text-white/80 font-medium drop-shadow">Starting from</span>
-            <span className="text-lg font-bold text-white drop-shadow-lg">
-              ₹{product.price.toLocaleString('en-IN')}
-            </span>
-          </div> */}
         </div>
-      </div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 }
 
@@ -60,6 +69,16 @@ interface ProductsPageClientProps {
 
 const PAGE_SIZE = 12;
 
+const categoryLabels: Record<string, string> = {
+  rings: 'Rings',
+  'special-offer-rings': 'Special Offers',
+  necklaces: 'Necklaces',
+  earrings: 'Earrings',
+  bracelets: 'Bracelets',
+  mangalsutra: 'Mangalsutra',
+  other: 'Other',
+};
+
 export default function ProductsPageClient({
   initialProducts,
   initialCategory = '',
@@ -68,101 +87,96 @@ export default function ProductsPageClient({
     useState<Product[]>(initialProducts);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  // Reset pagination when filters change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [filteredProducts]);
 
-  // Generate dynamic heading based on category
-  const getHeading = () => {
-    if (!initialCategory) return 'Our Products';
+  const heading = initialCategory
+    ? categoryLabels[initialCategory.toLowerCase()] || initialCategory
+    : 'All Collections';
 
-    const categoryMap: { [key: string]: string } = {
-      rings: 'Our Rings',
-      'special-offer-rings': 'Special Offers',
-      necklaces: 'Our Necklaces',
-      earrings: 'Our Earrings',
-      bracelets: 'Our Bracelets',
-      mangalsutra: 'Our Mangalsutra',
-      other: 'Our Other Products',
-    };
-
-    return (
-      categoryMap[initialCategory.toLowerCase()] ||
-      `Our ${initialCategory.charAt(0).toUpperCase() + initialCategory.slice(1)}s`
-    );
-  };
-
-  const getDescriptionText = () => {
-    if (initialCategory === 'special-offer-rings') {
-      return 'Exclusive collection of silver rings with lab grown diamonds at a special price of ₹5,999';
-    }
-    if (initialCategory) {
-      return `Discover our exquisite collection of ${initialCategory.toLowerCase()}`;
-    }
-    return 'Discover our exquisite collection of handcrafted jewelry pieces';
-  };
-  const descriptionText = getDescriptionText();
+  const eyebrow = initialCategory ? 'Collections' : 'Our Jewellery';
 
   return (
     <div className='min-h-screen bg-[#F6EEDF]'>
-      <div className='max-w-7xl mx-auto px-6 lg:px-8 py-12'>
-        <div className='text-center mb-12'>
-          <h1 className='text-4xl font-bold text-[#1E240A] mb-4'>
-            {getHeading()}
-          </h1>
-          <p className='text-lg text-gray-600 max-w-2xl mx-auto'>
-            {descriptionText}
-          </p>
-          {initialCategory && (
-            <div className='mt-4'>
+      {/* Page Header */}
+      <div className='max-w-7xl mx-auto px-6 lg:px-8 pt-16 pb-10'>
+        <div className='flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6'>
+          <div>
+            {initialCategory && (
               <Link
                 href='/products'
-                className='inline-flex items-center text-[#1E240A] hover:text-[#2A3A1A] transition-colors duration-200'
+                className='text-[#1E240A]/40 text-[10px] uppercase tracking-[0.3em] hover:text-[#1E240A]/70 transition-colors mb-4 block'
               >
-                ← View All Products
+                ← All Collections
               </Link>
-            </div>
-          )}
-        </div>
-
-        <div className='mb-8'>
-          <SearchAndFilter
-            key={initialCategory || 'all-products'}
-            products={initialProducts}
-            onFilteredProducts={setFilteredProducts}
-            initialCategory={initialCategory}
-          />
-        </div>
-
-        {filteredProducts.length === 0 ? (
-          <div className='text-center py-12'>
-            <p className='text-gray-600 text-lg'>
-              No products match your search criteria.
+            )}
+            <p className='text-[#1E240A]/40 text-[10px] uppercase tracking-[0.35em] mb-5'>
+              {eyebrow}
             </p>
-            <p className='text-gray-500 mt-2'>
-              Try adjusting your filters or search terms.
-            </p>
-            <Link
-              href='/products'
-              className='inline-block mt-4 px-6 py-2 bg-[#1E240A] text-white rounded-lg hover:bg-[#2A3A1A] transition-colors'
+            <h1
+              className='text-5xl md:text-6xl text-[#1E240A] leading-[1.0]'
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 400,
+                letterSpacing: '-0.02em',
+              }}
             >
-              View All Products
+              {heading}
+            </h1>
+          </div>
+
+          <div className='flex items-center gap-4 pb-1'>
+            <span className='text-[#1E240A]/40 text-[10px] uppercase tracking-[0.25em]'>
+              {filteredProducts.length} piece
+              {filteredProducts.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </div>
+
+        <div className='mt-10 h-px bg-[#1E240A]/10' />
+      </div>
+
+      {/* Filter */}
+      <div className='max-w-7xl mx-auto px-6 lg:px-8 mb-10'>
+        <SearchAndFilter
+          key={initialCategory || 'all-products'}
+          products={initialProducts}
+          onFilteredProducts={setFilteredProducts}
+          initialCategory={initialCategory}
+        />
+      </div>
+
+      {/* Grid */}
+      <div className='max-w-7xl mx-auto px-6 lg:px-8 pb-28'>
+        {filteredProducts.length === 0 ? (
+          <div className='py-24 text-center'>
+            <p className='text-[#1E240A]/50 text-sm mb-2'>
+              No pieces match your selection.
+            </p>
+            <p className='text-[#1E240A]/30 text-xs mb-10'>
+              Try adjusting your filters.
+            </p>
+            <Link href='/products'>
+              <button type='button' className='btn-outline text-xs'>
+                View All Pieces
+              </button>
             </Link>
           </div>
         ) : (
           <>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-              {filteredProducts.slice(0, visibleCount).map(product => (
-                <ProductCard key={product.id} product={product} />
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10'>
+              {filteredProducts.slice(0, visibleCount).map((product, i) => (
+                <ProductCard key={product.id} product={product} index={i} />
               ))}
             </div>
+
             {visibleCount < filteredProducts.length && (
-              <div className='text-center mt-10'>
+              <div className='text-center mt-16'>
                 <button
                   type='button'
                   onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
-                  className='px-8 py-3 bg-[#1E240A] text-white rounded-lg hover:bg-[#2A3A1A] transition-colors'
+                  className='btn-outline text-xs'
                 >
                   Load More
                 </button>

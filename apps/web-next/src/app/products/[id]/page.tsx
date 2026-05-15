@@ -35,173 +35,134 @@ export default async function ProductPage({ params }: ProductPageProps) {
     return notFound();
   }
 
-  // Calculate total stock from variants
-  // const totalStock = product.variants?.reduce((sum, variant) => sum + variant.stockQuantity, 0) || 0;
-  // const isInStock = totalStock > 0;
-
   return (
-    <div className='min-h-screen bg-gradient-to-br from-[#F6EEDF] to-[#F0E6D2]'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        {/* Breadcrumb Navigation */}
-        <nav className='mb-8'>
-          <div className='flex items-center space-x-2 text-sm text-gray-600'>
-            <Link href='/' className='hover:text-[#1E240A] transition-colors'>
+    <div className='min-h-screen bg-[#F6EEDF]'>
+      <div className='max-w-7xl mx-auto px-6 lg:px-8 py-12'>
+        {/* Breadcrumb */}
+        <nav className='mb-12'>
+          <div className='flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#1E240A]/40'>
+            <Link
+              href='/'
+              className='hover:text-[#1E240A]/70 transition-colors'
+            >
               Home
             </Link>
             <span>/</span>
             <Link
               href='/products'
-              className='hover:text-[#1E240A] transition-colors'
+              className='hover:text-[#1E240A]/70 transition-colors'
             >
-              Products
+              Collections
             </Link>
             <span>/</span>
-            <span className='text-[#1E240A] font-medium'>{product.name}</span>
+            <span className='text-[#1E240A]/70'>{product.name}</span>
           </div>
         </nav>
 
-        {/* Main Product Content */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-16'>
-          {/* Product Images Carousel */}
+        {/* Main Grid */}
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24'>
+          {/* Image Carousel */}
           <ProductImageCarousel
             images={product.images || []}
             productName={product.name}
           />
 
-          {/* Product Details */}
+          {/* Details */}
           <div className='space-y-8'>
-            {/* Product Header */}
-            <div className='space-y-4'>
-              {/* Category and Badges */}
-              <div className='flex items-center space-x-3'>
-                <span className='px-3 py-1 bg-[#1E240A]/10 text-[#1E240A] text-sm font-medium rounded-full uppercase tracking-wide'>
-                  {product.category}
+            {/* Category & Badges */}
+            <div className='flex items-center gap-3 flex-wrap'>
+              <span className='text-[#1E240A]/50 text-[10px] uppercase tracking-[0.3em]'>
+                {product.category}
+              </span>
+              {product.isFeatured && (
+                <span className='text-[#1E240A]/50 text-[10px] uppercase tracking-[0.3em]'>
+                  · Featured
                 </span>
-                {product.isFeatured && (
-                  <span className='px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full'>
-                    Featured
-                  </span>
-                )}
-                {product.isOnSale && (
-                  <span className='px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-full'>
-                    {product.salePercentage}% Off
-                  </span>
-                )}
-              </div>
+              )}
+              {product.isOnSale && (
+                <span className='text-[#1E240A] text-[10px] uppercase tracking-[0.3em]'>
+                  · {product.salePercentage}% Off
+                </span>
+              )}
+            </div>
 
-              {/* Product Title */}
-              <h1 className='text-4xl lg:text-5xl font-bold text-[#1E240A] leading-tight'>
+            {/* Title */}
+            <div className='pb-8 border-b border-[#1E240A]/10'>
+              <h1
+                className='text-4xl lg:text-5xl text-[#1E240A] leading-[1.1]'
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontWeight: 400,
+                  letterSpacing: '-0.02em',
+                }}
+              >
                 {product.name}
               </h1>
-
-              {/* Price */}
-              {/* <div className="flex items-center space-x-3">
-                <span className="text-sm text-gray-600">Starting from</span>
-                <span className="text-3xl lg:text-4xl font-bold text-[#1E240A]">
-                  {formatPrice(Number(product.price))}
-                </span>
-                {product.compareAtPrice && (
-                  <span className="text-xl text-gray-500 line-through">
-                    {formatPrice(Number(product.compareAtPrice))}
-                  </span>
-                )}
-              </div> */}
             </div>
 
-            {/* Product Description */}
-            <div className='prose prose-lg max-w-none'>
-              <p className='text-gray-700 leading-relaxed text-lg whitespace-pre-wrap'>
-                {product.description}
-              </p>
-            </div>
+            {/* Description */}
+            <p className='text-[#1E240A]/65 text-sm font-light leading-relaxed whitespace-pre-wrap'>
+              {product.description}
+            </p>
 
-            {/* Product Customizations */}
+            {/* Customizations */}
             {product.customizations && product.customizations.length > 0 && (
-              <div className='bg-white rounded-2xl p-6 shadow-lg border border-gray-100'>
+              <div className='border-t border-[#1E240A]/10 pt-8'>
                 <ProductCustomization customizations={product.customizations} />
               </div>
             )}
 
-            {/* Action Button */}
-            <div>
+            {/* Inquire CTA */}
+            <div className='pt-2'>
               <Link
                 href={`/contact?product=${encodeURIComponent(product.name)}`}
-                className='flex items-center justify-center space-x-2 w-full py-4 px-8 bg-[#1E240A] text-white rounded-2xl font-semibold text-lg hover:bg-[#1E240A]/90 shadow-lg hover:shadow-xl transition-all duration-300'
+                className='block w-full'
               >
-                <span>Inquire Now</span>
-                <svg
-                  className='w-5 h-5'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
-                  />
-                </svg>
+                <button type='button' className='btn-primary text-xs w-full'>
+                  Inquire Now
+                </button>
               </Link>
             </div>
 
-            {/* Product Features */}
-            <div className='bg-white rounded-2xl p-6 shadow-lg border border-gray-100'>
-              <h3 className='text-lg font-semibold text-[#1E240A] mb-4'>
-                Product Features
-              </h3>
-              <div className='space-y-3'>
-                <div className='flex items-center space-x-3'>
-                  <div className='w-2 h-2 bg-[#1E240A] rounded-full' />
-                  <span className='text-gray-700'>
-                    Free shipping on orders over ₹5,000
+            {/* Promise */}
+            <div className='border-t border-[#1E240A]/10 pt-8 space-y-4'>
+              {[
+                'Free shipping on orders over ₹5,000',
+                '30-day return policy',
+                'Lifetime warranty on craftsmanship',
+                'Authenticity certificate included',
+              ].map(item => (
+                <div key={item} className='flex items-start gap-4'>
+                  <div className='w-px h-4 bg-[#1E240A]/30 mt-0.5 flex-shrink-0' />
+                  <span className='text-[#1E240A]/55 text-xs font-light leading-relaxed'>
+                    {item}
                   </span>
                 </div>
-                <div className='flex items-center space-x-3'>
-                  <div className='w-2 h-2 bg-[#1E240A] rounded-full' />
-                  <span className='text-gray-700'>30-day return policy</span>
-                </div>
-                <div className='flex items-center space-x-3'>
-                  <div className='w-2 h-2 bg-[#1E240A] rounded-full' />
-                  <span className='text-gray-700'>
-                    Lifetime warranty on craftsmanship
-                  </span>
-                </div>
-                <div className='flex items-center space-x-3'>
-                  <div className='w-2 h-2 bg-[#1E240A] rounded-full' />
-                  <span className='text-gray-700'>
-                    Authenticity certificate included
-                  </span>
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/* Product Tags */}
+            {/* Tags */}
             {product.tags && product.tags.length > 0 && (
-              <div className='space-y-3'>
-                <h3 className='text-lg font-semibold text-[#1E240A]'>Tags</h3>
-                <div className='flex flex-wrap gap-2'>
-                  {product.tags.map(tag => (
-                    <span
-                      key={tag}
-                      className='px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full'
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+              <div className='flex flex-wrap gap-2 pt-2'>
+                {product.tags.map(tag => (
+                  <span
+                    key={tag}
+                    className='px-3 py-1 border border-[#1E240A]/20 text-[#1E240A]/50 text-[10px] uppercase tracking-[0.2em]'
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             )}
           </div>
         </div>
 
-        {/* Back to Products */}
-        <div className='mt-16 text-center'>
-          <Link
-            href='/products'
-            className='inline-flex items-center px-8 py-4 border-2 border-[#1E240A] text-[#1E240A] rounded-2xl hover:bg-[#1E240A] hover:text-white transition-all duration-300 font-semibold text-lg'
-          >
-            ← Back to All Products
+        {/* Back Link */}
+        <div className='mt-20 pt-10 border-t border-[#1E240A]/10'>
+          <Link href='/products'>
+            <button type='button' className='btn-outline text-xs'>
+              ← Back to Collections
+            </button>
           </Link>
         </div>
       </div>
