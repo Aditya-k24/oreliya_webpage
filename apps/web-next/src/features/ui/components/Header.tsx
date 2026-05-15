@@ -13,17 +13,6 @@ const navigation = [
   { name: 'Contact', href: '/contact' },
 ];
 
-const productCategories = [
-  { name: 'Special Offer', href: '/products?category=special-offer-rings' },
-  { name: 'All Products', href: '/products' },
-  { name: 'Rings', href: '/products?category=rings' },
-  { name: 'Necklace', href: '/products?category=necklaces' },
-  { name: 'Earrings', href: '/products?category=earrings' },
-  { name: 'Bracelet', href: '/products?category=bracelets' },
-  { name: 'Mangalsutra', href: '/products?category=mangalsutra' },
-  { name: 'Other', href: '/products?category=other' },
-];
-
 export function Header() {
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -73,20 +62,29 @@ export function Header() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-full w-72 bg-[#F6EEDF] z-50 transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-y-auto ${
+        className={`fixed left-0 top-0 h-full w-72 bg-[#1E240A] z-50 flex flex-col transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           showSidebar ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className='h-0.5 bg-[#1E240A]' />
-        <div className='p-8 pb-20'>
+        {/* Top */}
+        <div className='flex items-center justify-between px-8 h-16 border-b border-[#F6EEDF]/10'>
+          <Link href='/' onClick={() => setShowSidebar(false)}>
+            <Image
+              src='/assets/logos/logo-white.svg'
+              alt='Oreliya'
+              width={90}
+              height={22}
+              style={{ width: 'auto', height: 20 }}
+            />
+          </Link>
           <button
             type='button'
             onClick={() => setShowSidebar(false)}
-            className='absolute top-6 right-6 text-[#1E240A]/50 hover:text-[#1E240A] transition-colors'
+            className='text-[#F6EEDF]/40 hover:text-[#F6EEDF] transition-colors'
             aria-label='Close menu'
           >
             <svg
-              className='w-5 h-5'
+              className='w-4 h-4'
               fill='none'
               stroke='currentColor'
               viewBox='0 0 24 24'
@@ -99,95 +97,86 @@ export function Header() {
               />
             </svg>
           </button>
+        </div>
 
-          <Link
-            href='/'
-            onClick={() => setShowSidebar(false)}
-            className='block mb-12'
-          >
-            <Image
-              src='/assets/logos/logo-mark.svg'
-              alt='Oreliya'
-              width={36}
-              height={36}
-            />
-          </Link>
-
-          <nav className='space-y-1' aria-label='Main navigation'>
-            {navigation.map(item => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setShowSidebar(false)}
-                className={`block py-3 text-sm tracking-wide transition-colors duration-200 border-b border-[#1E240A]/10 ${
-                  pathname === item.href
-                    ? 'text-[#1E240A] font-medium'
-                    : 'text-[#1E240A]/60 hover:text-[#1E240A]'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-
-          <div className='mt-10 pt-8 border-t border-[#1E240A]/10'>
-            <p className='text-[#1E240A]/40 text-xs uppercase tracking-[0.2em] mb-4'>
-              Categories
-            </p>
-            <nav className='space-y-1'>
-              {productCategories.map(cat => (
-                <Link
-                  key={cat.href}
-                  href={cat.href}
-                  onClick={() => setShowSidebar(false)}
-                  className='block py-2 text-sm text-[#1E240A]/60 hover:text-[#1E240A] transition-colors duration-200'
-                >
-                  {cat.name}
-                </Link>
-              ))}
-            </nav>
-          </div>
+        {/* Nav */}
+        <nav
+          className='flex-1 px-8 pt-8 overflow-y-auto'
+          aria-label='Main navigation'
+        >
+          {navigation.map(item => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setShowSidebar(false)}
+              className={`block py-4 text-sm tracking-wide border-b border-[#F6EEDF]/10 transition-colors duration-200 ${
+                pathname === item.href
+                  ? 'text-[#F6EEDF]'
+                  : 'text-[#F6EEDF]/50 hover:text-[#F6EEDF]'
+              }`}
+            >
+              {item.name}
+            </Link>
+          ))}
 
           {isMounted && (session?.user as any)?.role === 'admin' && (
-            <div className='mt-8 pt-8 border-t border-[#1E240A]/10'>
-              <p className='text-[#1E240A]/40 text-xs uppercase tracking-[0.2em] mb-4'>
+            <div className='mt-8'>
+              <p className='text-[#F6EEDF]/25 text-[9px] uppercase tracking-[0.3em] mb-3'>
                 Admin
               </p>
-              <nav className='space-y-1'>
-                {[
-                  { name: 'Dashboard', href: '/admin' },
-                  { name: 'Add Product', href: '/admin/products/new' },
-                  { name: 'Manage Products', href: '/admin/products' },
-                ].map(item => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setShowSidebar(false)}
-                    className='block py-2 text-sm text-[#1E240A]/60 hover:text-[#1E240A] transition-colors duration-200'
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </nav>
+              {[
+                { name: 'Dashboard', href: '/admin' },
+                { name: 'Add Product', href: '/admin/products/new' },
+                { name: 'Manage Products', href: '/admin/products' },
+              ].map(item => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setShowSidebar(false)}
+                  className='block py-2.5 text-xs text-[#F6EEDF]/40 hover:text-[#F6EEDF] transition-colors duration-200'
+                >
+                  {item.name}
+                </Link>
+              ))}
             </div>
           )}
+        </nav>
 
+        {/* Auth */}
+        <div className='px-8 py-6 border-t border-[#F6EEDF]/10'>
           {isMounted && !session && (
-            <div className='mt-8 pt-8 border-t border-[#1E240A]/10 flex flex-col gap-3'>
+            <div className='flex gap-6'>
               <Link
                 href='/login'
                 onClick={() => setShowSidebar(false)}
-                className='btn-outline text-center text-sm py-3'
+                className='text-[#F6EEDF]/50 hover:text-[#F6EEDF] text-xs uppercase tracking-[0.2em] transition-colors duration-200'
               >
                 Sign In
               </Link>
               <Link
                 href='/register'
                 onClick={() => setShowSidebar(false)}
-                className='btn-primary text-center text-sm py-3'
+                className='text-[#F6EEDF] text-xs uppercase tracking-[0.2em] border-b border-[#F6EEDF]/40 pb-px hover:border-[#F6EEDF] transition-colors duration-200'
               >
                 Register
               </Link>
+            </div>
+          )}
+          {isMounted && session && (
+            <div className='flex items-center justify-between'>
+              <span className='text-[#F6EEDF]/50 text-xs'>
+                {session.user?.name?.split(' ')[0] || 'Account'}
+              </span>
+              <button
+                type='button'
+                onClick={() => {
+                  signOut();
+                  setShowSidebar(false);
+                }}
+                className='text-[#F6EEDF]/30 hover:text-[#F6EEDF]/70 text-[10px] uppercase tracking-[0.2em] transition-colors'
+              >
+                Sign Out
+              </button>
             </div>
           )}
         </div>

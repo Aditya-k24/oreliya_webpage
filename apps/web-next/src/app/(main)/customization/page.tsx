@@ -14,6 +14,39 @@ interface CustomizationForm {
   additionalNotes: string;
 }
 
+const jewelryTypes = [
+  'Ring',
+  'Necklace',
+  'Earrings',
+  'Bracelet',
+  'Pendant',
+  'Anklet',
+  'Brooch',
+  'Other',
+];
+const budgetRanges = [
+  'Under ₹50,000',
+  '₹50,000 – ₹1,00,000',
+  '₹1,00,000 – ₹2,50,000',
+  '₹2,50,000 – ₹5,00,000',
+  '₹5,00,000 – ₹10,00,000',
+  'Over ₹10,00,000',
+];
+const timelineOptions = [
+  '1–2 weeks',
+  '3–4 weeks',
+  '1–2 months',
+  '2–3 months',
+  '3+ months',
+  'No specific timeline',
+];
+
+const inputCls =
+  'w-full bg-transparent border-b border-[#1E240A]/20 focus:border-[#1E240A] outline-none py-2.5 text-[#1E240A] text-sm tracking-wide transition-colors duration-200 placeholder:text-[#1E240A]/20';
+const labelCls =
+  'block text-[9px] uppercase tracking-[0.3em] text-[#1E240A]/45 mb-2';
+const selectCls = `${inputCls} cursor-pointer`;
+
 export default function CustomizationPage() {
   const [formData, setFormData] = useState<CustomizationForm>({
     customerName: '',
@@ -29,33 +62,6 @@ export default function CustomizationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
-  const jewelryTypes = [
-    'Ring',
-    'Necklace',
-    'Earrings',
-    'Bracelet',
-    'Pendant',
-    'Anklet',
-    'Brooch',
-    'Other',
-  ];
-  const budgetRanges = [
-    'Under ₹50,000',
-    '₹50,000 - ₹1,00,000',
-    '₹1,00,000 - ₹2,50,000',
-    '₹2,50,000 - ₹5,00,000',
-    '₹5,00,000 - ₹10,00,000',
-    'Over ₹10,00,000',
-  ];
-  const timelineOptions = [
-    '1-2 weeks',
-    '3-4 weeks',
-    '1-2 months',
-    '2-3 months',
-    '3+ months',
-    'No specific timeline',
-  ];
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -79,14 +85,10 @@ export default function CustomizationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
     try {
-      // Send customization request
       const response = await fetch('/api/customization', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.customerName,
           email: formData.email,
@@ -97,9 +99,7 @@ export default function CustomizationPage() {
           deliveryDate: formData.timeline,
         }),
       });
-
       const data = await response.json();
-
       if (response.ok) {
         setSubmitSuccess(true);
         setTimeout(() => {
@@ -116,12 +116,11 @@ export default function CustomizationPage() {
             additionalNotes: '',
           });
           setImagePreview(null);
-        }, 3000);
+        }, 4000);
       } else {
-        alert(data.message || 'Failed to send customization request. Please try again.');
+        alert(data.message || 'Failed to send request. Please try again.');
       }
-    } catch (error) {
-      console.error('Error submitting customization:', error);
+    } catch {
       alert('Network error. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
@@ -130,336 +129,309 @@ export default function CustomizationPage() {
 
   if (submitSuccess) {
     return (
-      <div className='min-h-screen bg-white flex items-center justify-center'>
-        <div className='max-w-md mx-auto text-center p-8'>
-          <div className='text-6xl mb-4'>✨</div>
-          <h1 className='text-3xl font-bold text-[#1E240A] mb-4'>
-            Request Submitted!
-          </h1>
-          <p className='text-gray-600 mb-6'>
-            Thank you for your customization request. Our team will review your
-            reference image and get back to you within 24-48 hours.
+      <div className='min-h-screen bg-[#F6EEDF] flex items-center justify-center'>
+        <div className='text-center'>
+          <p className='text-[#1E240A]/40 text-[9px] uppercase tracking-[0.4em] mb-6'>
+            Request Received
           </p>
-          <div className='text-sm text-gray-500'>
-            You&apos;ll receive a confirmation email shortly.
-          </div>
+          <h1
+            className='text-4xl text-[#1E240A] mb-5'
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Thank you.
+          </h1>
+          <p className='text-[#1E240A]/50 text-sm font-light'>
+            Our team will get back to you within 24–48 hours.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className='bg-white'>
-      <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        <div className='mb-8 text-center bg-[#F6EEDF] py-12 rounded-2xl'>
-          <div className='w-16 h-16 bg-[#1E240A] rounded-full mx-auto mb-6 flex items-center justify-center'>
-            <span className='text-white text-2xl'>💎</span>
-          </div>
-          <h1 className='text-4xl font-bold text-[#1E240A] mb-4'>
-            Custom Jewelry Design
+    <div className='bg-[#F6EEDF]'>
+      <div className='max-w-3xl mx-auto px-6 lg:px-8 py-16'>
+        {/* Banner */}
+        <div className='text-center mb-14 pb-14 border-b border-[#1E240A]/10'>
+          <p className='text-[#1E240A]/40 text-[9px] uppercase tracking-[0.4em] mb-6'>
+            Bespoke
+          </p>
+          <h1
+            className='text-5xl md:text-6xl text-[#1E240A] leading-[1.0] mb-6'
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Custom Jewellery
+            <br />
+            <span className='italic'>Design</span>
           </h1>
-          <p className='text-lg text-gray-600 max-w-2xl mx-auto'>
-            Bring your vision to life with our bespoke jewelry service. Upload a
-            reference image and let us create something uniquely yours.
+          <p className='text-[#1E240A]/50 text-sm font-light max-w-md mx-auto leading-relaxed'>
+            Bring your vision to life. Upload a reference image and let us
+            create something uniquely yours.
           </p>
         </div>
 
-        <div className='bg-white border border-gray-100 rounded-2xl shadow-lg p-6 lg:p-8'>
-          <form onSubmit={handleSubmit} className='space-y-6'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              <div>
-                <label
-                  htmlFor='customerName'
-                  className='block text-sm font-medium text-[#1E240A] mb-2'
-                >
-                  Full Name *
-                </label>
-                <input
-                  type='text'
-                  id='customerName'
-                  name='customerName'
-                  required
-                  value={formData.customerName}
-                  onChange={handleInputChange}
-                  className='w-full px-3 py-2 border-b border-gray-300 focus:border-[#1E240A] bg-transparent outline-none transition-colors'
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor='email'
-                  className='block text-sm font-medium text-[#1E240A] mb-2'
-                >
-                  Email *
-                </label>
-                <input
-                  type='email'
-                  id='email'
-                  name='email'
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className='w-full px-3 py-2 border-b border-gray-300 focus:border-[#1E240A] bg-transparent outline-none transition-colors'
-                />
-              </div>
-            </div>
-
+        {/* Form */}
+        <form onSubmit={handleSubmit} className='space-y-10'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
             <div>
-              <label
-                htmlFor='phone'
-                className='block text-sm font-medium text-[#1E240A] mb-2'
-              >
-                Phone Number
+              <label htmlFor='customerName' className={labelCls}>
+                Full Name *
               </label>
               <input
-                type='tel'
-                id='phone'
-                name='phone'
-                value={formData.phone}
+                type='text'
+                id='customerName'
+                name='customerName'
+                required
+                value={formData.customerName}
                 onChange={handleInputChange}
-                className='w-full px-3 py-2 border-b border-gray-300 focus:border-[#1E240A] bg-transparent outline-none transition-colors'
+                placeholder='Your name'
+                className={inputCls}
               />
             </div>
-
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              <div>
-                <label
-                  htmlFor='jewelryType'
-                  className='block text-sm font-medium text-[#1E240A] mb-2'
-                >
-                  Type of Jewelry *
-                </label>
-                <select
-                  id='jewelryType'
-                  name='jewelryType'
-                  required
-                  value={formData.jewelryType}
-                  onChange={handleInputChange}
-                  className='w-full px-3 py-2 border-b border-gray-300 focus:border-[#1E240A] bg-transparent outline-none transition-colors'
-                >
-                  <option value=''>Select jewelry type</option>
-                  {jewelryTypes.map(type => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor='budget'
-                  className='block text-sm font-medium text-[#1E240A] mb-2'
-                >
-                  Budget Range *
-                </label>
-                <select
-                  id='budget'
-                  name='budget'
-                  required
-                  value={formData.budget}
-                  onChange={handleInputChange}
-                  className='w-full px-3 py-2 border-b border-gray-300 focus:border-[#1E240A] bg-transparent outline-none transition-colors'
-                >
-                  <option value=''>Select budget range</option>
-                  {budgetRanges.map(b => (
-                    <option key={b} value={b}>
-                      {b}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
             <div>
-              <label
-                htmlFor='timeline'
-                className='block text-sm font-medium text-[#1E240A] mb-2'
-              >
-                Timeline *
+              <label htmlFor='email' className={labelCls}>
+                Email *
+              </label>
+              <input
+                type='email'
+                id='email'
+                name='email'
+                required
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder='your@email.com'
+                className={inputCls}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor='phone' className={labelCls}>
+              Phone Number
+            </label>
+            <input
+              type='tel'
+              id='phone'
+              name='phone'
+              value={formData.phone}
+              onChange={handleInputChange}
+              placeholder='+91 00000 00000'
+              className={inputCls}
+            />
+          </div>
+
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+            <div>
+              <label htmlFor='jewelryType' className={labelCls}>
+                Type of Jewellery *
               </label>
               <select
-                id='timeline'
-                name='timeline'
+                id='jewelryType'
+                name='jewelryType'
                 required
-                value={formData.timeline}
+                value={formData.jewelryType}
                 onChange={handleInputChange}
-                className='w-full px-3 py-2 border-b border-gray-300 focus:border-[#1E240A] bg-transparent outline-none transition-colors'
+                className={selectCls}
               >
-                <option value=''>Select timeline</option>
-                {timelineOptions.map(t => (
+                <option value=''>Select type</option>
+                {jewelryTypes.map(t => (
                   <option key={t} value={t}>
                     {t}
                   </option>
                 ))}
               </select>
             </div>
-
             <div>
-              <label
-                htmlFor='description'
-                className='block text-sm font-medium text-[#1E240A] mb-2'
-              >
-                Description of Your Vision *
+              <label htmlFor='budget' className={labelCls}>
+                Budget Range *
               </label>
-              <textarea
-                id='description'
-                name='description'
+              <select
+                id='budget'
+                name='budget'
                 required
-                rows={4}
-                value={formData.description}
+                value={formData.budget}
                 onChange={handleInputChange}
-                placeholder='Describe the jewelry piece you have in mind, including style, materials, and any specific details...'
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-[#1E240A] outline-none transition-colors resize-none'
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor='referenceImage'
-                className='block text-sm font-medium text-[#1E240A] mb-2'
+                className={selectCls}
               >
-                Reference Image *
-              </label>
-              <div className='mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-[#1E240A] transition-colors'>
-                <div className='space-y-1 text-center'>
-                  {imagePreview ? (
-                    <div className='space-y-4'>
-                      <img
-                        src={imagePreview}
-                        alt='Reference preview'
-                        className='mx-auto h-32 w-32 object-cover rounded-lg'
-                      />
-                      <button
-                        type='button'
-                        onClick={() => {
-                          setFormData(prev => ({
-                            ...prev,
-                            referenceImage: null,
-                          }));
-                          setImagePreview(null);
-                        }}
-                        className='text-sm text-red-600 hover:text-red-500'
-                      >
-                        Remove image
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <svg
-                        className='mx-auto h-12 w-12 text-gray-400'
-                        stroke='currentColor'
-                        fill='none'
-                        viewBox='0 0 48 48'
-                        aria-hidden='true'
-                      >
-                        <path
-                          d='M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02'
-                          strokeWidth={2}
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                        />
-                      </svg>
-                      <div className='flex text-sm text-gray-600'>
-                        <label
-                          htmlFor='referenceImage'
-                          className='relative cursor-pointer bg-white rounded-md font-medium text-[#1E240A] hover:text-[#2A3A1A]'
-                        >
-                          <span>Upload a file</span>
-                          <input
-                            id='referenceImage'
-                            name='referenceImage'
-                            type='file'
-                            accept='image/*'
-                            required
-                            onChange={handleImageChange}
-                            className='sr-only'
-                          />
-                        </label>
-                        <p className='pl-1'>or drag and drop</p>
-                      </div>
-                      <p className='text-xs text-gray-500'>
-                        PNG, JPG, GIF up to 10MB
-                      </p>
-                    </>
-                  )}
+                <option value=''>Select range</option>
+                {budgetRanges.map(b => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor='timeline' className={labelCls}>
+              Timeline *
+            </label>
+            <select
+              id='timeline'
+              name='timeline'
+              required
+              value={formData.timeline}
+              onChange={handleInputChange}
+              className={selectCls}
+            >
+              <option value=''>Select timeline</option>
+              {timelineOptions.map(t => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor='description' className={labelCls}>
+              Describe Your Vision *
+            </label>
+            <textarea
+              id='description'
+              name='description'
+              required
+              rows={4}
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder='Style, materials, occasion, any specific details…'
+              className='w-full bg-transparent border border-[#1E240A]/15 focus:border-[#1E240A]/40 outline-none p-4 text-[#1E240A] text-sm font-light leading-relaxed tracking-wide transition-colors duration-200 placeholder:text-[#1E240A]/25 resize-none'
+            />
+          </div>
+
+          {/* Image upload */}
+          <div>
+            <label className={labelCls}>Reference Image *</label>
+            <div className='border border-dashed border-[#1E240A]/20 hover:border-[#1E240A]/40 transition-colors p-8'>
+              {imagePreview ? (
+                <div className='flex items-center gap-6'>
+                  <img
+                    src={imagePreview}
+                    alt='Reference'
+                    className='w-20 h-20 object-cover flex-shrink-0'
+                  />
+                  <div>
+                    <p className='text-[#1E240A]/60 text-xs mb-3'>
+                      {formData.referenceImage?.name}
+                    </p>
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setFormData(p => ({ ...p, referenceImage: null }));
+                        setImagePreview(null);
+                      }}
+                      className='text-[9px] uppercase tracking-[0.3em] text-[#1E240A]/30 hover:text-[#1E240A] transition-colors'
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <label
+                  htmlFor='referenceImage'
+                  className='flex flex-col items-center gap-3 cursor-pointer'
+                >
+                  <svg
+                    className='w-8 h-8 text-[#1E240A]/20'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={1}
+                      d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+                    />
+                  </svg>
+                  <span className='text-[#1E240A]/40 text-xs tracking-wide'>
+                    Click to upload · PNG, JPG up to 10MB
+                  </span>
+                  <input
+                    id='referenceImage'
+                    name='referenceImage'
+                    type='file'
+                    accept='image/*'
+                    required
+                    onChange={handleImageChange}
+                    className='sr-only'
+                  />
+                </label>
+              )}
             </div>
+          </div>
 
-            <div>
-              <label
-                htmlFor='additionalNotes'
-                className='block text-sm font-medium text-[#1E240A] mb-2'
-              >
-                Additional Notes
-              </label>
-              <textarea
-                id='additionalNotes'
-                name='additionalNotes'
-                rows={3}
-                value={formData.additionalNotes}
-                onChange={handleInputChange}
-                placeholder='Any other details, preferences, or special requests...'
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-[#1E240A] outline-none transition-colors resize-none'
-              />
-            </div>
+          <div>
+            <label htmlFor='additionalNotes' className={labelCls}>
+              Additional Notes
+            </label>
+            <textarea
+              id='additionalNotes'
+              name='additionalNotes'
+              rows={3}
+              value={formData.additionalNotes}
+              onChange={handleInputChange}
+              placeholder='Any other preferences or special requests…'
+              className='w-full bg-transparent border border-[#1E240A]/15 focus:border-[#1E240A]/40 outline-none p-4 text-[#1E240A] text-sm font-light leading-relaxed tracking-wide transition-colors duration-200 placeholder:text-[#1E240A]/25 resize-none'
+            />
+          </div>
 
-            <div className='pt-4'>
-              <button
-                type='submit'
-                disabled={isSubmitting}
-                className='w-full bg-[#1E240A] hover:bg-[#2A3A1A] text-white font-medium py-3 px-4 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center uppercase tracking-wider text-sm rounded'
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2' />
-                    Submitting...
-                  </>
-                ) : (
-                  'Submit Customization Request'
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className='pt-2'>
+            <button
+              type='submit'
+              disabled={isSubmitting}
+              className='btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {isSubmitting ? 'Submitting…' : 'Submit Design Request'}
+            </button>
+          </div>
+        </form>
 
-        <div className='mt-8 bg-[#F6EEDF] rounded-2xl p-6'>
-          <h3 className='text-lg font-semibold text-[#1E240A] mb-4'>
+        {/* How it works */}
+        <div className='mt-20 pt-16 border-t border-[#1E240A]/10'>
+          <p className='text-[#1E240A]/40 text-[9px] uppercase tracking-[0.4em] mb-10'>
             How It Works
-          </h3>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-            <div className='text-center'>
-              <div className='w-12 h-12 bg-[#1E240A] rounded-full flex items-center justify-center mx-auto mb-3'>
-                <span className='text-white text-xl'>1</span>
+          </p>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-[#1E240A]/10'>
+            {[
+              {
+                n: '01',
+                title: 'Submit Your Request',
+                body: 'Upload a reference image and fill out the form with your vision.',
+              },
+              {
+                n: '02',
+                title: 'Design Consultation',
+                body: 'Our team reviews and discusses every detail with you directly.',
+              },
+              {
+                n: '03',
+                title: 'Creation & Delivery',
+                body: 'We handcraft your piece and deliver it with care.',
+              },
+            ].map(step => (
+              <div
+                key={step.n}
+                className='py-8 md:py-0 md:px-8 first:md:pl-0 last:md:pr-0'
+              >
+                <p className='text-[#1E240A]/25 text-[9px] uppercase tracking-widest mb-4'>
+                  {step.n}
+                </p>
+                <p className='text-[#1E240A] text-sm mb-2'>{step.title}</p>
+                <p className='text-[#1E240A]/45 text-xs font-light leading-relaxed'>
+                  {step.body}
+                </p>
               </div>
-              <h4 className='font-medium text-[#1E240A] mb-2'>
-                Submit Your Request
-              </h4>
-              <p className='text-sm text-gray-600'>
-                Upload a reference image and fill out our detailed form
-              </p>
-            </div>
-            <div className='text-center'>
-              <div className='w-12 h-12 bg-[#1E240A] rounded-full flex items-center justify-center mx-auto mb-3'>
-                <span className='text-white text-xl'>2</span>
-              </div>
-              <h4 className='font-medium text-[#1E240A] mb-2'>
-                Design Consultation
-              </h4>
-              <p className='text-sm text-gray-600'>
-                Our team will review and discuss your vision with you
-              </p>
-            </div>
-            <div className='text-center'>
-              <div className='w-12 h-12 bg-[#1E240A] rounded-full flex items-center justify-center mx-auto mb-3'>
-                <span className='text-white text-xl'>3</span>
-              </div>
-              <h4 className='font-medium text-[#1E240A] mb-2'>
-                Creation &amp; Delivery
-              </h4>
-              <p className='text-sm text-gray-600'>
-                We&apos;ll craft your custom piece and deliver it to you
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </div>
