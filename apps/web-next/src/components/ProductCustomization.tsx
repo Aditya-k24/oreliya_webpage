@@ -1,187 +1,152 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { ProductCustomization } from '@/types/product';
+import type { ProductCustomization as CustomizationOption } from '@/types/product';
 
 interface ProductCustomizationProps {
-  customizations: ProductCustomization[];
-  onCustomizationChange?: (customizations: Record<string, any>) => void;
-  initialValues?: Record<string, any>;
+  customizations: CustomizationOption[];
+  onCustomizationChange?: (values: Record<string, string>) => void;
+  initialValues?: Record<string, string>;
 }
+
+const labelCls =
+  'block text-[9px] uppercase tracking-[0.3em] text-[#1E240A]/40 mb-2';
+const inputCls =
+  'w-full bg-transparent border-b border-[#1E240A]/20 focus:border-[#1E240A] outline-none py-2 text-[#1E240A] text-sm tracking-wide transition-colors duration-200 placeholder:text-[#1E240A]/25';
 
 export default function ProductCustomization({
   customizations,
   onCustomizationChange,
-  initialValues = {}
+  initialValues = {},
 }: ProductCustomizationProps) {
-  const [values, setValues] = useState<Record<string, any>>(initialValues);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<Record<string, string>>(initialValues);
 
-  // Sort customizations by sortOrder
-  const sortedCustomizations = [...customizations].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  const sorted = [...customizations].sort(
+    (a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)
+  );
 
   useEffect(() => {
-    if (onCustomizationChange) {
-      onCustomizationChange(values);
-    }
+    if (onCustomizationChange) onCustomizationChange(values);
   }, [values, onCustomizationChange]);
 
-  const handleInputChange = (attribute: string, value: any) => {
-    setValues(prev => ({ ...prev, [attribute]: value }));
-    
-    // Clear error when user starts typing
-    if (errors[attribute]) {
-      setErrors(prev => ({ ...prev, [attribute]: '' }));
-    }
+  const handleChange = (name: string, value: string) => {
+    setValues(prev => ({ ...prev, [name]: value }));
   };
 
-  // Validation function for future use
-  // const validateInput = (customization: ProductCustomization, value: any): string => {
-  //   if (customization.required && (!value || value === '')) {
-  //     return `${customization.name} is required`;
-  //   }
+  const renderField = (c: CustomizationOption) => {
+    const value = values[c.name] || '';
 
-  //   if (customization.type === 'text' && value) {
-  //     if (customization.maxLength && value.length > customization.maxLength) {
-  //       return `Maximum ${customization.maxLength} characters allowed`;
-  //     }
-  //     
-  //     if (customization.pattern) {
-  //       const regex = new RegExp(customization.pattern);
-  //       if (!regex.test(value)) {
-  //         return 'Invalid format';
-  //       }
-  //     }
-  //   }
-
-  //   if (customization.type === 'number' && value) {
-  //     const numValue = Number(value);
-  //     if (customization.minValue !== undefined && numValue < customization.minValue) {
-  //       return `Minimum value is ${customization.minValue}`;
-  //     }
-  //     if (customization.maxValue !== undefined && numValue > customization.maxValue) {
-  //       return `Maximum value is ${customization.maxValue}`;
-  //     }
-  //   }
-
-  //   return '';
-  // };
-
-  const renderCustomizationField = (customization: ProductCustomization) => {
-    const value = values[customization.name] || '';
-    const error = errors[customization.name] || '';
-
-    const baseInputClasses = "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E240A] focus:border-[#1E240A]";
-    const errorInputClasses = "border-red-500 focus:ring-red-500 focus:border-red-500";
-
-    switch (customization.type) {
-      case 'select':
-        return (
-          <div key={customization.id} className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {customization.name}
-              {customization.required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-            <select
-              value={value}
-              onChange={(e) => handleInputChange(customization.name, e.target.value)}
-              className={`${baseInputClasses} ${error ? errorInputClasses : 'border-gray-300'}`}
-            >
-              <option value="">Select {customization.name}</option>
-              {customization.options?.map((option, index) => (
-                <option key={index} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            {customization.helpText && (
-              <p className="text-gray-500 text-sm">{customization.helpText}</p>
-            )}
-          </div>
-        );
-
-      case 'number':
-        return (
-          <div key={customization.id} className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {customization.name}
-              {customization.required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-            <input
-              type="number"
-              value={value}
-              onChange={(e) => handleInputChange(customization.name, e.target.value)}
-              min={customization.minValue}
-              max={customization.maxValue}
-              className={`${baseInputClasses} ${error ? errorInputClasses : 'border-gray-300'}`}
-              placeholder={`Enter ${customization.name.toLowerCase()}`}
-            />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            {customization.helpText && (
-              <p className="text-gray-500 text-sm">{customization.helpText}</p>
-            )}
-            {(customization.minValue !== undefined || customization.maxValue !== undefined) && (
-              <p className="text-gray-500 text-sm">
-                Range: {customization.minValue || 'No minimum'} - {customization.maxValue || 'No maximum'}
-              </p>
-            )}
-          </div>
-        );
-
-      case 'text':
-        return (
-          <div key={customization.id} className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {customization.name}
-              {customization.required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-            <input
-              type="text"
-              value={value}
-              onChange={(e) => handleInputChange(customization.name, e.target.value)}
-              maxLength={customization.maxLength}
-              className={`${baseInputClasses} ${error ? errorInputClasses : 'border-gray-300'}`}
-              placeholder={`Enter ${customization.name.toLowerCase()}`}
-            />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            {customization.helpText && (
-              <p className="text-gray-500 text-sm">{customization.helpText}</p>
-            )}
-            {customization.maxLength && (
-              <p className="text-gray-500 text-sm">
-                {value.length}/{customization.maxLength} characters
-              </p>
-            )}
-          </div>
-        );
-
-      default:
-        return null;
+    if (c.type === 'select') {
+      return (
+        <div key={c.id}>
+          <label className={labelCls}>
+            {c.name}
+            {c.required && <span className='text-[#1E240A]/40 ml-1'>*</span>}
+          </label>
+          <select
+            value={value}
+            onChange={e => handleChange(c.name, e.target.value)}
+            className={`${inputCls} cursor-pointer`}
+          >
+            <option value=''>Select {c.name}</option>
+            {c.options?.map(opt => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+          {c.helpText && (
+            <p className='text-[#1E240A]/35 text-[10px] mt-1.5 tracking-wide'>
+              {c.helpText}
+            </p>
+          )}
+        </div>
+      );
     }
+
+    if (c.type === 'number') {
+      return (
+        <div key={c.id}>
+          <label className={labelCls}>
+            {c.name}
+            {c.required && <span className='text-[#1E240A]/40 ml-1'>*</span>}
+          </label>
+          <input
+            type='number'
+            value={value}
+            onChange={e => handleChange(c.name, e.target.value)}
+            min={c.minValue}
+            max={c.maxValue}
+            placeholder={`Enter ${c.name.toLowerCase()}`}
+            className={inputCls}
+          />
+          {c.helpText && (
+            <p className='text-[#1E240A]/35 text-[10px] mt-1.5 tracking-wide'>
+              {c.helpText}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    if (c.type === 'text') {
+      return (
+        <div key={c.id}>
+          <label className={labelCls}>
+            {c.name}
+            {c.required && <span className='text-[#1E240A]/40 ml-1'>*</span>}
+          </label>
+          <input
+            type='text'
+            value={value}
+            onChange={e => handleChange(c.name, e.target.value)}
+            maxLength={c.maxLength}
+            placeholder={`Enter ${c.name.toLowerCase()}`}
+            className={inputCls}
+          />
+          {c.maxLength && (
+            <p className='text-[#1E240A]/25 text-[10px] mt-1.5 tracking-wide text-right'>
+              {value.length}/{c.maxLength}
+            </p>
+          )}
+          {c.helpText && (
+            <p className='text-[#1E240A]/35 text-[10px] mt-1.5 tracking-wide'>
+              {c.helpText}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    return null;
   };
+
+  const filledValues = Object.entries(values).filter(([, v]) => v);
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-[#1E240A]">Customize Your Jewelry</h3>
-      
-      <div className="space-y-6">
-        {sortedCustomizations.map(renderCustomizationField)}
-      </div>
+    <div className='space-y-8'>
+      <p className='text-[9px] uppercase tracking-[0.4em] text-[#1E240A]/35'>
+        Customise
+      </p>
 
-      {/* Customization Summary */}
-      {Object.keys(values).length > 0 && (
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Your Customization:</h4>
-          <div className="space-y-1">
-            {Object.entries(values).map(([key, value]) => (
-              value && (
-                <div key={key} className="text-sm text-gray-600">
-                  <span className="font-medium">{key}:</span> {value}
-                </div>
-              )
-            ))}
-          </div>
+      <div className='space-y-8'>{sorted.map(renderField)}</div>
+
+      {filledValues.length > 0 && (
+        <div className='pt-4 border-t border-[#1E240A]/10 space-y-3'>
+          <p className='text-[9px] uppercase tracking-[0.3em] text-[#1E240A]/30'>
+            Your selection
+          </p>
+          {filledValues.map(([k, v]) => (
+            <div
+              key={k}
+              className='flex items-start justify-between gap-4 text-xs'
+            >
+              <span className='text-[#1E240A]/40 uppercase tracking-[0.15em] text-[10px]'>
+                {k}
+              </span>
+              <span className='text-[#1E240A]'>{v}</span>
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -126,25 +126,21 @@ export default function ProductsPageClient({
             </h1>
           </div>
 
-          <div className='flex items-center gap-4 pb-1'>
+          <div className='flex items-center gap-6 pb-1'>
             <span className='text-[#1E240A]/40 text-[10px] uppercase tracking-[0.25em]'>
               {filteredProducts.length} piece
               {filteredProducts.length !== 1 ? 's' : ''}
             </span>
+            <SearchAndFilter
+              key={initialCategory || 'all-products'}
+              products={initialProducts}
+              onFilteredProducts={setFilteredProducts}
+              initialCategory={initialCategory}
+            />
           </div>
         </div>
 
         <div className='mt-10 h-px bg-[#1E240A]/10' />
-      </div>
-
-      {/* Filter */}
-      <div className='max-w-7xl mx-auto px-6 lg:px-8 mb-10'>
-        <SearchAndFilter
-          key={initialCategory || 'all-products'}
-          products={initialProducts}
-          onFilteredProducts={setFilteredProducts}
-          initialCategory={initialCategory}
-        />
       </div>
 
       {/* Grid */}

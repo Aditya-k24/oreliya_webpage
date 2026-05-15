@@ -33,10 +33,10 @@ const categories = [
 ];
 
 const sortOptions = [
-  { value: 'newest', label: 'Newest' },
-  { value: 'name', label: 'A–Z' },
-  { value: 'price-asc', label: 'Price ↑' },
-  { value: 'price-desc', label: 'Price ↓' },
+  { value: 'newest', label: 'Newest First' },
+  { value: 'name', label: 'Name A–Z' },
+  { value: 'price-asc', label: 'Price: Low to High' },
+  { value: 'price-desc', label: 'Price: High to Low' },
 ];
 
 const availabilityOptions: { label: string; value: boolean | null }[] = [
@@ -127,10 +127,12 @@ export function SearchAndFilter({
     }
 
     if (filters.minPrice) {
-      filtered = filtered.filter(p => p.price >= parseFloat(filters.minPrice));
+      const minPrice = parseFloat(filters.minPrice);
+      filtered = filtered.filter(p => p.price >= minPrice);
     }
     if (filters.maxPrice) {
-      filtered = filtered.filter(p => p.price <= parseFloat(filters.maxPrice));
+      const maxPrice = parseFloat(filters.maxPrice);
+      filtered = filtered.filter(p => p.price <= maxPrice);
     }
 
     if (filters.inStock !== null) {
@@ -210,29 +212,32 @@ export function SearchAndFilter({
     });
   };
 
-  const hasRefineFilters = !!(
-    filters.minPrice ||
-    filters.maxPrice ||
+  const hasActiveFilters =
+    !!filters.search ||
+    !!filters.category ||
+    !!filters.subcategory ||
+    !!filters.minPrice ||
+    !!filters.maxPrice ||
     filters.inStock !== null ||
-    filters.subcategory
-  );
+    filters.sortBy !== 'newest';
 
-  const hasAnyFilter = !!(
-    filters.search ||
-    filters.category ||
-    hasRefineFilters ||
-    filters.sortBy !== 'newest'
-  );
+  const inputCls =
+    'w-full bg-transparent border-b border-[#F6EEDF]/15 focus:border-[#F6EEDF]/50 outline-none py-2 text-[#F6EEDF]/80 text-xs tracking-wide transition-colors duration-200 placeholder:text-[#F6EEDF]/20';
 
-  const sidebarInputCls =
-    'w-full bg-transparent border-b border-[#F6EEDF]/20 focus:border-[#F6EEDF]/60 outline-none py-2 text-[#F6EEDF] text-xs tracking-wide transition-colors duration-200 placeholder:text-[#F6EEDF]/20';
+  const sectionLabelCls =
+    'text-[#F6EEDF]/25 text-[9px] uppercase tracking-[0.4em] mb-4 block';
+
+  const optionCls = (active: boolean) =>
+    `block w-full text-left py-3.5 text-sm tracking-wide border-b border-[#F6EEDF]/10 transition-colors duration-200 ${
+      active ? 'text-[#F6EEDF]' : 'text-[#F6EEDF]/50 hover:text-[#F6EEDF]'
+    }`;
 
   return (
-    <>
-      {/* Sidebar overlay */}
+    <div className={className}>
+      {/* Overlay */}
       {showSidebar && (
         <div
-          className='fixed inset-0 bg-black/40 z-40 backdrop-blur-[2px]'
+          className='fixed inset-0 bg-black/40 z-40 backdrop-blur-sm'
           role='button'
           tabIndex={0}
           aria-label='Close filters'
@@ -241,23 +246,21 @@ export function SearchAndFilter({
         />
       )}
 
-      {/* Refine sidebar */}
+      {/* Sidebar — mirrors nav sidebar, slides from right */}
       <aside
         className={`fixed right-0 top-0 h-full w-72 bg-[#1E240A] z-50 flex flex-col transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           showSidebar ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Top bar */}
-        <div className='flex items-center justify-between px-8 h-16 border-b border-[#F6EEDF]/10'>
-          <div>
-            <p className='text-[#F6EEDF]/30 text-[9px] uppercase tracking-[0.4em]'>
-              Refine
-            </p>
-          </div>
+        <div className='flex items-center justify-between px-8 h-16 border-b border-[#F6EEDF]/10 flex-shrink-0'>
+          <p className='text-[#F6EEDF]/40 text-[9px] uppercase tracking-[0.4em]'>
+            Filter &amp; Sort
+          </p>
           <button
             type='button'
             onClick={() => setShowSidebar(false)}
-            className='text-[#F6EEDF]/30 hover:text-[#F6EEDF] transition-colors'
+            className='text-[#F6EEDF]/40 hover:text-[#F6EEDF] transition-colors'
             aria-label='Close filters'
           >
             <svg
@@ -276,43 +279,84 @@ export function SearchAndFilter({
           </button>
         </div>
 
-        {/* Sidebar body */}
-        <div className='flex-1 overflow-y-auto px-8 py-8 space-y-10'>
-          {/* Sort */}
+        {/* Scrollable content */}
+        <nav className='flex-1 px-8 pt-8 pb-6 overflow-y-auto space-y-10'>
+          {/* Search */}
           <div>
-            <p className='text-[#F6EEDF]/30 text-[9px] uppercase tracking-[0.4em] mb-4'>
-              Sort
-            </p>
-            <div className='space-y-1'>
-              {sortOptions.map(opt => (
-                <button
-                  key={opt.value}
-                  type='button'
-                  onClick={() => handleFilterChange('sortBy', opt.value)}
-                  className={`block w-full text-left py-2 text-xs tracking-wide border-b border-[#F6EEDF]/10 transition-colors duration-200 ${
-                    filters.sortBy === opt.value
-                      ? 'text-[#F6EEDF]'
-                      : 'text-[#F6EEDF]/40 hover:text-[#F6EEDF]'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
+            <span className={sectionLabelCls}>Search</span>
+            <div className='relative'>
+              <input
+                type='text'
+                placeholder='Search pieces…'
+                value={filters.search}
+                onChange={e => handleFilterChange('search', e.target.value)}
+                className={`${inputCls} pr-5`}
+              />
+              <svg
+                className='absolute right-0 top-2.5 w-3.5 h-3.5 text-[#F6EEDF]/20 pointer-events-none'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={1.5}
+                  d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+                />
+              </svg>
             </div>
           </div>
 
+          {/* Category */}
+          <div>
+            <span className={sectionLabelCls}>Category</span>
+            {categories.map(cat => (
+              <button
+                key={cat.value}
+                type='button'
+                onClick={() => handleFilterChange('category', cat.value)}
+                className={optionCls(filters.category === cat.value)}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Subcategory */}
+          {filters.category && availableSubcategories.length > 0 && (
+            <div>
+              <span className={sectionLabelCls}>Style</span>
+              <button
+                type='button'
+                onClick={() => handleFilterChange('subcategory', '')}
+                className={optionCls(!filters.subcategory)}
+              >
+                All
+              </button>
+              {availableSubcategories.map(sub => (
+                <button
+                  key={sub.value}
+                  type='button'
+                  onClick={() => handleFilterChange('subcategory', sub.value)}
+                  className={optionCls(filters.subcategory === sub.value)}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Price */}
           <div>
-            <p className='text-[#F6EEDF]/30 text-[9px] uppercase tracking-[0.4em] mb-4'>
-              Price (₹)
-            </p>
+            <span className={sectionLabelCls}>Price (₹)</span>
             <div className='flex items-center gap-3'>
               <input
                 type='number'
                 placeholder='Min'
                 value={filters.minPrice}
                 onChange={e => handleFilterChange('minPrice', e.target.value)}
-                className={sidebarInputCls}
+                className={inputCls}
               />
               <span className='text-[#F6EEDF]/20 text-xs flex-shrink-0'>—</span>
               <input
@@ -320,168 +364,84 @@ export function SearchAndFilter({
                 placeholder='Max'
                 value={filters.maxPrice}
                 onChange={e => handleFilterChange('maxPrice', e.target.value)}
-                className={sidebarInputCls}
+                className={inputCls}
               />
             </div>
           </div>
 
           {/* Availability */}
           <div>
-            <p className='text-[#F6EEDF]/30 text-[9px] uppercase tracking-[0.4em] mb-4'>
-              Availability
-            </p>
-            <div className='space-y-1'>
-              {availabilityOptions.map(opt => (
-                <button
-                  key={String(opt.value)}
-                  type='button'
-                  onClick={() => handleFilterChange('inStock', opt.value)}
-                  className={`block w-full text-left py-2 text-xs tracking-wide border-b border-[#F6EEDF]/10 transition-colors duration-200 ${
-                    filters.inStock === opt.value
-                      ? 'text-[#F6EEDF]'
-                      : 'text-[#F6EEDF]/40 hover:text-[#F6EEDF]'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
+            <span className={sectionLabelCls}>Availability</span>
+            {availabilityOptions.map(opt => (
+              <button
+                key={String(opt.value)}
+                type='button'
+                onClick={() => handleFilterChange('inStock', opt.value)}
+                className={optionCls(filters.inStock === opt.value)}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
 
-          {/* Subcategory */}
-          {filters.category && availableSubcategories.length > 0 && (
-            <div>
-              <p className='text-[#F6EEDF]/30 text-[9px] uppercase tracking-[0.4em] mb-4'>
-                Style
-              </p>
-              <div className='space-y-1'>
-                <button
-                  type='button'
-                  onClick={() => handleFilterChange('subcategory', '')}
-                  className={`block w-full text-left py-2 text-xs tracking-wide border-b border-[#F6EEDF]/10 transition-colors duration-200 ${
-                    !filters.subcategory
-                      ? 'text-[#F6EEDF]'
-                      : 'text-[#F6EEDF]/40 hover:text-[#F6EEDF]'
-                  }`}
-                >
-                  All
-                </button>
-                {availableSubcategories.map(sub => (
-                  <button
-                    key={sub.value}
-                    type='button'
-                    onClick={() => handleFilterChange('subcategory', sub.value)}
-                    className={`block w-full text-left py-2 text-xs tracking-wide border-b border-[#F6EEDF]/10 transition-colors duration-200 ${
-                      filters.subcategory === sub.value
-                        ? 'text-[#F6EEDF]'
-                        : 'text-[#F6EEDF]/40 hover:text-[#F6EEDF]'
-                    }`}
-                  >
-                    {sub.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+          {/* Sort */}
+          <div>
+            <span className={sectionLabelCls}>Sort By</span>
+            {sortOptions.map(opt => (
+              <button
+                key={opt.value}
+                type='button'
+                onClick={() => handleFilterChange('sortBy', opt.value)}
+                className={optionCls(filters.sortBy === opt.value)}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </nav>
 
         {/* Footer */}
-        {hasRefineFilters && (
-          <div className='px-8 py-6 border-t border-[#F6EEDF]/10'>
+        <div className='px-8 py-6 border-t border-[#F6EEDF]/10 flex-shrink-0'>
+          {hasActiveFilters ? (
             <button
               type='button'
               onClick={clearFilters}
               className='text-[#F6EEDF]/30 hover:text-[#F6EEDF]/70 text-[10px] uppercase tracking-[0.25em] transition-colors duration-200'
             >
-              Clear Filters
+              Clear All Filters
             </button>
-          </div>
-        )}
-      </aside>
-
-      {/* Inline bar */}
-      <div className={className}>
-        {/* Row 1: category pills + refine button */}
-        <div className='flex flex-wrap items-center justify-between gap-y-3 gap-x-4'>
-          <div className='flex flex-wrap gap-1.5'>
-            {categories.map(cat => (
-              <button
-                key={cat.value}
-                type='button'
-                onClick={() => handleFilterChange('category', cat.value)}
-                className={`px-4 py-1.5 text-[10px] uppercase tracking-[0.25em] border transition-colors duration-200 ${
-                  filters.category === cat.value
-                    ? 'bg-[#1E240A] text-[#F6EEDF] border-[#1E240A]'
-                    : 'text-[#1E240A]/45 border-[#1E240A]/20 hover:text-[#1E240A] hover:border-[#1E240A]/50'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          <button
-            type='button'
-            onClick={() => setShowSidebar(true)}
-            className={`flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] transition-colors duration-200 ${
-              hasRefineFilters
-                ? 'text-[#1E240A]'
-                : 'text-[#1E240A]/35 hover:text-[#1E240A]'
-            }`}
-          >
-            <svg
-              className='w-3 h-3'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={1.5}
-                d='M3 4h18M6 12h12M10 20h4'
-              />
-            </svg>
-            {hasRefineFilters ? 'Refine ·' : 'Refine'}
-          </button>
-        </div>
-
-        {/* Row 2: search + clear */}
-        <div className='flex items-center gap-6 mt-5'>
-          <div className='relative flex-1 max-w-xs'>
-            <input
-              type='text'
-              placeholder='Search pieces…'
-              value={filters.search}
-              onChange={e => handleFilterChange('search', e.target.value)}
-              className='w-full bg-transparent border-b border-[#1E240A]/20 focus:border-[#1E240A] outline-none py-2 text-[#1E240A] text-xs tracking-wide transition-colors duration-200 placeholder:text-[#1E240A]/25 pr-5'
-            />
-            <svg
-              className='absolute right-0 top-2.5 w-3.5 h-3.5 text-[#1E240A]/25 pointer-events-none'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={1.5}
-                d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
-              />
-            </svg>
-          </div>
-
-          {hasAnyFilter && (
-            <button
-              type='button'
-              onClick={clearFilters}
-              className='ml-auto text-[10px] uppercase tracking-[0.25em] text-[#1E240A]/25 hover:text-[#1E240A]/60 transition-colors duration-200'
-            >
-              Clear
-            </button>
+          ) : (
+            <p className='text-[#F6EEDF]/15 text-[10px] uppercase tracking-[0.25em]'>
+              No filters applied
+            </p>
           )}
         </div>
-      </div>
-    </>
+      </aside>
+
+      {/* Trigger button */}
+      <button
+        type='button'
+        onClick={() => setShowSidebar(true)}
+        className='flex items-center gap-2.5 text-[10px] uppercase tracking-[0.25em] text-[#1E240A]/50 hover:text-[#1E240A] transition-colors duration-200'
+      >
+        <svg
+          className='w-3.5 h-3.5'
+          fill='none'
+          stroke='currentColor'
+          viewBox='0 0 24 24'
+        >
+          <path
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            strokeWidth={1.5}
+            d='M3 4h18M6 12h12M10 20h4'
+          />
+        </svg>
+        Filter &amp; Sort
+        {hasActiveFilters && (
+          <span className='w-1.5 h-1.5 bg-[#1E240A] rounded-full' />
+        )}
+      </button>
+    </div>
   );
 }

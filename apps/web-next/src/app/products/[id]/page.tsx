@@ -27,93 +27,95 @@ interface ProductPageProps {
   params: Promise<{ id: string }>;
 }
 
+const promises = [
+  'Free shipping on orders over ₹5,000',
+  '30-day return policy',
+  'Lifetime warranty on craftsmanship',
+  'Authenticity certificate included',
+];
+
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
   const product = await getProductById(id);
 
-  if (!product) {
-    return notFound();
-  }
+  if (!product) return notFound();
 
   return (
     <div className='min-h-screen bg-[#F6EEDF]'>
       <div className='max-w-7xl mx-auto px-6 lg:px-8 py-12'>
         {/* Breadcrumb */}
         <nav className='mb-12'>
-          <div className='flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#1E240A]/40'>
+          <div className='flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#1E240A]/35'>
             <Link
               href='/'
-              className='hover:text-[#1E240A]/70 transition-colors'
+              className='hover:text-[#1E240A]/60 transition-colors'
             >
               Home
             </Link>
-            <span>/</span>
+            <span className='text-[#1E240A]/20'>/</span>
             <Link
               href='/products'
-              className='hover:text-[#1E240A]/70 transition-colors'
+              className='hover:text-[#1E240A]/60 transition-colors'
             >
               Collections
             </Link>
-            <span>/</span>
-            <span className='text-[#1E240A]/70'>{product.name}</span>
+            <span className='text-[#1E240A]/20'>/</span>
+            <span className='text-[#1E240A]/60'>{product.name}</span>
           </div>
         </nav>
 
-        {/* Main Grid */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24'>
-          {/* Image Carousel */}
+        {/* Main grid — image slightly wider */}
+        <div className='grid grid-cols-1 lg:grid-cols-[1.1fr,0.9fr] gap-16 lg:gap-20 items-start'>
+          {/* Left — image carousel */}
           <ProductImageCarousel
             images={product.images || []}
             productName={product.name}
           />
 
-          {/* Details */}
-          <div className='space-y-8'>
-            {/* Category & Badges */}
-            <div className='flex items-center gap-3 flex-wrap'>
-              <span className='text-[#1E240A]/50 text-[10px] uppercase tracking-[0.3em]'>
-                {product.category}
-              </span>
+          {/* Right — details, sticky on scroll */}
+          <div className='lg:sticky lg:top-24'>
+            {/* Category & badges */}
+            <p className='text-[#1E240A]/40 text-[9px] uppercase tracking-[0.4em] mb-6'>
+              {product.category}
               {product.isFeatured && (
-                <span className='text-[#1E240A]/50 text-[10px] uppercase tracking-[0.3em]'>
-                  · Featured
-                </span>
+                <span className='text-[#1E240A]/30'> · Featured</span>
               )}
               {product.isOnSale && (
-                <span className='text-[#1E240A] text-[10px] uppercase tracking-[0.3em]'>
+                <span className='text-[#1E240A]'>
+                  {' '}
                   · {product.salePercentage}% Off
                 </span>
               )}
-            </div>
+            </p>
 
             {/* Title */}
-            <div className='pb-8 border-b border-[#1E240A]/10'>
-              <h1
-                className='text-4xl lg:text-5xl text-[#1E240A] leading-[1.1]'
-                style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontWeight: 400,
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                {product.name}
-              </h1>
-            </div>
+            <h1
+              className='text-4xl lg:text-[2.75rem] text-[#1E240A] leading-[1.05] mb-8'
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 400,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {product.name}
+            </h1>
+
+            <div className='h-px bg-[#1E240A]/10 mb-8' />
 
             {/* Description */}
-            <p className='text-[#1E240A]/65 text-sm font-light leading-relaxed whitespace-pre-wrap'>
+            <p className='text-[#1E240A]/60 text-sm font-light leading-[1.8] whitespace-pre-wrap mb-8'>
               {product.description}
             </p>
 
             {/* Customizations */}
             {product.customizations && product.customizations.length > 0 && (
-              <div className='border-t border-[#1E240A]/10 pt-8'>
+              <div className='border-t border-[#1E240A]/10 pt-8 mb-8'>
                 <ProductCustomization customizations={product.customizations} />
               </div>
             )}
 
-            {/* Inquire CTA */}
-            <div className='pt-2'>
+            {/* CTA */}
+            <div className='border-t border-[#1E240A]/10 pt-8 mb-8'>
               <Link
                 href={`/contact?product=${encodeURIComponent(product.name)}`}
                 className='block w-full'
@@ -124,17 +126,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </Link>
             </div>
 
-            {/* Promise */}
-            <div className='border-t border-[#1E240A]/10 pt-8 space-y-4'>
-              {[
-                'Free shipping on orders over ₹5,000',
-                '30-day return policy',
-                'Lifetime warranty on craftsmanship',
-                'Authenticity certificate included',
-              ].map(item => (
+            {/* Promises */}
+            <div className='border-t border-[#1E240A]/10 pt-8 space-y-4 mb-8'>
+              {promises.map(item => (
                 <div key={item} className='flex items-start gap-4'>
-                  <div className='w-px h-4 bg-[#1E240A]/30 mt-0.5 flex-shrink-0' />
-                  <span className='text-[#1E240A]/55 text-xs font-light leading-relaxed'>
+                  <div className='w-px h-3.5 bg-[#1E240A]/25 mt-0.5 flex-shrink-0' />
+                  <span className='text-[#1E240A]/50 text-xs font-light leading-relaxed'>
                     {item}
                   </span>
                 </div>
@@ -143,11 +140,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             {/* Tags */}
             {product.tags && product.tags.length > 0 && (
-              <div className='flex flex-wrap gap-2 pt-2'>
+              <div className='flex flex-wrap gap-2'>
                 {product.tags.map(tag => (
                   <span
                     key={tag}
-                    className='px-3 py-1 border border-[#1E240A]/20 text-[#1E240A]/50 text-[10px] uppercase tracking-[0.2em]'
+                    className='px-3 py-1 border border-[#1E240A]/15 text-[#1E240A]/40 text-[10px] uppercase tracking-[0.2em]'
                   >
                     {tag}
                   </span>
@@ -157,7 +154,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
         </div>
 
-        {/* Back Link */}
+        {/* Back */}
         <div className='mt-20 pt-10 border-t border-[#1E240A]/10'>
           <Link href='/products'>
             <button type='button' className='btn-outline text-xs'>
